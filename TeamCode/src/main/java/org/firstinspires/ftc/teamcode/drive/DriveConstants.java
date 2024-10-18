@@ -55,7 +55,7 @@ public class DriveConstants {
      * empirically tuned.
      */
     public static double kV = 1.016 / rpmToVelocity(MAX_RPM);
-    public static double kA = 0.0027;
+    public static double kA = 0.003;
     public static double kStatic = 0.015;
 
     /*
