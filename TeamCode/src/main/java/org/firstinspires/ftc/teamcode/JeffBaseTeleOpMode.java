@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 //import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -57,6 +58,7 @@ public class JeffBaseTeleOpMode extends OpMode {
 
     /* Variables to store the positions that the wrist should be set to when folding in, or folding out. */
     final double WRIST_FOLDED_IN = 0.0;
+    final double WRIST_SPECIMIN = 0.3;
     final double WRIST_FOLDED_OUT = 0.6;
 
     /* A number in degrees that the triggers can adjust the arm position by */
@@ -115,10 +117,8 @@ public class JeffBaseTeleOpMode extends OpMode {
             rightSlide.setTargetPosition(0);
             rightSlide.setPower(0.5);
             rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        } else {
-            leftSlide.setPower(0.0);
-            rightSlide.setPower(0.0);
         }
+
         telemetry.addData("Left Linear Slide: ", "%d", leftSlide.getCurrentPosition());
         telemetry.addData("Right Linear Slide: ", "%d", rightSlide.getCurrentPosition());
 
@@ -184,7 +184,7 @@ public class JeffBaseTeleOpMode extends OpMode {
         } else if (gamepad1.dpad_right) {
             /* This is the correct height to score SPECIMEN on the HIGH CHAMBER */
             armPosition = ARM_SCORE_SPECIMEN;
-            wrist.setPosition(WRIST_FOLDED_IN);
+            wrist.setPosition(WRIST_SPECIMIN);
         } else if (gamepad1.dpad_up) {
             /* This sets the arm to vertical to hook onto the LOW RUNG for hanging */
             armPosition = ARM_ATTACH_HANGING_HOOK;
@@ -196,7 +196,6 @@ public class JeffBaseTeleOpMode extends OpMode {
             intake.setPower(INTAKE_OFF);
             wrist.setPosition(WRIST_FOLDED_IN);
         }
-
 
             /* Here we create a "fudge factor" for the arm position.
             This allows you to adjust (or "fudge") the arm position slightly with the gamepad triggers.
