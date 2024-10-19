@@ -94,7 +94,6 @@ public class TestAuto_Schooch extends LinearOpMode {
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
                 .strafeRight(60)
                 .build();
-        drive.followTrajectorySequence(trajSeq);
 //        }
     }
 }
