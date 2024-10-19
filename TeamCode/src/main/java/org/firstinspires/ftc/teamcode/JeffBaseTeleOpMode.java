@@ -24,6 +24,7 @@ public class JeffBaseTeleOpMode extends OpMode {
     public DcMotor armMotor;
     public CRServo intake;
     public Servo wrist;
+    public Servo bucket;
 
     final double ARM_TICKS_PER_DEGREE =
             28 // number of encoder ticks per rotation of the bare motor
@@ -44,12 +45,14 @@ public class JeffBaseTeleOpMode extends OpMode {
     as far from the starting position, decrease it. */
 
     final double ARM_COLLAPSED_INTO_ROBOT = 0;
-    final double ARM_COLLECT = 250 * ARM_TICKS_PER_DEGREE;
+    final double ARM_COLLECT = 245 * ARM_TICKS_PER_DEGREE;
     final double ARM_CLEAR_BARRIER = 230 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SPECIMEN = 160 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SAMPLE_IN_LOW = 160 * ARM_TICKS_PER_DEGREE;
     final double ARM_DEPOSIT = 75 * ARM_TICKS_PER_DEGREE;
     final double ARM_WINCH_ROBOT = 15 * ARM_TICKS_PER_DEGREE;
+
+    final int SLIDE_HIGH = 2650;
 
     /* Variables to store the speed the intake servo should be set at to intake, and deposit game elements. */
     final double INTAKE_COLLECT = -1.0;
@@ -58,11 +61,15 @@ public class JeffBaseTeleOpMode extends OpMode {
 
     /* Variables to store the positions that the wrist should be set to when folding in, or folding out. */
     final double WRIST_FOLDED_IN = 0.0;
-    final double WRIST_SPECIMEN = 0.5;
+    final double WRIST_SPECIMEN = 0.4;
     final double WRIST_FOLDED_OUT = 1;
 
     /* A number in degrees that the triggers can adjust the arm position by */
     final double FUDGE_FACTOR = 15 * ARM_TICKS_PER_DEGREE;
+
+    final double BUCKET_DOWN = 1.0;
+    final double BUCKET_CATCH = 0.75;
+    final double BUCKET_DUMP = 0.3;
 
     /* Variables that are used to set the arm to a specific position */
 
@@ -88,6 +95,11 @@ public class JeffBaseTeleOpMode extends OpMode {
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         armMotor = hardwareMap.get(DcMotor.class, "arm");
         armMotor.setTargetPosition(0);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -98,6 +110,9 @@ public class JeffBaseTeleOpMode extends OpMode {
 
         wrist = hardwareMap.get(Servo.class, "wrist");
         wrist.setPosition(WRIST_FOLDED_IN);
+
+        bucket = hardwareMap.get(Servo.class, "bucket");
+        bucket.setPosition(BUCKET_CATCH);
     }
 
     public void loop() {
@@ -108,22 +123,34 @@ public class JeffBaseTeleOpMode extends OpMode {
         double max;
 
         if (gamepad2.dpad_up) {
-            leftSlide.setTargetPosition(3000);
-            leftSlide.setPower(0.5);
+            leftSlide.setTargetPosition(SLIDE_HIGH);
+            leftSlide.setPower(2.0);
             leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            rightSlide.setTargetPosition(3000);
-            rightSlide.setPower(0.5);
+            rightSlide.setTargetPosition(SLIDE_HIGH);
+            rightSlide.setPower(2.0);
             rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         } else if (gamepad2.dpad_down) {
             leftSlide.setTargetPosition(0);
-            leftSlide.setPower(0.5);
+            leftSlide.setPower(2.0);
             leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             rightSlide.setTargetPosition(0);
-            rightSlide.setPower(0.5);
+            rightSlide.setPower(2.0);
             rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+
+        if (gamepad2.left_trigger > 0) {
+            bucket.setPosition(BUCKET_CATCH);
+        } else if (gamepad2.right_trigger > 0) {
+            bucket.setPosition(BUCKET_DUMP);
+        }
+
+        if (gamepad2.x) {
+            wrist.setPosition(WRIST_FOLDED_OUT);
+        } else if (gamepad2.y) {
+            wrist.setPosition(WRIST_FOLDED_IN);
         }
 
         telemetry.addData("Left Linear Slide: ", "%d", leftSlide.getCurrentPosition());
@@ -178,6 +205,7 @@ public class JeffBaseTeleOpMode extends OpMode {
                     Note here that we don't set the wrist position or the intake power when we
                     select this "mode", this means that the intake and wrist will continue what
                     they were doing before we clicked left bumper. */
+            wrist.setPosition(WRIST_FOLDED_OUT);
             armPosition = ARM_CLEAR_BARRIER;
         } else if (gamepad1.y) {
             /* This is the correct height to score the sample in the LOW BASKET */
@@ -195,11 +223,6 @@ public class JeffBaseTeleOpMode extends OpMode {
         } else if (gamepad1.dpad_up) {
             armPosition = ARM_DEPOSIT;
             wrist.setPosition(WRIST_FOLDED_IN);
-            if (armMotor.getCurrentPosition() >= armPosition - 5 && armMotor.getCurrentPosition() <= armPosition + 5) {
-                intake.setPower(INTAKE_DEPOSIT);
-            } else {
-                intake.setPower(INTAKE_OFF);
-            }
         } else if (gamepad1.dpad_down) {
             /* this moves the arm down to lift the robot up once it has been hooked */
             armPosition = ARM_WINCH_ROBOT;
@@ -232,6 +255,7 @@ public class JeffBaseTeleOpMode extends OpMode {
         telemetry.addData("arm Encoder: ", armMotor.getCurrentPosition());
         telemetry.addData("intake: ", intake.getPower());
         telemetry.addData("wrist: ", wrist.getPosition());
+        telemetry.addData("bucket: ", bucket.getPosition());
         telemetry.addData("Run Time", getRuntime());
         telemetry.update();
     }
