@@ -7,9 +7,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-//import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-//import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 @TeleOp(name = "Jeff Base Two Driver TeleOp", group = "Robot")
 
@@ -48,7 +48,7 @@ public class JeffBaseTeleOpMode extends OpMode {
     final double ARM_CLEAR_BARRIER = 230 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SPECIMEN = 160 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SAMPLE_IN_LOW = 160 * ARM_TICKS_PER_DEGREE;
-    final double ARM_ATTACH_HANGING_HOOK = 120 * ARM_TICKS_PER_DEGREE;
+    final double ARM_DEPOSIT = 75 * ARM_TICKS_PER_DEGREE;
     final double ARM_WINCH_ROBOT = 15 * ARM_TICKS_PER_DEGREE;
 
     /* Variables to store the speed the intake servo should be set at to intake, and deposit game elements. */
@@ -58,8 +58,8 @@ public class JeffBaseTeleOpMode extends OpMode {
 
     /* Variables to store the positions that the wrist should be set to when folding in, or folding out. */
     final double WRIST_FOLDED_IN = 0.0;
-    final double WRIST_SPECIMIN = 0.3;
-    final double WRIST_FOLDED_OUT = 0.6;
+    final double WRIST_SPECIMEN = 0.5;
+    final double WRIST_FOLDED_OUT = 1;
 
     /* A number in degrees that the triggers can adjust the arm position by */
     final double FUDGE_FACTOR = 15 * ARM_TICKS_PER_DEGREE;
@@ -71,15 +71,22 @@ public class JeffBaseTeleOpMode extends OpMode {
 
     public void init() {
         leftSlide = hardwareMap.get(DcMotor.class, "leftSlide");
+        leftSlide.setDirection(DcMotor.Direction.FORWARD);
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         rightSlide = hardwareMap.get(DcMotor.class, "rightSlide");
+        rightSlide.setDirection(DcMotor.Direction.REVERSE);
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftFrontDrive = hardwareMap.get(DcMotor.class, "leftFront");
         leftBackDrive = hardwareMap.get(DcMotor.class, "leftRear");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightRear");
+
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         armMotor = hardwareMap.get(DcMotor.class, "arm");
         armMotor.setTargetPosition(0);
@@ -105,7 +112,7 @@ public class JeffBaseTeleOpMode extends OpMode {
             leftSlide.setPower(0.5);
             leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            rightSlide.setTargetPosition(-3000);
+            rightSlide.setTargetPosition(3000);
             rightSlide.setPower(0.5);
             rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -184,12 +191,15 @@ public class JeffBaseTeleOpMode extends OpMode {
         } else if (gamepad1.dpad_right) {
             /* This is the correct height to score SPECIMEN on the HIGH CHAMBER */
             armPosition = ARM_SCORE_SPECIMEN;
-            wrist.setPosition(WRIST_SPECIMIN);
+            wrist.setPosition(WRIST_SPECIMEN);
         } else if (gamepad1.dpad_up) {
-            /* This sets the arm to vertical to hook onto the LOW RUNG for hanging */
-            armPosition = ARM_ATTACH_HANGING_HOOK;
-            intake.setPower(INTAKE_OFF);
+            armPosition = ARM_DEPOSIT;
             wrist.setPosition(WRIST_FOLDED_IN);
+            if (armMotor.getCurrentPosition() >= armPosition - 5 && armMotor.getCurrentPosition() <= armPosition + 5) {
+                intake.setPower(INTAKE_DEPOSIT);
+            } else {
+                intake.setPower(INTAKE_OFF);
+            }
         } else if (gamepad1.dpad_down) {
             /* this moves the arm down to lift the robot up once it has been hooked */
             armPosition = ARM_WINCH_ROBOT;
