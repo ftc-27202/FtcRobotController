@@ -108,12 +108,7 @@ public class TestAuto extends LinearOpMode {
 
 //        while (!isStopRequested()) {
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
-                .forward(24)
-                .strafeRight(24)
-                .turn(Math.toRadians(180) + 1e-6)
-                .forward(24)
-                .strafeRight(24)
-                .turn(Math.toRadians(180) - 1e-6)
+                .strafeRight(60)
                 .build();
         drive.followTrajectorySequence(trajSeq);
 //        }
