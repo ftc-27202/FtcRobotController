@@ -52,6 +52,8 @@ public class JeffBaseTeleOpMode extends OpMode {
     final double ARM_DEPOSIT = 75 * ARM_TICKS_PER_DEGREE;
     final double ARM_WINCH_ROBOT = 15 * ARM_TICKS_PER_DEGREE;
 
+    final int SLIDE_GROUND = 0;
+    final int SLIDE_HALF = 1250;
     final int SLIDE_HIGH = 2650;
 
     /* Variables to store the speed the intake servo should be set at to intake, and deposit game elements. */
@@ -120,6 +122,8 @@ public class JeffBaseTeleOpMode extends OpMode {
         //double right;
         //double forward;
         //double rotate;
+        //if left_trigger: speed = 0.6; else speed = 1.0
+        double speed = gamepad1.right_trigger > 0 ? 0.6 : 1.0;
         double max;
 
         if (gamepad2.dpad_up) {
@@ -132,11 +136,19 @@ public class JeffBaseTeleOpMode extends OpMode {
             rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         } else if (gamepad2.dpad_down) {
-            leftSlide.setTargetPosition(0);
+            leftSlide.setTargetPosition(SLIDE_GROUND);
             leftSlide.setPower(2.0);
             leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            rightSlide.setTargetPosition(0);
+            rightSlide.setTargetPosition(SLIDE_GROUND);
+            rightSlide.setPower(2.0);
+            rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        } else if (gamepad2.dpad_left) {
+            leftSlide.setTargetPosition(SLIDE_HALF);
+            leftSlide.setPower(2.0);
+            leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            rightSlide.setTargetPosition(SLIDE_HALF);
             rightSlide.setPower(2.0);
             rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
@@ -182,10 +194,10 @@ public class JeffBaseTeleOpMode extends OpMode {
         }
 
         // Send calculated power to wheels
-        leftFrontDrive.setPower(leftFrontPower);
-        rightFrontDrive.setPower(rightFrontPower);
-        leftBackDrive.setPower(leftBackPower);
-        rightBackDrive.setPower(rightBackPower);
+        leftFrontDrive.setPower(leftFrontPower * speed);
+        rightFrontDrive.setPower(rightFrontPower * speed);
+        leftBackDrive.setPower(leftBackPower * speed);
+        rightBackDrive.setPower(rightBackPower * speed);
 
         if (gamepad1.a) {
             intake.setPower(INTAKE_COLLECT);
@@ -238,7 +250,7 @@ public class JeffBaseTeleOpMode extends OpMode {
             than the other, it "wins out". This variable is then multiplied by our FUDGE_FACTOR.
             The FUDGE_FACTOR is the number of degrees that we can adjust the arm by with this function. */
 
-        armPositionFudgeFactor = FUDGE_FACTOR * (gamepad1.right_trigger + (-gamepad1.left_trigger));
+        armPositionFudgeFactor = FUDGE_FACTOR * (gamepad1.left_trigger);
 
         armMotor.setTargetPosition((int) (armPosition + armPositionFudgeFactor));
 
