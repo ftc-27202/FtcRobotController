@@ -36,7 +36,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 //@Disabled
 public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
-    @Override
+
     public void loop () {
         //if left_trigger: speed = 0.6; else speed = 1.0
         double speed = gamepad1.right_trigger > 0 ? 0.6 : 1.0;
@@ -122,6 +122,8 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             rightSlide.setTargetPosition(SLIDE_HIGH);
             rightSlide.setPower(2.0);
             rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            lastSlideActionTime = getRuntime();
         } else if (gamepad2.dpad_down) {
             leftSlide.setTargetPosition(SLIDE_GROUND);
             leftSlide.setPower(2.0);
@@ -130,6 +132,8 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             rightSlide.setTargetPosition(SLIDE_GROUND);
             rightSlide.setPower(2.0);
             rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            lastSlideActionTime = getRuntime();
         } else if (gamepad2.dpad_left) {
             leftSlide.setTargetPosition(SLIDE_HALF);
             leftSlide.setPower(2.0);
@@ -138,6 +142,8 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             rightSlide.setTargetPosition(SLIDE_HALF);
             rightSlide.setPower(2.0);
             rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            lastSlideActionTime = getRuntime();
         }
 
         if (gamepad2.left_trigger > 0) {
@@ -151,5 +157,30 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
         } else if (gamepad2.y) {
             wrist.setPosition(WRIST_FOLDED_IN);
         }
+
+        //prevent overheating
+        if (
+                //it's been SLIDE_STALL_TIME
+                getRuntime() >= lastSlideActionTime + SLIDE_STALL_TIME &&
+                //slides not in position
+                (
+                        //left slide not in target position
+                        (
+                                leftSlide.getTargetPosition() + 5 < leftSlide.getCurrentPosition() ||
+                                leftSlide.getTargetPosition() - 5 > leftSlide.getCurrentPosition()
+                        ) ||
+                        // or right slide not in target position
+                        (
+                                rightSlide.getTargetPosition() + 5 < rightSlide.getCurrentPosition() ||
+                                rightSlide.getTargetPosition() - 5 > rightSlide.getCurrentPosition()
+                        )
+                )
+
+        ) {
+            leftSlide.setPower(0.0);
+            rightSlide.setPower(0.0);
+        }
+
+        super.loop();
     }
 }

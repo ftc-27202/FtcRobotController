@@ -43,6 +43,7 @@ public class JeffBaseTeleOpMode extends OpMode {
     final int SLIDE_GROUND = 0;
     final int SLIDE_HALF = 1250;
     final int SLIDE_HIGH = 2650;
+    final double SLIDE_STALL_TIME = 1.5;
 
     /* Variables to store the speed the intake servo should be set at to intake, and deposit game elements. */
     final double INTAKE_COLLECT = -1.0;
@@ -63,6 +64,7 @@ public class JeffBaseTeleOpMode extends OpMode {
 
     double armPosition = (int) ARM_COLLAPSED_INTO_ROBOT;
     double armPositionFudgeFactor;
+    double lastSlideActionTime = getRuntime();
 
     public void init() {
         leftSlide = hardwareMap.get(DcMotor.class, "leftSlide");
@@ -103,6 +105,7 @@ public class JeffBaseTeleOpMode extends OpMode {
         bucket.setPosition(BUCKET_CATCH);
     }
 
+    @Override
     public void loop() {
         /* Check to see if our arm is over the current limit, and report via telemetry. */
         if (((DcMotorEx) armMotor).isOverCurrent()) {
