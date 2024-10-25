@@ -115,34 +115,13 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
 
 
         if (gamepad2.dpad_up) {
-            leftSlide.setTargetPosition(SLIDE_HIGH);
-            leftSlide.setPower(2.0);
-            leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            rightSlide.setTargetPosition(SLIDE_HIGH);
-            rightSlide.setPower(2.0);
-            rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+            slideTargetPosition = SLIDE_HIGH;
             lastSlideActionTime = getRuntime();
         } else if (gamepad2.dpad_down) {
-            leftSlide.setTargetPosition(SLIDE_GROUND);
-            leftSlide.setPower(2.0);
-            leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            rightSlide.setTargetPosition(SLIDE_GROUND);
-            rightSlide.setPower(2.0);
-            rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+            slideTargetPosition = SLIDE_GROUND;
             lastSlideActionTime = getRuntime();
         } else if (gamepad2.dpad_left) {
-            leftSlide.setTargetPosition(SLIDE_HALF);
-            leftSlide.setPower(2.0);
-            leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            rightSlide.setTargetPosition(SLIDE_HALF);
-            rightSlide.setPower(2.0);
-            rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+            slideTargetPosition = SLIDE_HALF;
             lastSlideActionTime = getRuntime();
         }
 
@@ -158,28 +137,31 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             wrist.setPosition(WRIST_FOLDED_IN);
         }
 
-        //prevent overheating
-        if (
-                //it's been SLIDE_STALL_TIME
-                getRuntime() >= lastSlideActionTime + SLIDE_STALL_TIME &&
-                //slides not in position
-                (
-                        //left slide not in target position
-                        (
-                                leftSlide.getTargetPosition() + 5 < leftSlide.getCurrentPosition() ||
-                                leftSlide.getTargetPosition() - 5 > leftSlide.getCurrentPosition()
-                        ) ||
-                        // or right slide not in target position
-                        (
-                                rightSlide.getTargetPosition() + 5 < rightSlide.getCurrentPosition() ||
-                                rightSlide.getTargetPosition() - 5 > rightSlide.getCurrentPosition()
-                        )
-                )
+        //slides not in position
+        if (getRuntime() >= lastSlideActionTime + SLIDE_STALL_TIME) {
+           final double leftSlideRemaining = Math.abs(leftSlide.getTargetPosition() - leftSlide.getCurrentPosition());
+           final double rightSlideRemaining = Math.abs(rightSlide.getTargetPosition() - rightSlide.getCurrentPosition());
 
-        ) {
-            leftSlide.setPower(0.0);
-            rightSlide.setPower(0.0);
+           if (leftSlideRemaining > 50 || rightSlideRemaining > 50) {
+               leftSlide.setPower(0.0);
+               rightSlide.setPower(0.0);
+               telemetry.addLine("SLIDE(S) STUCK!");
+               return;
+           }
         }
+
+        //prevents extensions being 42 inches or more
+        if (armMotor.getTargetPosition() > ARM_SCORE_SPECIMEN && (leftSlide.getTargetPosition() > SLIDE_HALF || rightSlide.getTargetPosition() > SLIDE_HALF)) {
+            slideTargetPosition = SLIDE_HALF;
+        }
+
+        leftSlide.setTargetPosition(slideTargetPosition);
+        leftSlide.setPower(2.0);
+        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        rightSlide.setTargetPosition(slideTargetPosition);
+        rightSlide.setPower(2.0);
+        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         super.loop();
     }

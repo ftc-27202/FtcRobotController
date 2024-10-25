@@ -53,7 +53,7 @@ public class JeffBaseTeleOpMode extends OpMode {
     /* Variables to store the positions that the wrist should be set to when folding in, or folding out. */
     final double WRIST_FOLDED_IN = 0.0;
     final double WRIST_SPECIMEN = 0.4;
-    final double WRIST_FOLDED_OUT = 1;
+    final double WRIST_FOLDED_OUT = 1.0;
 
     final double FUDGE_FACTOR = 15 * ARM_TICKS_PER_DEGREE;
 
@@ -64,6 +64,7 @@ public class JeffBaseTeleOpMode extends OpMode {
 
     double armPosition = (int) ARM_COLLAPSED_INTO_ROBOT;
     double armPositionFudgeFactor;
+    int slideTargetPosition;
     double lastSlideActionTime = getRuntime();
 
     public void init() {
