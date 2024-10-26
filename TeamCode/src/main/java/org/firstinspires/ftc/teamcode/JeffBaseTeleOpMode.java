@@ -41,9 +41,9 @@ public class JeffBaseTeleOpMode extends OpMode {
     final double ARM_WINCH_ROBOT = 15 * ARM_TICKS_PER_DEGREE;
 
     final int SLIDE_GROUND = 0;
-    final int SLIDE_HALF = 1250;
+    final int SLIDE_HALF = 1350;
     final int SLIDE_HIGH = 2650;
-    final double SLIDE_STALL_TIME = 1.5;
+    final double SLIDE_STALL_TIME = 2.0;
 
     /* Variables to store the speed the intake servo should be set at to intake, and deposit game elements. */
     final double INTAKE_COLLECT = -1.0;

@@ -142,7 +142,7 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
            final double leftSlideRemaining = Math.abs(leftSlide.getTargetPosition() - leftSlide.getCurrentPosition());
            final double rightSlideRemaining = Math.abs(rightSlide.getTargetPosition() - rightSlide.getCurrentPosition());
 
-           if (leftSlideRemaining > 50 || rightSlideRemaining > 50) {
+           if (leftSlideRemaining > 100 || rightSlideRemaining > 100) {
                leftSlide.setPower(0.0);
                rightSlide.setPower(0.0);
                telemetry.addLine("SLIDE(S) STUCK!");
