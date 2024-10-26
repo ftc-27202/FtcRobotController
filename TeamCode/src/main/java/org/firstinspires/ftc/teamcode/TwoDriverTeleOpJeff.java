@@ -74,36 +74,36 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
         rightBackDrive.setPower(rightBackPower * speed);
 
         if (gamepad1.a) {
-            intake.setPower(INTAKE_COLLECT);
+            intake.setPosition(CLAW_OPEN);
         } else if (gamepad1.x) {
-            intake.setPower(INTAKE_OFF);
-        } else if (gamepad1.b) {
-            intake.setPower(INTAKE_DEPOSIT);
-        }
+            intake.setPosition(CLAW_CLOSED);
+        }// else if (gamepad1.b) {
+        //    intake.setPower(INTAKE_DEPOSIT);
+        //}
 
         if (gamepad1.right_bumper) {
             armPosition = ARM_COLLECT;
-            wrist.setPosition(WRIST_FOLDED_OUT);
-            intake.setPower(INTAKE_COLLECT);
+            wrist.setPosition(WRIST_DOWN);
+            intake.setPosition(CLAW_OPEN);
         } else if (gamepad1.left_bumper) {
-            wrist.setPosition(WRIST_FOLDED_OUT);
+            wrist.setPosition(WRIST_DOWN);
             armPosition = ARM_CLEAR_BARRIER;
         } else if (gamepad1.y) {
             armPosition = ARM_SCORE_SAMPLE_IN_LOW;
         } else if (gamepad1.dpad_left) {
             armPosition = ARM_COLLAPSED_INTO_ROBOT;
-            intake.setPower(INTAKE_OFF);
-            wrist.setPosition(WRIST_FOLDED_IN);
+            intake.setPosition(CLAW_CLOSED);
+            wrist.setPosition(WRIST_DOWN);
         } else if (gamepad1.dpad_right) {
             armPosition = ARM_SCORE_SPECIMEN;
-            wrist.setPosition(WRIST_SPECIMEN);
+            wrist.setPosition(WRIST_DOWN);
         } else if (gamepad1.dpad_up) {
             armPosition = ARM_DEPOSIT;
-            wrist.setPosition(WRIST_FOLDED_IN);
+            wrist.setPosition(WRIST_UP);
         } else if (gamepad1.dpad_down) {
             armPosition = ARM_WINCH_ROBOT;
-            intake.setPower(INTAKE_OFF);
-            wrist.setPosition(WRIST_FOLDED_IN);
+            intake.setPosition(CLAW_OPEN);
+            wrist.setPosition(WRIST_UP);
         }
 
         armPositionFudgeFactor = FUDGE_FACTOR * (gamepad1.left_trigger);
@@ -132,9 +132,9 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
         }
 
         if (gamepad2.x) {
-            wrist.setPosition(WRIST_FOLDED_OUT);
+            wrist.setPosition(WRIST_UP);
         } else if (gamepad2.y) {
-            wrist.setPosition(WRIST_FOLDED_IN);
+            wrist.setPosition(WRIST_DOWN);
         }
 
         //slides not in position

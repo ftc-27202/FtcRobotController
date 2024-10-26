@@ -22,7 +22,7 @@ public class JeffBaseTeleOpMode extends OpMode {
     public DcMotor rightFrontDrive;
     public DcMotor rightBackDrive;
     public DcMotor armMotor;
-    public CRServo intake;
+    public Servo intake;
     public Servo wrist;
     public Servo bucket;
 
@@ -46,14 +46,13 @@ public class JeffBaseTeleOpMode extends OpMode {
     final double SLIDE_STALL_TIME = 2.0;
 
     /* Variables to store the speed the intake servo should be set at to intake, and deposit game elements. */
-    final double INTAKE_COLLECT = -1.0;
-    final double INTAKE_OFF = 0.0;
-    final double INTAKE_DEPOSIT = 0.5;
+    final double CLAW_CLOSED = 0;
+    final double CLAW_OPEN = 0.5;
 
     /* Variables to store the positions that the wrist should be set to when folding in, or folding out. */
-    final double WRIST_FOLDED_IN = 0.0;
-    final double WRIST_SPECIMEN = 0.4;
-    final double WRIST_FOLDED_OUT = 1.0;
+    final double WRIST_DOWN = 0.0;
+    //final double WRIST_SPECIMEN = 0.4;
+    final double WRIST_UP = 0.6;
 
     final double FUDGE_FACTOR = 15 * ARM_TICKS_PER_DEGREE;
 
@@ -96,11 +95,11 @@ public class JeffBaseTeleOpMode extends OpMode {
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        intake = hardwareMap.get(CRServo.class, "intake");
-        intake.setPower(INTAKE_OFF);
+        intake = hardwareMap.get(Servo.class, "intake");
+        intake.setPosition(CLAW_OPEN);
 
         wrist = hardwareMap.get(Servo.class, "wrist");
-        wrist.setPosition(WRIST_FOLDED_IN);
+        wrist.setPosition(WRIST_UP);
 
         bucket = hardwareMap.get(Servo.class, "bucket");
         bucket.setPosition(BUCKET_CATCH);
@@ -118,7 +117,7 @@ public class JeffBaseTeleOpMode extends OpMode {
         telemetry.addData("Right Linear Slide: ", "%d", rightSlide.getCurrentPosition());
         telemetry.addData("arm Target: ", armMotor.getTargetPosition());
         telemetry.addData("arm Encoder: ", armMotor.getCurrentPosition());
-        telemetry.addData("intake: ", intake.getPower());
+        telemetry.addData("intake: ", intake.getPosition());
         telemetry.addData("wrist: ", wrist.getPosition());
         telemetry.addData("bucket: ", bucket.getPosition());
         telemetry.addData("Run Time", getRuntime());
