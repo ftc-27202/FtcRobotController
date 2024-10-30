@@ -24,6 +24,7 @@ public class JeffBaseTeleOpMode extends OpMode {
     public DcMotor armMotor;
     public Servo intake;
     public Servo wrist;
+    public Servo elbow;
     public Servo bucket;
 
     final double ARM_TICKS_PER_DEGREE =
@@ -54,6 +55,9 @@ public class JeffBaseTeleOpMode extends OpMode {
     //final double WRIST_SPECIMEN = 0.4;
     final double WRIST_UP = 0.6;
 
+    final double ELBOW_OUT = 0.0;
+    final double ELBOW_IN = 1.0;
+
     final double FUDGE_FACTOR = 15 * ARM_TICKS_PER_DEGREE;
 
     final double BUCKET_CATCH = 0.75;
@@ -64,6 +68,8 @@ public class JeffBaseTeleOpMode extends OpMode {
     double armPosition = (int) ARM_COLLAPSED_INTO_ROBOT;
     double armPositionFudgeFactor;
     int slideTargetPosition;
+    int lastSlideInputTarget;
+    boolean autoMovedSlides = false;
     double lastSlideActionTime = getRuntime();
 
     public void init() {
@@ -100,6 +106,9 @@ public class JeffBaseTeleOpMode extends OpMode {
 
         wrist = hardwareMap.get(Servo.class, "wrist");
         wrist.setPosition(WRIST_UP);
+
+        elbow = hardwareMap.get(Servo.class, "elbow");
+        elbow.setPosition(ELBOW_IN);
 
         bucket = hardwareMap.get(Servo.class, "bucket");
         bucket.setPosition(BUCKET_CATCH);

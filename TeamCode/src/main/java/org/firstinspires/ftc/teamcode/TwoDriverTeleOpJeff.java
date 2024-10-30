@@ -85,24 +85,28 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             armPosition = ARM_COLLECT;
             wrist.setPosition(WRIST_DOWN);
             intake.setPosition(CLAW_OPEN);
+            elbow.setPosition(ELBOW_OUT);
         } else if (gamepad1.left_bumper) {
             wrist.setPosition(WRIST_DOWN);
             armPosition = ARM_CLEAR_BARRIER;
+            elbow.setPosition(ELBOW_OUT);
         } else if (gamepad1.y) {
             armPosition = ARM_SCORE_SAMPLE_IN_LOW;
         } else if (gamepad1.dpad_left) {
             armPosition = ARM_COLLAPSED_INTO_ROBOT;
             intake.setPosition(CLAW_CLOSED);
             wrist.setPosition(WRIST_DOWN);
+            elbow.setPosition(ELBOW_IN);
         } else if (gamepad1.dpad_right) {
             armPosition = ARM_SCORE_SPECIMEN;
             wrist.setPosition(WRIST_DOWN);
+            elbow.setPosition(ELBOW_OUT);
         } else if (gamepad1.dpad_up) {
             armPosition = ARM_DEPOSIT;
             wrist.setPosition(WRIST_UP);
+            elbow.setPosition(ELBOW_IN);
         } else if (gamepad1.dpad_down) {
             armPosition = ARM_WINCH_ROBOT;
-            intake.setPosition(CLAW_OPEN);
             wrist.setPosition(WRIST_UP);
         }
 
@@ -117,12 +121,15 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
         if (gamepad2.dpad_up) {
             slideTargetPosition = SLIDE_HIGH;
             lastSlideActionTime = getRuntime();
+            lastSlideInputTarget = SLIDE_HIGH;
         } else if (gamepad2.dpad_down) {
             slideTargetPosition = SLIDE_GROUND;
             lastSlideActionTime = getRuntime();
+            lastSlideInputTarget = SLIDE_GROUND;
         } else if (gamepad2.dpad_left) {
             slideTargetPosition = SLIDE_HALF;
             lastSlideActionTime = getRuntime();
+            lastSlideInputTarget = SLIDE_HALF;
         }
 
         if (gamepad2.left_trigger > 0) {
@@ -153,6 +160,15 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
         //prevents extensions being 42 inches or more
         if (armMotor.getTargetPosition() > ARM_SCORE_SPECIMEN && (leftSlide.getTargetPosition() > SLIDE_HALF || rightSlide.getTargetPosition() > SLIDE_HALF)) {
             slideTargetPosition = SLIDE_HALF;
+        }
+
+        //prevents the arm from slamming into the slides
+        if ((armMotor.getTargetPosition() < ARM_DEPOSIT && armMotor.getCurrentPosition() > ARM_DEPOSIT) || (armMotor.getTargetPosition() > ARM_DEPOSIT && armMotor.getCurrentPosition() < ARM_DEPOSIT)) {
+            slideTargetPosition = SLIDE_HALF;
+            autoMovedSlides = true;
+        } else if (autoMovedSlides) {
+            slideTargetPosition = lastSlideInputTarget;
+            autoMovedSlides = false;
         }
 
         leftSlide.setTargetPosition(slideTargetPosition);
