@@ -40,12 +40,13 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
     public void loop () {
         //if left_trigger: speed = 0.6; else speed = 1.0
         double speed = gamepad1.right_trigger > 0 ? 0.6 : 1.0;
+        double turn_speed = gamepad1.right_trigger > 0 ?  0.2 : 1.0;
         double max;
 
         // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
         double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
         double lateral = gamepad1.left_stick_x;
-        double yaw = gamepad1.right_stick_x;
+        double yaw = gamepad1.right_stick_x * turn_speed;
 
         // Combine the joystick requests for each axis-motion to determine each wheel's power.
         // Set up a variable for each drive wheel to save the power level for telemetry.
