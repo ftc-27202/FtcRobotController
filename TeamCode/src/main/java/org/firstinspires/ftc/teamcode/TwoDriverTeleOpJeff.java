@@ -40,12 +40,13 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
     public void loop () {
         //if left_trigger: speed = 0.6; else speed = 1.0
         double speed = gamepad1.right_trigger > 0 ? 0.6 : 1.0;
+        double turn_speed = gamepad1.right_trigger > 0 ?  0.2 : 1.0;
         double max;
 
         // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
         double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
         double lateral = gamepad1.left_stick_x;
-        double yaw = gamepad1.right_stick_x;
+        double yaw = gamepad1.right_stick_x * turn_speed;
 
         // Combine the joystick requests for each axis-motion to determine each wheel's power.
         // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -84,7 +85,7 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
         if (gamepad1.right_bumper) {
             armPosition = ARM_COLLECT;
             wrist.setPosition(WRIST_DOWN);
-            intake.setPosition(CLAW_OPEN);
+            intake.setPosition(CLAW_CLOSED);
             elbow.setPosition(ELBOW_OUT);
         } else if (gamepad1.left_bumper) {
             wrist.setPosition(WRIST_DOWN);
@@ -166,10 +167,10 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
         if ((armMotor.getTargetPosition() < ARM_DEPOSIT && armMotor.getCurrentPosition() > ARM_DEPOSIT) || (armMotor.getTargetPosition() > ARM_DEPOSIT && armMotor.getCurrentPosition() < ARM_DEPOSIT)) {
             slideTargetPosition = SLIDE_HALF;
             autoMovedSlides = true;
-        } else if (autoMovedSlides) {
-            slideTargetPosition = lastSlideInputTarget;
-            autoMovedSlides = false;
-        }
+        }// else if (autoMovedSlides) {
+        //    slideTargetPosition = lastSlideInputTarget;
+        //    autoMovedSlides = false;
+        //}
 
         leftSlide.setTargetPosition(slideTargetPosition);
         leftSlide.setPower(2.0);
