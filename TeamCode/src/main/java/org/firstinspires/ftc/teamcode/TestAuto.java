@@ -39,6 +39,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
@@ -94,9 +99,25 @@ import java.util.concurrent.TimeUnit;
 @Autonomous(name = "Test Auto", group = "drive")
 
 public class TestAuto extends LinearOpMode {
+
+    protected DcMotor leftFrontDrive = null;
+    protected DcMotor leftBackDrive = null;
+    protected DcMotor rightFrontDrive = null;
+    protected DcMotor rightBackDrive = null;
+
+    protected DcMotor intakeMotor = null;
+    protected Servo purpleServo = null;
+    protected Servo planeServo = null;
+    protected DcMotor armMotor = null;
+    protected Servo boxServo = null;
+
+    ExposureControl myExposureControl;
+
     @Override
     public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        myExposureControl.setMode(ExposureControl.Mode.Manual);
+        myExposureControl.setExposure(30, TimeUnit.MILLISECONDS);
 
         Pose2d startPose = new Pose2d(-24, -60, Math.toRadians(180));
 
@@ -108,7 +129,12 @@ public class TestAuto extends LinearOpMode {
 
 //        while (!isStopRequested()) {
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
-                .strafeRight(60)
+                .forward(40)
+                .addTemporalMarker(2, () -> {
+                })
+                .back(15)
+                .strafeLeft(50)
+                .lineToLinearHeading(new Pose2d(-72, -24, Math.toRadians((180) - 1e-6)))
                 .build();
         drive.followTrajectorySequence(trajSeq);
 //        }
