@@ -33,12 +33,12 @@ public class JeffBaseTeleOpMode extends OpMode {
                     * 1 / 360.0; // Ticks per degree, not per rotation
 
     final double ARM_COLLAPSED_INTO_ROBOT = 0;
-    final double ARM_COLLECT = 235 * ARM_TICKS_PER_DEGREE;
-    final double ARM_CLEAR_BARRIER = 245 * ARM_TICKS_PER_DEGREE;
+    final double ARM_COLLECT = 225 * ARM_TICKS_PER_DEGREE;
+    final double ARM_CLEAR_BARRIER = 215 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SPECIMEN = 160 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SAMPLE_IN_LOW = 160 * ARM_TICKS_PER_DEGREE;
     final double ARM_DEPOSIT = 95 * ARM_TICKS_PER_DEGREE;
-    final double ARM_WINCH_ROBOT = 15 * ARM_TICKS_PER_DEGREE;
+    final double ARM_WINCH_ROBOT = 10 * ARM_TICKS_PER_DEGREE;
 
     final int SLIDE_GROUND = 0;
     final int SLIDE_HALF = 1350;
