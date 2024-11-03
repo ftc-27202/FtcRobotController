@@ -1,4 +1,4 @@
-package com.ftc27202.meepmeeptesting;
+package com.example.meepmeeptesting;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
@@ -11,19 +11,14 @@ public class MeepMeepTesting {
         MeepMeep meepMeep = new MeepMeep(800);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
-                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(0, 0, 0))
-                        .forward(30)
-                        .turn(Math.toRadians(90))
-                        .forward(30)
-                        .turn(Math.toRadians(90))
-                        .forward(30)
-                        .turn(Math.toRadians(90))
-                        .forward(30)
-                        .turn(Math.toRadians(90))
+                // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel
+                // track width (Jeff's track width is 16", Jeff's track length is 17")
+                .setConstraints(40, 40, Math.toRadians(180), Math.toRadians(180), 16)
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-39.5, -60, 0))
+                        .waitSeconds(1)
+                        .back(6)
+                        .lineToLinearHeading(new Pose2d(-36, -12, 0))
                         .build());
-
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTOTHEDEEP_JUICE_DARK)
                 .setDarkMode(true)

@@ -29,32 +29,17 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.canvas.Spline;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceRunner;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /*
  * This OpMode illustrates using a camera to locate and drive towards a specific AprilTag.
@@ -95,16 +80,16 @@ import java.util.concurrent.TimeUnit;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  *
  */
-@Autonomous(name = "Test Auto", group = "drive")
-@Disabled
-public class TestAuto extends LinearOpMode {
+@Autonomous(name = "Jeff Base Auto Mode (Deploy)", group = "drive")
 
+public class JeffBaseAutoMode_Deploy extends LinearOpMode {
     public DcMotor leftSlide;
     public DcMotor rightSlide;
     public DcMotor leftFrontDrive;
     public DcMotor leftBackDrive;
     public DcMotor rightFrontDrive;
     public DcMotor rightBackDrive;
+    public DcMotor armMotor;
     public CRServo intake;
     public Servo wrist;
     public Servo bucket;
@@ -114,13 +99,14 @@ public class TestAuto extends LinearOpMode {
                     * 250047.0 / 4913.0 // This is the exact gear ratio of the 50.9:1 Yellow Jacket gearbox
                     * 100.0 / 20.0 // This is the external gear reduction, a 20T pinion gear that drives a 100T hub-mount gear
                     * 1 / 360.0; // Ticks per degree, not per rotation
+
     final double ARM_COLLAPSED_INTO_ROBOT = 0;
-    final double ARM_COLLECT = 235 * ARM_TICKS_PER_DEGREE;
-    final double ARM_CLEAR_BARRIER = 245 * ARM_TICKS_PER_DEGREE;
+    final double ARM_COLLECT = 225 * ARM_TICKS_PER_DEGREE;
+    final double ARM_CLEAR_BARRIER = 215 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SPECIMEN = 160 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SAMPLE_IN_LOW = 160 * ARM_TICKS_PER_DEGREE;
     final double ARM_DEPOSIT = 95 * ARM_TICKS_PER_DEGREE;
-    final double ARM_WINCH_ROBOT = 15 * ARM_TICKS_PER_DEGREE;
+    final double ARM_WINCH_ROBOT = 10 * ARM_TICKS_PER_DEGREE;
 
     final int SLIDE_GROUND = 0;
     final int SLIDE_HALF = 1350;
@@ -142,21 +128,13 @@ public class TestAuto extends LinearOpMode {
 
     /* Variables that are used to set the arm to a specific position */
 
-    double armPosition = (int) ARM_COLLAPSED_INTO_ROBOT;
-    double armPositionFudgeFactor;
     int slideTargetPosition;
-    double lastSlideActionTime = getRuntime();
+    double armMotorTargetPosition;
+
+    private boolean SequenceComplete = false;
 
     @Override
     public void runOpMode() {
-
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-
-        Pose2d startPose = new Pose2d(-24, -60, Math.toRadians(180));
-
-        drive.setPoseEstimate(startPose);
-
-
         leftSlide = hardwareMap.get(DcMotor.class, "leftSlide");
         leftSlide.setDirection(DcMotor.Direction.FORWARD);
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -180,6 +158,12 @@ public class TestAuto extends LinearOpMode {
         rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        armMotor = hardwareMap.get(DcMotor.class, "arm");
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setTargetPosition((int) ARM_COLLAPSED_INTO_ROBOT);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ((DcMotorEx) armMotor).setVelocity(2100);
+
         intake = hardwareMap.get(CRServo.class, "intake");
         intake.setPower(INTAKE_OFF);
 
@@ -187,7 +171,6 @@ public class TestAuto extends LinearOpMode {
         wrist.setPosition(WRIST_FOLDED_IN);
 
         bucket = hardwareMap.get(Servo.class, "bucket");
-        bucket.setPosition(BUCKET_CATCH);
         leftSlide.setPower(0.5);
         rightSlide.setPower(0.5);
 
@@ -197,42 +180,64 @@ public class TestAuto extends LinearOpMode {
         leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        // Roadrunner initialization
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+
+        // Starting Pose (x, y, and heading)
+        // read: https://learnroadrunner.com/trajectories.html#coordinate-system
+        Pose2d startPose = new Pose2d(-39.5, -60, 0);
+        drive.setPoseEstimate(startPose);
+
+        Trajectory traj1 = drive.trajectoryBuilder(startPose)
+                .back(6)
+                .build();
+
+        Trajectory traj2 = drive.trajectoryBuilder(startPose)
+                .lineToLinearHeading(new Pose2d(-36, -8, 0))
+                .build();
+
         // Wait for the game to start (driver presses START)
         waitForStart();
 
-        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
-            .forward(10)
-            .build();
-
-        drive.followTrajectorySequence(trajSeq);
-
-        //        slideTargetPosition = SLIDE_HIGH;
-//        leftSlide.setTargetPosition(slideTargetPosition);
-//        rightSlide.setTargetPosition(slideTargetPosition);
-//        bucket.setPosition(BUCKET_DUMP);
-        }
-    //}
-}
-
-/*
-        waitForStart();
+        bucket.setPosition(BUCKET_CATCH);
 
         if (isStopRequested()) return;
+        while (!isStopRequested() && !SequenceComplete) {
+            drive.followTrajectory(traj1);
 
-       //while (!isStopRequested()) {
-        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
-                .back(7)
+            // Raise slider to High Basket
+            slideTargetPosition = SLIDE_HIGH;
+            leftSlide.setTargetPosition(slideTargetPosition);
+            rightSlide.setTargetPosition(slideTargetPosition);
+            while (leftSlide.getCurrentPosition() < slideTargetPosition) {
+                sleep(10);
+            };
 
-                .addTemporalMarker(12000.0, () -> {
-                    slideTargetPosition = SLIDE_HIGH;
-                    leftSlide.setTargetPosition(slideTargetPosition);
-                    rightSlide.setTargetPosition(slideTargetPosition);
-                    lastSlideActionTime = getRuntime();
+            // Bucket -> Dump
+            bucket.setPosition(BUCKET_DUMP);
+            while (bucket.getPosition() > BUCKET_DUMP) {
+                sleep(10);
+            };
 
-                    bucket.setPosition(BUCKET_DUMP);
-                })
-                .build();
-        drive.followTrajectorySequence(trajSeq);
+            // wait for the sample to fall
+            sleep(500);
+
+            // Move the slider to Ground
+            slideTargetPosition = SLIDE_GROUND;
+            leftSlide.setTargetPosition(slideTargetPosition);
+            rightSlide.setTargetPosition(slideTargetPosition);
+            while (leftSlide.getCurrentPosition() > slideTargetPosition) {
+                sleep(10);
+            };
+
+            // Bucket -> Dump
+            bucket.setPosition(BUCKET_CATCH);
+
+            // Navigate to next position
+            // Spline towards the ascent zone
+            drive.followTrajectory(traj2);
+
+            SequenceComplete = true;
         }
-
-*/
+    }
+}

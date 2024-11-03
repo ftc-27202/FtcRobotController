@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -6,8 +7,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.opencv.core.Mat;
 
-public class BaseTeleOpMode extends OpMode {
+@Disabled
 
+public class BaseTeleOpMode extends OpMode {
     // Declare OpMode members.
     protected DcMotor leftFrontDrive = null;
     protected DcMotor leftBackDrive = null;
