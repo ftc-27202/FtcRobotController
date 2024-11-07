@@ -1,6 +1,7 @@
 package com.example.meepmeeptesting;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 
 import org.rowlandhall.meepmeep.MeepMeep;
 import org.rowlandhall.meepmeep.roadrunner.DefaultBotBuilder;
@@ -17,7 +18,8 @@ public class MeepMeepTesting {
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-39.5, -60, 0))
                         .waitSeconds(1)
                         .back(6)
-                        .lineToLinearHeading(new Pose2d(-36, -12, 0))
+                        .lineToLinearHeading(new Pose2d(-48, -12, 0))
+                        .lineToSplineHeading(new Pose2d(-38, -25, Math.toRadians(180 + 1e-6)))
                         .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTOTHEDEEP_JUICE_DARK)

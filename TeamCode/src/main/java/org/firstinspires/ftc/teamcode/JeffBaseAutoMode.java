@@ -197,7 +197,11 @@ public class JeffBaseAutoMode extends LinearOpMode {
                 .build();
 
         Trajectory traj2 = drive.trajectoryBuilder(startPose)
-                .lineToLinearHeading(new Pose2d(-50, -54, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-48, -12, 0))
+                .build();
+
+        Trajectory traj3 = drive.trajectoryBuilder(startPose)
+                .lineToSplineHeading(new Pose2d(-38, -25, Math.toRadians(180 + 1e-6)))
                 .build();
 
         // Wait for the game to start (driver presses START)
@@ -207,8 +211,8 @@ public class JeffBaseAutoMode extends LinearOpMode {
 
         if (isStopRequested()) return;
         while (!isStopRequested() && !SequenceComplete) {
-//            drive.followTrajectory(traj1);
-//
+            drive.followTrajectory(traj1);
+
 //            // Raise slider to High Basket
 //            slideTargetPosition = SLIDE_HIGH;
 //            leftSlide.setTargetPosition(slideTargetPosition);
@@ -237,9 +241,11 @@ public class JeffBaseAutoMode extends LinearOpMode {
 
             // Navigate to next position
             // Spline towards the neutral sample
-//            drive.followTrajectory(traj2);
+            drive.followTrajectory(traj2);
+            drive.followTrajectory(traj3);
 
             // Bucket -> Catch
+            /*
             bucket.setPosition(BUCKET_CATCH);
             while (bucket.getPosition() < BUCKET_CATCH) {
                 sleep(10);
@@ -267,6 +273,9 @@ public class JeffBaseAutoMode extends LinearOpMode {
 
 
             sleep(5000);
+            */
+
+
             SequenceComplete = true;
         }
     }
