@@ -75,7 +75,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  *
  */
-@Autonomous(name = "Test Auto", group = "drive")
+@Autonomous(name = "Test Auto1", group = "drive")
 
 public class TestAuto_Schooch extends LinearOpMode {
     @Override
