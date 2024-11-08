@@ -38,7 +38,7 @@ public class JeffBaseTeleOpMode extends OpMode {
     final double ARM_CLEAR_BARRIER = 215 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SPECIMEN = 160 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SAMPLE_IN_LOW = 160 * ARM_TICKS_PER_DEGREE;
-    final double ARM_DEPOSIT = 80 * ARM_TICKS_PER_DEGREE;
+    final double ARM_DEPOSIT = 74 * ARM_TICKS_PER_DEGREE;
     final double ARM_WINCH_ROBOT = 10 * ARM_TICKS_PER_DEGREE;
 
     final int SLIDE_GROUND = 0;

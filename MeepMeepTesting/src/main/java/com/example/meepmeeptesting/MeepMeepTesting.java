@@ -18,8 +18,9 @@ public class MeepMeepTesting {
                 .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-39.5, -60, 0))
                         .waitSeconds(1)
                         .back(6)
-                        .lineToLinearHeading(new Pose2d(-48, -12, 0))
-                        .lineToSplineHeading(new Pose2d(-38, -25, Math.toRadians(180 + 1e-6)))
+                        .lineToLinearHeading(new Pose2d(-50, 6, 0))
+                        .turn(Math.toRadians(180) - 1e-6)
+                        .strafeTo(new Vector2d(-38,-24))
                         .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTOTHEDEEP_JUICE_DARK)
