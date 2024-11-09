@@ -199,15 +199,22 @@
                  .back(6)
                  .build();
 
+//         Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
+//                 .lineToLinearHeading(new Pose2d(-54, 6, 0))
+//                 .build();
          Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
-                 .lineToLinearHeading(new Pose2d(-54, 6, 0))
+                 .lineToLinearHeading(new Pose2d(-54, 0, 0))
                  .build();
+
+//         Trajectory traj3 = drive.trajectoryBuilder(traj2.end())
+//                 .strafeRight(10)
+//                 .build();
 
          Trajectory traj3 = drive.trajectoryBuilder(traj2.end())
-                 .strafeRight(10)
+                .strafeTo(new Vector2d(-48, -8))
                  .build();
 
-//        Trajectory traj4 = drive.trajectoryBuilder(traj3.end())
+         //        Trajectory traj4 = drive.trajectoryBuilder(traj3.end())
 //                .lineToLinearHeading(new Pose2d(-30,0,180 + 1e-6))
 //                .build();
 
