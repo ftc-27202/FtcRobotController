@@ -200,7 +200,7 @@
                  .build();
 
          Trajectory traj2 = drive.trajectoryBuilder(traj1.end())
-                 .lineToLinearHeading(new Pose2d(-50, 6, 0))
+                 .lineToLinearHeading(new Pose2d(-54, 6, 0))
                  .build();
 
          Trajectory traj3 = drive.trajectoryBuilder(traj2.end())
@@ -220,7 +220,7 @@
                  .build();
 
          Trajectory traj7 = drive.trajectoryBuilder(traj6.end().plus(new Pose2d(0, 0, Math.toRadians(180))), false)
-                 .strafeTo(new Vector2d(-42,-62))
+                 .strafeTo(new Vector2d(-41,-62))
                  .build();
 
          Trajectory traj8 = drive.trajectoryBuilder(traj7.end())
@@ -238,9 +238,6 @@
 
          if (isStopRequested()) return;
          while (!isStopRequested() && !SequenceComplete) {
-
-             sleep(3000);
-
              drive.followTrajectory(traj1);
 
              // Raise slider to High Basket
