@@ -21,6 +21,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Vector;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -164,7 +168,8 @@ public class bodhiMachineVision extends LinearOpMode
         Mat colorR = new Mat();
         Mat colorG = new Mat();
         Mat colorB = new Mat();
-        Mat imgThreshold = new Mat();
+        Mat hsv = new Mat();
+        Mat result = new Mat();
         int avg1, avg2, avg3;
 
         // Volatile since accessed by OpMode thread w/o synchronization
@@ -175,9 +180,9 @@ public class bodhiMachineVision extends LinearOpMode
         void inputToCb(Mat input)
         {
             //Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
-            Core.extractChannel(input, colorR, 0);
-            Core.extractChannel(input, colorG, 1);
-            Core.extractChannel(input, colorB, 2);
+            //Core.extractChannel(input, colorR, 0);
+            //Core.extractChannel(input, colorG, 1);
+            //Core.extractChannel(input, colorB, 2);
         }
 
         @Override
@@ -187,13 +192,14 @@ public class bodhiMachineVision extends LinearOpMode
             // submats we make will still be linked to it on subsequent frames. (If the object were to
             // only be initialized in processFrame, then the submats would become delinked because the
             // backing buffer would be re-allocated the first time a real frame was crunched)
-            inputToCb(firstFrame);
+            //inputToCb(firstFrame);
 
             // Submats are a persistent reference to a region of the parent buffer. Any changes to the
             // child affect the parent, and the reverse also holds true.
+            /*
             region1_Cb = colorR.submat(new Rect(region1_pointA, region1_pointB));
             region2_Cb = colorR.submat(new Rect(region2_pointA, region2_pointB));
-            region3_Cb = colorR.submat(new Rect(region3_pointA, region3_pointB));
+            region3_Cb = colorR.submat(new Rect(region3_pointA, region3_pointB));*/
         }
 
         @Override
@@ -231,16 +237,34 @@ public class bodhiMachineVision extends LinearOpMode
             // surroundings.
 
             // Get the Cb channel of the input frame after conversion to YCrCb
-            inputToCb(input);
+            //inputToCb(input);
             //Mat imgGray = new Mat();
+            //return Imgproc.threshold(colorR,127,255, Imgproc.THRESH_BINARY);
+            //Core.bitwise_not(colorR, colorR);
+            Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV, 4);
 
-            Imgproc.adaptiveThreshold(colorR, imgThreshold, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 11, 2);
+
+            //red
+            Core.inRange(hsv, new Scalar(0, 25, 200), new Scalar(10, 255, 255), colorR);
+            //yellow
+            Core.inRange(hsv, new Scalar(20, 30, 170), new Scalar(40, 255, 255), colorG);
+            //blue
+            Core.inRange(hsv, new Scalar(100, 75, 120), new Scalar(140, 255, 255), colorB);
+
+            //imgThreshold = colorR;
+            //Imgproc.threshold(colorR, imgThreshold, 150, 255, Imgproc.THRESH_BINARY);
+            //Imgproc.adaptiveThreshold(colorR, imgThreshold, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 11, 2);
 
             // Compute the average pixel value of each submat region. We're taking the average of a
             // single channel buffer, so the value we need is at index 0. We could have also taken the
             // average pixel value of the 3-channel image, and referenced the value at index 2 here.
 
-            return colorR;
+            List<Mat> listMat = Arrays.asList(colorR, colorG, colorB);
+            Core.merge(listMat, result);
+            //imgThreshold = (colorR, colorG, colorB);
+            //Core.merge(channels, result);
+            return result;
+            //return imgThreshold;
         }
 
         // Call this from the OpMode thread to obtain the latest analysis
