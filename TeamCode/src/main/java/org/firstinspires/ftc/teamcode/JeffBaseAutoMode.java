@@ -212,11 +212,11 @@
 //                .build();
 
          Trajectory traj5 = drive.trajectoryBuilder(traj3.end().plus(new Pose2d(0, 0, Math.toRadians(180))), false)
-                 .strafeTo(new Vector2d(-38,-20))
+                 .strafeTo(new Vector2d(-38,-18))
                  .build();
 
          Trajectory traj6 = drive.trajectoryBuilder(traj5.end())
-                 .forward(4)
+                 .forward(10)
                  .build();
 
          Trajectory traj7 = drive.trajectoryBuilder(traj6.end().plus(new Pose2d(0, 0, Math.toRadians(180))), false)
