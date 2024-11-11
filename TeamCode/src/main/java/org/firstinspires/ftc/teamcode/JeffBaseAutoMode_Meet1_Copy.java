@@ -1,4 +1,4 @@
- /* Copyright (c) 2023 FIRST. All rights reserved.
+package org.firstinspires.ftc.teamcode; /* Copyright (c) 2023 FIRST. All rights reserved.
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted (subject to the limitations in the disclaimer below) provided that
@@ -27,23 +27,18 @@
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   */
 
- package org.firstinspires.ftc.teamcode;
-
- import android.util.Half;
-
- import com.acmerobotics.roadrunner.geometry.Pose2d;
- import com.acmerobotics.roadrunner.geometry.Vector2d;
- import com.acmerobotics.roadrunner.trajectory.Trajectory;
+// import com.acmerobotics.roadrunner.geometry.Pose2d;
+// import com.acmerobotics.roadrunner.geometry.Vector2d;
+// import com.acmerobotics.roadrunner.trajectory.Trajectory;
  import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
  import com.qualcomm.robotcore.eventloop.opmode.Disabled;
  import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  import com.qualcomm.robotcore.hardware.CRServo;
  import com.qualcomm.robotcore.hardware.DcMotor;
  import com.qualcomm.robotcore.hardware.DcMotorEx;
- import com.qualcomm.robotcore.hardware.DcMotorSimple;
  import com.qualcomm.robotcore.hardware.Servo;
 
- import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+// import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
  /*
   * This OpMode illustrates using a camera to locate and drive towards a specific AprilTag.
@@ -84,9 +79,20 @@
   * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
   */
 
- @Autonomous(name = "AA_Auto Mode", group = "drive")
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Trajectory;
+import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 
- public class JeffBaseAutoMode extends LinearOpMode {
+@Autonomous(name = "Auto Jeff Meet 1", group = "drive")
+ @Disabled
+ public class JeffBaseAutoMode_Meet1_Copy extends LinearOpMode {
      public DcMotor leftSlide;
      public DcMotor rightSlide;
      public DcMotor leftFrontDrive;
@@ -186,7 +192,7 @@
          rightSlide.setTargetPosition(slideTargetPosition);
          leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
          rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+/*
          // Roadrunner initialization
          SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
@@ -358,5 +364,5 @@
 
              SequenceComplete = true;
          }
-     }
+*/     }
  }
