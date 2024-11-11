@@ -39,8 +39,6 @@
  import com.qualcomm.robotcore.hardware.DcMotorEx;
  import com.qualcomm.robotcore.hardware.Servo;
 
- import org.firstinspires.ftc.teamcode.MecanumDrive;
-
  /*
   * This OpMode illustrates using a camera to locate and drive towards a specific AprilTag.
   * The code assumes a Holonomic (Mecanum or X Drive) Robot.
