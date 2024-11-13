@@ -247,9 +247,10 @@ public class bodhiMachineVision extends LinearOpMode
 
 
             //red
-            Core.inRange(hsv, new Scalar(240, 25, 200), new Scalar(255, 255, 255), colorR0);
-            Core.inRange(hsv, new Scalar(0, 25, 200), new Scalar(15, 255, 255), colorR1);
+            Core.inRange(hsv, new Scalar(240, 25, 170), new Scalar(255, 255, 255), colorR0);
+            Core.inRange(hsv, new Scalar(0, 25, 170), new Scalar(15, 255, 255), colorR1);
 
+            Core.add(colorR0, colorR1, colorR);
             //yellow
             Core.inRange(hsv, new Scalar(20, 30, 170), new Scalar(40, 255, 255), colorG);
             //blue
@@ -262,8 +263,9 @@ public class bodhiMachineVision extends LinearOpMode
             // Compute the average pixel value of each submat region. We're taking the average of a
             // single channel buffer, so the value we need is at index 0. We could have also taken the
             // average pixel value of the 3-channel image, and referenced the value at index 2 here.
-            List<Mat> listMat = Arrays.asList(colorR0, colorG, colorB);
+            List<Mat> listMat = Arrays.asList(colorR, colorG, colorB);
             Core.merge(listMat, result);
+
             //imgThreshold = (colorR, colorG, colorB);
             //Core.merge(channels, result);
             return result;
