@@ -171,6 +171,8 @@ public class bodhiMachineVision extends LinearOpMode
         Mat colorG = new Mat();
         Mat colorB = new Mat();
         Mat hsv = new Mat();
+        Mat dst = new Mat();
+        Mat cdst = new Mat();
         Mat result = new Mat();
         int avg1, avg2, avg3;
 
@@ -244,17 +246,34 @@ public class bodhiMachineVision extends LinearOpMode
             //return Imgproc.threshold(colorR,127,255, Imgproc.THRESH_BINARY);
             //Core.bitwise_not(colorR, colorR);
             Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV, 4);
-
-
+            
             //red
             Core.inRange(hsv, new Scalar(240, 25, 170), new Scalar(255, 255, 255), colorR0);
             Core.inRange(hsv, new Scalar(0, 25, 170), new Scalar(15, 255, 255), colorR1);
 
             Core.add(colorR0, colorR1, colorR);
             //yellow
-            Core.inRange(hsv, new Scalar(20, 30, 170), new Scalar(40, 255, 255), colorG);
+            Core.inRange(hsv, new Scalar(20, 20, 170), new Scalar(40, 255, 255), colorG);
             //blue
             Core.inRange(hsv, new Scalar(100, 75, 120), new Scalar(140, 255, 255), colorB);
+
+            // Edge detection
+            Imgproc.Canny(colorG, dst, 50, 200, 3, false);
+            // Copy edges to the images that will display the results in BGR
+            Imgproc.cvtColor(dst, cdst, Imgproc.COLOR_GRAY2BGR);
+            // Standard Hough Line Transform
+            Mat lines = new Mat(); // will hold the results of the detection
+            Imgproc.HoughLines(dst, lines, 1, Math.PI/180, 60); // runs the actual detection
+            // Draw the lines
+            for (int x = 0; x < lines.rows(); x++) {
+                double rho = lines.get(x, 0)[0],
+                        theta = lines.get(x, 0)[1];
+                double a = Math.cos(theta), b = Math.sin(theta);
+                double x0 = a*rho, y0 = b*rho;
+                Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
+                Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
+                Imgproc.line(cdst, pt1, pt2, new Scalar(0, 0, 255), 3, Imgproc.LINE_AA, 0);
+            }
 
             //imgThreshold = colorR;
             //Imgproc.threshold(colorR, imgThreshold, 150, 255, Imgproc.THRESH_BINARY);
@@ -268,7 +287,7 @@ public class bodhiMachineVision extends LinearOpMode
 
             //imgThreshold = (colorR, colorG, colorB);
             //Core.merge(channels, result);
-            return result;
+            return cdst;
             //return imgThreshold;
         }
 
