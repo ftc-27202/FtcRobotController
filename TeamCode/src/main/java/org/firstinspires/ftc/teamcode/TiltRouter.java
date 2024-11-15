@@ -66,17 +66,16 @@ public class TiltRouter
 
 	public void setTarget(Waypoint newTarget)
 	{
-		if (waypoints.isEmpty())
+		if (waypoints.isEmpty()) // Robot is currently at rest.
 		{
-			// Robot is currently at rest. Add new waypoints so the next call to updateProgress() will
-			// command the motors to start.
-			final Waypoint currentTarget = target;
-			waypoints = findRoute(currentTarget, newTarget);
+			// Update waypoints so the next call to updateProgress() will command the motors to start.
+			waypoints = findRoute(target, newTarget);
+			target = newTarget;
 		}
-		else
+		else // Robot is currently moving toward a target.
 		{
-			// Robot is currently moving toward a target.
 			Waypoint finalWaypoint = waypoints.get(waypoints.size() - 1);
+
 			if (newTarget == finalWaypoint)
 				return; // Nothing to do: Action was already moving toward this target.
 
@@ -86,11 +85,12 @@ public class TiltRouter
 			final Waypoint nextWaypoint = waypoints.get(0);
 			waypoints.clear(); // Abandon old unreached waypoints.
 			waypoints = findRoute(nextWaypoint, newTarget); // Re-route to new target, but finish current waypoint first.
+			target = newTarget;
 		}
 	}
 
-	// Update the Action motion progress against the measured encoder values. If the next waypoint
-	// has been reached then instruct the motors to advance to next waypoint.
+	// Update the tile router progress using the measured encoder values. If the current waypoint
+	// has been reached then instruct the motors to advance to next one.
 	public Waypoint updateProgress(/*Pose measuredPose*/)
 	{
 		if (waypoints.isEmpty()) return null; // Nothing to do: The action has reached its target.
