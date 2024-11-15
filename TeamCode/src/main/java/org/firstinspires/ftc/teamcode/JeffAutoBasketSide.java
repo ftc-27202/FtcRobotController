@@ -340,6 +340,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 bucket.setPosition(BUCKET_DUMP);
+                packet.put("BucketPos", bucket.getPosition());
                 sleep(500);
                 return false;
             }
@@ -353,6 +354,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 bucket.setPosition(BUCKET_CATCH);
+                packet.put("BucketPos", bucket.getPosition());
                 return false;
             }
         }
@@ -451,8 +453,8 @@ public class JeffAutoBasketSide extends LinearOpMode {
     @Override
     public void runOpMode() {
         Pose2d initialPose = new Pose2d(-41, -60, 0);
-//            MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
-        SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
+        MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
+//        SparkFunOTOSDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
         Slide slide = new Slide(hardwareMap);
         Bucket bucket = new Bucket(hardwareMap);
         Arm arm = new Arm(hardwareMap);
@@ -463,16 +465,23 @@ public class JeffAutoBasketSide extends LinearOpMode {
         int visionOutputPosition = 1;
 
         TrajectoryActionBuilder trajDriveToHighBasket = drive.actionBuilder(initialPose)
-                .lineToXConstantHeading(-47);
+                .lineToX(-47);
 
-        TrajectoryActionBuilder trajDriveToCollectSamplePosition = trajDriveToHighBasket.fresh()
+//        TrajectoryActionBuilder trajDriveToCollectSamplePosition1 = trajDriveToHighBasket.fresh()
+//                .splineToConstantHeading(new Vector2d(-54, 0), 0)
+//                .strafeTo(new Vector2d(-48, -8))
+//                .turn(Math.toRadians(180) - 1e-6)
+//                .strafeTo(new Vector2d(-38,-18));
+
+        TrajectoryActionBuilder trajDriveToCollectSamplePosition1 = trajDriveToHighBasket.fresh()
                 .splineToConstantHeading(new Vector2d(-54, 0), 0)
                 .strafeTo(new Vector2d(-48, -8))
                 .turn(Math.toRadians(180) - 1e-6)
                 .strafeTo(new Vector2d(-38,-18));
 
-        TrajectoryActionBuilder trajDriveForwardToCollectSample = trajDriveToCollectSamplePosition.fresh()
+        TrajectoryActionBuilder trajDriveForwardToCollectSample = trajDriveToCollectSamplePosition1.fresh()
                 .lineToXConstantHeading(-48);
+//                .lineToXConstantHeading(-48);
 
         TrajectoryActionBuilder trajDriveToTurn = trajDriveForwardToCollectSample.fresh()
                 .turn(Math.toRadians(180) - 1e-6);
@@ -495,7 +504,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
         telemetry.update();
 
         Action actDriveToHighBasket = trajDriveToHighBasket.build();
-        Action actDriveToCollectSamplePosition = trajDriveToCollectSamplePosition.build();
+        Action actDriveToCollectSamplePosition1 = trajDriveToCollectSamplePosition1.build();
         Action actDriveForwardToCollectSample = trajDriveForwardToCollectSample.build();
         Action actDriveToTurn = trajDriveToTurn.build();
         Action actDriveToHighBasket2 = trajDriveToHighBasket2.build();
@@ -507,26 +516,43 @@ public class JeffAutoBasketSide extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                        actDriveToHighBasket,
+                        trajDriveToHighBasket.build(),
+                        trajDriveToCollectSamplePosition1.build(),
+                        trajDriveForwardToCollectSample.build()
+/*                        actDriveToHighBasket,
                         new ParallelAction(
                             bucket.BucketCatch(),
                             slide.SlidesUpHigh()
                         ),
                         bucket.BucketDump(),
                         new ParallelAction(
-                            actDriveToCollectSamplePosition,
-                            new SequentialAction(
-                                    slide.SlidesDownHalf()
-//                                    ,
-//                                    wrist.WristOut(),
-//                                    intake.IntakeCollect(),
-//                                    arm.ArmCollect()
-                            )
-                        )
-//                                ,
-//                        actDriveForwardToCollectSample
+                            bucket.BucketCatch(),
+                            slide.SlidesDownHalf(),
+                            actDriveToCollectSamplePosition1
+                        ),
+                        new ParallelAction(
+                            wrist.WristOut(),
+                            intake.IntakeCollect(),
+                            arm.ArmCollect()
+                        ),
+                        actDriveForwardToCollectSample
+*/
 //                        ,
-//                        bucket.BucketCatch(),
+//                        new ParallelAction(
+//                            wrist.WristIn(),
+//                            slide.SlidesDownGround(),
+//                            arm.ArmDeposit()
+//                        ),
+//                        new ParallelAction(
+//                            actDriveToTurn,
+//                            intake.IntakeDeposit()
+//                        ),
+//                        new ParallelAction(
+//                            intake.IntakeOff(),
+//                            arm.ArmScoreSampleInLow(),
+//                            actDriveToHighBasket2
+//                        )
+//                        ,
 //                        slide.SlidesDownGround(),
 //                        wrist.WristIn(),
 //                        arm.ArmDeposit(),

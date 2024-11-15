@@ -66,12 +66,12 @@ public class TestMotorAndEncoderNumber extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        oneMotor = hardwareMap.get(DcMotor.class, "rightRear");
+        oneMotor = hardwareMap.get(DcMotor.class, "rightFront");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        oneMotor.setDirection(DcMotor.Direction.REVERSE);
+//        oneMotor.setDirection(DcMotor.Direction.REVERSE);
 
         // Wait for the game to start (driver presses START)
         waitForStart();

@@ -63,14 +63,13 @@ public class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
         // drive model parameters
-        public double inPerTick = 1; // SparkFun OTOS Note: you can probably leave this at 1
-//        public double lateralInPerTick = inPerTick;
-        public double lateralInPerTick = 0.757907232820255;
-        public double trackWidthTicks = 12.57269000553011;
+        public double inPerTick = 2.1; // SparkFun OTOS Note: you can probably leave this at 1
+        public double lateralInPerTick = 1.8;
+        public double trackWidthTicks = 6.944129662046202;
 
         // feedforward parameters (in tick units)
-        public double kS = 0.8246356855607178;
-        public double kV = 0.20410554582227677;
+        public double kS = 0.7192931507786531;
+        public double kV = 0.3737319054327707;
         public double kA = 0.000001;
 
         // path profile parameters (in inches)
@@ -141,6 +140,8 @@ public class MecanumDrive {
 
             // TODO: reverse encoders if needed
             //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+            leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+            leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
         }
 
         @Override
@@ -232,8 +233,6 @@ public class MecanumDrive {
         //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightBack.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
