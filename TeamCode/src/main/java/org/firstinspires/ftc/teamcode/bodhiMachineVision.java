@@ -259,6 +259,7 @@ public class bodhiMachineVision extends LinearOpMode
 
             // Edge detection
             Imgproc.Canny(colorG, dst, 50, 200, 3, false);
+
             // Copy edges to the images that will display the results in BGR
             Imgproc.cvtColor(dst, cdst, Imgproc.COLOR_GRAY2BGR);
             // Standard Hough Line Transform
@@ -272,7 +273,7 @@ public class bodhiMachineVision extends LinearOpMode
                 double x0 = a*rho, y0 = b*rho;
                 Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
                 Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
-                Imgproc.line(cdst, pt1, pt2, new Scalar(0, 0, 255), 3, Imgproc.LINE_AA, 0);
+                Imgproc.line(cdst, pt1, pt2, new Scalar(255, 255, 0), 3, Imgproc.LINE_AA, 0);
             }
 
             //imgThreshold = colorR;
