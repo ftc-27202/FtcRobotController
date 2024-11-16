@@ -170,9 +170,9 @@ public class bodhiMachineVision extends LinearOpMode
         Mat colorR = new Mat();
         Mat colorG = new Mat();
         Mat colorB = new Mat();
-        Mat hsv = new Mat();
         Mat dst = new Mat();
         Mat cdst = new Mat();
+        Mat hsv = new Mat();
         Mat result = new Mat();
         int avg1, avg2, avg3;
 
@@ -204,6 +204,28 @@ public class bodhiMachineVision extends LinearOpMode
             region1_Cb = colorR.submat(new Rect(region1_pointA, region1_pointB));
             region2_Cb = colorR.submat(new Rect(region2_pointA, region2_pointB));
             region3_Cb = colorR.submat(new Rect(region3_pointA, region3_pointB));*/
+        }
+
+        public void houghPolar(Mat input, Scalar color) {
+            // Edge detection
+            Imgproc.Canny(input, dst, 50, 200, 3, false);
+
+            // Copy edges to the images that will display the results in BGR
+            Imgproc.cvtColor(dst, cdst, Imgproc.COLOR_GRAY2BGR);
+            // Standard Hough Line Transform
+            Mat lines = new Mat(); // will hold the results of the detection
+            Imgproc.HoughLines(dst, lines, 1, Math.PI/180, 60); // runs the actual detection
+            // Draw the lines
+            for (int x = 0; x < lines.rows(); x++) {
+                double rho = lines.get(x, 0)[0],
+                        theta = lines.get(x, 0)[1];
+                double a = Math.cos(theta), b = Math.sin(theta);
+                double x0 = a*rho, y0 = b*rho;
+                Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
+                Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
+                Imgproc.line(result, pt1, pt2, color, 3, Imgproc.LINE_AA, 0);
+            }
+
         }
 
         @Override
@@ -257,24 +279,11 @@ public class bodhiMachineVision extends LinearOpMode
             //blue
             Core.inRange(hsv, new Scalar(100, 75, 120), new Scalar(140, 255, 255), colorB);
 
-            // Edge detection
-            Imgproc.Canny(colorG, dst, 50, 200, 3, false);
+            result = input;
 
-            // Copy edges to the images that will display the results in BGR
-            Imgproc.cvtColor(dst, cdst, Imgproc.COLOR_GRAY2BGR);
-            // Standard Hough Line Transform
-            Mat lines = new Mat(); // will hold the results of the detection
-            Imgproc.HoughLines(dst, lines, 1, Math.PI/180, 60); // runs the actual detection
-            // Draw the lines
-            for (int x = 0; x < lines.rows(); x++) {
-                double rho = lines.get(x, 0)[0],
-                        theta = lines.get(x, 0)[1];
-                double a = Math.cos(theta), b = Math.sin(theta);
-                double x0 = a*rho, y0 = b*rho;
-                Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
-                Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
-                Imgproc.line(cdst, pt1, pt2, new Scalar(255, 255, 0), 3, Imgproc.LINE_AA, 0);
-            }
+            houghPolar(colorR, new Scalar(255, 0, 0));
+            houghPolar(colorG, new Scalar(255, 255, 0));
+            houghPolar(colorB, new Scalar(0, 0, 255));
 
             //imgThreshold = colorR;
             //Imgproc.threshold(colorR, imgThreshold, 150, 255, Imgproc.THRESH_BINARY);
@@ -283,12 +292,10 @@ public class bodhiMachineVision extends LinearOpMode
             // Compute the average pixel value of each submat region. We're taking the average of a
             // single channel buffer, so the value we need is at index 0. We could have also taken the
             // average pixel value of the 3-channel image, and referenced the value at index 2 here.
-            List<Mat> listMat = Arrays.asList(colorR, colorG, colorB);
-            Core.merge(listMat, result);
 
             //imgThreshold = (colorR, colorG, colorB);
             //Core.merge(channels, result);
-            return cdst;
+            return result;
             //return imgThreshold;
         }
 
