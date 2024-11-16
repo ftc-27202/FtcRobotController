@@ -21,6 +21,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
@@ -28,6 +29,7 @@ import java.util.Vector;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -35,6 +37,7 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvWebcam;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
@@ -52,14 +55,11 @@ public class bodhiMachineVision extends LinearOpMode
     @Override
     public void runOpMode()
     {
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "cameraMonitorViewId",
-                "id",
-                hardwareMap.appContext.getPackageName());
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
-        phoneCam = OpenCvCameraFactory.getInstance().createInternalCamera(
-                OpenCvInternalCamera.CameraDirection.BACK,
-                cameraMonitorViewId);
+        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+        phoneCam = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
 
         // Specify the image processing pipeline we wish to invoke upon receipt of a frame from the camera.
         // Note that switching pipelines on-the-fly (while a streaming session is in flight) *IS* supported.
@@ -70,7 +70,7 @@ public class bodhiMachineVision extends LinearOpMode
             @Override
             public void onOpened()
             {
-                phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                phoneCam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
