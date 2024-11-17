@@ -415,6 +415,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 intake.setPower(INTAKE_OFF);
+                sleep(500);
                 return false;
             }
         }
@@ -439,19 +440,27 @@ public class JeffAutoBasketSide extends LinearOpMode {
         int visionOutputPosition = 1;
 
         TrajectoryActionBuilder trajDriveToHighBasket = drive.actionBuilder(initialPose)
-                .lineToX(-47);
+                .strafeTo(new Vector2d(-43, -60));
 
         TrajectoryActionBuilder trajDriveToCollectSamplePosition1 = trajDriveToHighBasket.fresh()
-                .splineToConstantHeading(new Vector2d(-54, 0), 0)
-                .strafeToConstantHeading(new Vector2d(-38, -18))
-                .turnTo(Math.toRadians(180));
+                .strafeTo(new Vector2d(-28, -30))
+                .turnTo(Math.toRadians(160))
+                .strafeTo(new Vector2d(-29, -27));
 
-        TrajectoryActionBuilder trajDriveForwardToCollectSample = trajDriveToCollectSamplePosition1.fresh()
-                .strafeToConstantHeading(new Vector2d(-48,-18), new TranslationalVelConstraint(10));
+        TrajectoryActionBuilder trajDriveForwardToCollectSample1 = trajDriveToCollectSamplePosition1.fresh()
+                .strafeTo(new Vector2d(-33, -23), new TranslationalVelConstraint(10));
 
-        TrajectoryActionBuilder trajDriveToHighBasket2 = trajDriveForwardToCollectSample.fresh()
+        TrajectoryActionBuilder trajDriveToHighBasket2 = trajDriveForwardToCollectSample1.fresh()
                 .turnTo(Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(-47,-60),0);
+                .strafeTo(new Vector2d(-45, -60));
+
+        TrajectoryActionBuilder trajDriveToCollectSamplePosition2 = trajDriveToHighBasket2.fresh()
+                .strafeTo(new Vector2d(-45, 2));
+
+        TrajectoryActionBuilder trajDriveToPushSample2 = trajDriveToCollectSamplePosition2.fresh()
+                .lineToX(-58);
+//                .strafeTo(new Vector2d(-58, 4));
+//                .strafeTo(new Vector2d(-48, -60));
 
         // actions that need to happen on init; for instance, a claw tightening.
         //      Actions.runBlocking(claw.closeClaw());
@@ -468,8 +477,11 @@ public class JeffAutoBasketSide extends LinearOpMode {
 
         Action actDriveToHighBasket = trajDriveToHighBasket.build();
         Action actDriveToCollectSamplePosition1 = trajDriveToCollectSamplePosition1.build();
-        Action actDriveForwardToCollectSample = trajDriveForwardToCollectSample.build();
+        Action actDriveForwardToCollectSample1 = trajDriveForwardToCollectSample1.build();
         Action actDriveToHighBasket2 = trajDriveToHighBasket2.build();
+        Action actDriveToCollectSamplePosition2 = trajDriveToCollectSamplePosition2.build();
+        Action actDriveToPushSample2 = trajDriveToPushSample2.build();
+
 
         waitForStart();
         this.resetRuntime();
@@ -494,28 +506,64 @@ public class JeffAutoBasketSide extends LinearOpMode {
                             intake.IntakeCollect(),
                             arm.ArmCollect()
                         ),
-                        actDriveForwardToCollectSample,
+                        actDriveForwardToCollectSample1,
                         new ParallelAction(
                             wrist.WristIn(),
                             slide.SlidesDownGround(),
                             arm.ArmDeposit()
                         ),
                         intake.IntakeDeposit(),
+                        actDriveToHighBasket2,
                         new ParallelAction(
-                            arm.ArmScoreSampleInLow(),
                             intake.IntakeOff(),
-                            actDriveToHighBasket2
+                            arm.ArmScoreSampleInLow(),
+                            slide.SlidesUpHigh()
                         ),
-                        slide.SlidesUpHigh(),
                         bucket.BucketDump(),
                         arm.ArmCollapsedIntoRobot(),
+                        slide.SlidesDownGround(),
                         new ParallelAction(
-                            slide.SlidesDownGround(),
-                            bucket.BucketCatch()
+                            bucket.BucketCatch(),
+                            actDriveToCollectSamplePosition2
                         )
+//                        ,
+//                        actDriveToPushSample2
+//                        ,
+//                        new ParallelAction(
+//                            wrist.WristOut(),
+//                            intake.IntakeCollect(),
+//                            arm.ArmCollect()
+//                        ),
+//                        actDriveForwardToCollectSample2,
+//                        new ParallelAction(
+//                            wrist.WristIn(),
+//                            slide.SlidesDownGround(),
+//                            arm.ArmDeposit()
+//                        ),
+//                        intake.IntakeDeposit(),
+//                        actDriveToHighBasket3,
+//                        new ParallelAction(
+//                            intake.IntakeOff(),
+//                            arm.ArmScoreSampleInLow(),
+//                            slide.SlidesUpHigh()
+//                        ),
+//                        bucket.BucketDump()
+//                        ,
+
+
+
+//                        ,
+//                        arm.ArmCollapsedIntoRobot(),
+//                        new ParallelAction(
+//                            slide.SlidesDownGround(),
+//                            bucket.BucketCatch()
+//                        )
                 )
         );
 
+        telemetry.addData("x", drive.pose.position.x);
+        telemetry.addData("y", drive.pose.position.y);
+        telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
         telemetry.addData("Duration", this.getRuntime());
         telemetry.update();
     }
