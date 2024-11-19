@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode; /* Copyright (c) 2023 FIRST. All rights reserved.
+package org.firstinspires.ftc.teamcode.backup; /* Copyright (c) 2023 FIRST. All rights reserved.
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted (subject to the limitations in the disclaimer below) provided that
@@ -78,17 +78,6 @@ package org.firstinspires.ftc.teamcode; /* Copyright (c) 2023 FIRST. All rights 
   * Use Android Studio to Copy this Class, and Paste it into the TeamCode/src/main/java/org/firstinspires/ftc/teamcode folder.
   * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
   */
-
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Trajectory;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
 
 @Autonomous(name = "Auto Jeff Meet 1", group = "drive")
  @Disabled
