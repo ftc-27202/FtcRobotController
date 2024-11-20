@@ -164,7 +164,7 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
         rightSlide.setTargetPosition(slideTargetPosition);
 //        rightSlide.setPower(2.0);
         rightSlide.setPower(0.80);
-        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         super.loop();
     }

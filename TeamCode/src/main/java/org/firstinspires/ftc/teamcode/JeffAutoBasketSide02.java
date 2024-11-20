@@ -433,7 +433,6 @@ public class JeffAutoBasketSide02 extends LinearOpMode {
         this.resetRuntime();
 
         if (isStopRequested()) return;
-
         Actions.runBlocking(
             new SequentialAction(
                 new ParallelAction(
@@ -468,65 +467,66 @@ public class JeffAutoBasketSide02 extends LinearOpMode {
                     actDriveToHighBasket2
                 ),
                 bucket.BucketDump(),
-                new SleepAction(0.5),
-                new ParallelAction(
-                    slide.SlidesDownGround(),
-                    actDriveToCollectSamplePosition2,
-                    wrist.WristOut(),
-                    intake.IntakeCollect(),
-                    arm.ArmCollect()
-                ),
-                actDriveForwardToCollectSample2,
-                new ParallelAction(
-                    new SequentialAction(
-                        new ParallelAction(
-                            bucket.BucketCatch(),
-                            wrist.WristIn(),
-                            arm.ArmDeposit()
-                        ),
-                        intake.IntakeDeposit(),
-                        new ParallelAction(
-                            arm.ArmClearBucket(),
-                            slide.SlidesUpHigh()
-                        ),
-                        intake.IntakeOff()
-                    ),
-                    actDriveToHighBasket3
-                ),
-                bucket.BucketDump(),
-                new SleepAction(0.5),
-                new ParallelAction(
-                    slide.SlidesDownGround(),
-                    actDriveToCollectSamplePosition3,
-                    wrist.WristOut(),
-                    intake.IntakeCollect(),
-                    arm.ArmCollect()
-                ),
-                actDriveForwardToCollectSample3,
-                new ParallelAction(
-                    new SequentialAction(
-                        new ParallelAction(
-                            bucket.BucketCatch(),
-                            wrist.WristIn(),
-                            arm.ArmDeposit()
-                        ),
-                        intake.IntakeDeposit(),
-                        new ParallelAction(
-                            arm.ArmClearBucket(),
-                            slide.SlidesUpHigh()
-                        ),
-                        intake.IntakeOff()
-                    ),
-                    actDriveToHighBasket4
-                ),
-                bucket.BucketDump(),
-                new SleepAction(0.5),
-                new ParallelAction(
-                    bucket.BucketCatch(),
-                    arm.ArmCollapsedIntoRobot(),
-                    slide.SlidesDownGround(),
-                    actDriveToPark
-                )
+                new SleepAction(0.5)
+//                    ,
+//                new ParallelAction(
+//                    slide.SlidesDownGround(),
+//                    actDriveToCollectSamplePosition2,
+//                    wrist.WristOut(),
+//                    intake.IntakeCollect(),
+//                    arm.ArmCollect()
+//                ),
+//                actDriveForwardToCollectSample2,
+//                new ParallelAction(
+//                    new SequentialAction(
+//                        new ParallelAction(
+//                            bucket.BucketCatch(),
+//                            wrist.WristIn(),
+//                            arm.ArmDeposit()
+//                        ),
+//                        intake.IntakeDeposit(),
+//                        new ParallelAction(
+//                            arm.ArmClearBucket(),
+//                            slide.SlidesUpHigh()
+//                        ),
+//                        intake.IntakeOff()
+//                    ),
+//                    actDriveToHighBasket3
+//                ),
+//                bucket.BucketDump(),
+//                new SleepAction(0.5),
+//                new ParallelAction(
+//                    slide.SlidesDownGround(),
+//                    actDriveToCollectSamplePosition3,
+//                    wrist.WristOut(),
+//                    intake.IntakeCollect(),
+//                    arm.ArmCollect()
+//                ),
+//                actDriveForwardToCollectSample3,
+//                new ParallelAction(
+//                    new SequentialAction(
+//                        new ParallelAction(
+//                            bucket.BucketCatch(),
+//                            wrist.WristIn(),
+//                            arm.ArmDeposit()
+//                        ),
+//                        intake.IntakeDeposit(),
+//                        new ParallelAction(
+//                            arm.ArmClearBucket(),
+//                            slide.SlidesUpHigh()
+//                        ),
+//                        intake.IntakeOff()
+//                    ),
+//                    actDriveToHighBasket4
+//                ),
+//                bucket.BucketDump(),
+//                new SleepAction(0.5),
+//                new ParallelAction(
+//                    bucket.BucketCatch(),
+//                    arm.ArmCollapsedIntoRobot(),
+//                    slide.SlidesDownGround(),
+//                    actDriveToPark
+//                )
             )
         );
 
