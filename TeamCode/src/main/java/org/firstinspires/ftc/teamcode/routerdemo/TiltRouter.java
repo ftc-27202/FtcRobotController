@@ -25,6 +25,7 @@ public class TiltRouter
 		ASCENT_HIGH_HANG   // Hook hanging on high specimen bar.
 	}
 
+	// Structure that describes the tilt mechanism state in human-readable terms (like degrees).
 	public static class Pose
 	{
 		double tiltAngleDeg;       // Tilt angles are relative to world "up" when viewed from robot's left side.
@@ -48,6 +49,7 @@ public class TiltRouter
 		}
 	}
 
+	private long lastTargetChangeTimeMillis;
 	private Waypoint target;
 	private List<Waypoint> waypoints = new ArrayList<>();
 
@@ -60,9 +62,8 @@ public class TiltRouter
 	{
 		if (waypoints.isEmpty()) // Robot is currently at rest.
 		{
-			// Update waypoints so the next call to updateProgress() will command the motors to start.
+			// Set new waypoints so the next call to updateProgress() will command the motors to start.
 			waypoints = findRoute(target, newTarget);
-			target = newTarget;
 		}
 		else // Robot is currently moving toward a target.
 		{
@@ -71,14 +72,16 @@ public class TiltRouter
 			if (newTarget == finalWaypoint)
 				return; // Nothing to do: Action was already moving toward this target.
 
-			// Switch to the new target by replacing the existing waypoints, but finish the current
-			// waypoint before starting toward the new target. Routes only ensure safe movement between
-			// known waypoints so changing the path between waypoints could cause a collision.
+			// Switch to the new target by replacing the existing waypoints, but allow the current leg
+			// to finish before starting toward the new target. Routes ensure safe motion between known
+			// waypoints but changing the path between arbitrary waypoints could cause a collision.
 			final Waypoint nextWaypoint = waypoints.get(0);
 			waypoints.clear(); // Abandon old unreached waypoints.
-			waypoints = findRoute(nextWaypoint, newTarget); // Re-route to new target, but finish current waypoint first.
-			target = newTarget;
+			waypoints = findRoute(nextWaypoint, newTarget); // Re-route to new target.
 		}
+
+		lastTargetChangeTimeMillis = System.currentTimeMillis();
+		target = newTarget;
 	}
 
 	// Update the tile router progress using the measured encoder values. If the current waypoint
@@ -91,27 +94,28 @@ public class TiltRouter
 		final Pose currentPose = RobotGeometry.convertToPose(currentEncoderPositions);
 		final Waypoint nextWaypoint = waypoints.get(0);
 
-		if (RobotGeometry.atWaypoint(nextWaypoint, currentPose))
+		if (RobotGeometry.isAtWaypoint(nextWaypoint, currentPose))
 		{
 			// Reached the next waypoint. Pop it off and determine what's next.
 			waypoints.remove(0);
 
-			if (waypoints.isEmpty())
+			if (waypoints.isEmpty()) // Tilt has reached its destination.
 			{
-				; // Action has reached its destination. Turn off motors at a resting position?
+				if (target == Waypoint.COMPACT)
+					; // Turn off motor power at a resting position?
+
+				// TODO(mike): How do we kill power? (and where do we start it up again?)
 			}
 			else
 			{
 				return waypoints.get(0);
 			}
 		}
-/*
 		else // Not there yet.
 		{
-			if (lastTargetCommandTime - currentTime() > 1500) {}
-				kill power?
+			if (System.currentTimeMillis() - lastTargetChangeTimeMillis > 2000)
+				; // kill power to motors?
 		}
-*/
 
 		return null;
 	}

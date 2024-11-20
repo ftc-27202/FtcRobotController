@@ -26,6 +26,46 @@ public class RobotGeometry
 	public static final int WRIST_TWIST_MIN_DEG = -90;      //
 	public static final int WRIST_TWIST_MAX_DEG = 90;       //
 
+	public static RobotMotors.DriveMotorPowerLevels calculateDriveMotorPowerLevels(
+			float leftStickX, float leftStickY, float rightStickX, float rightTrigger)
+	{
+		final double speed = rightTrigger > 0 ? 0.6 : 1.0;
+		final double turnSpeed = rightTrigger > 0 ? 0.2 : 1.0;
+
+		// POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+		final double axial = -leftStickY;  // Note: pushing stick forward gives negative value
+		final double lateral = leftStickX;
+		final double yaw = rightStickX * turnSpeed;
+
+		// Combine the joystick requests for each axis-motion to determine each wheel's power.
+		// Set up a variable for each drive wheel to save the power level for telemetry.
+		double frontLeftPower = axial + lateral + yaw;
+		double frontRightPower = axial - lateral - yaw;
+		double backLeftPower = axial - lateral + yaw;
+		double backRightPower = axial + lateral - yaw;
+
+		// Normalize the values so no wheel power exceeds 100%
+		// This ensures that the robot maintains the desired motion.
+		double max;
+		max = Math.max(Math.abs(frontLeftPower), Math.abs(frontRightPower));
+		max = Math.max(max, Math.abs(backLeftPower));
+		max = Math.max(max, Math.abs(backRightPower));
+
+		if (max > 1.0)
+		{
+			frontLeftPower /= max;
+			frontRightPower /= max;
+			backLeftPower /= max;
+			backRightPower /= max;
+		}
+
+		return new RobotMotors.DriveMotorPowerLevels(
+				frontLeftPower * speed,
+				backLeftPower * speed,
+				frontRightPower * speed,
+				backRightPower * speed);
+	}
+
 	public static double convertToEncoderPosition(@NonNull ClawRouter.Waypoint waypoint)
 	{
 		switch (waypoint)
@@ -171,33 +211,33 @@ public class RobotGeometry
 		return convertToEncoderPositions(pose);
 	}
 
-	private static boolean valueWithin(double v0, double v1, double delta)
+	private static boolean isValueWithin(double v0, double v1, double delta)
 	{
 		return Math.abs(v0 - v1) <= delta;
 	}
 
-	private static boolean valueWithin(int v0, double v1, double delta)
+	private static boolean isValueWithin(int v0, double v1, double delta)
 	{
 		return Math.abs(v0 - v1) <= delta;
 	}
 
-	public static boolean atWaypoint(TiltRouter.Waypoint waypoint, TiltRouter.Pose currentPose)
+	public static boolean isAtWaypoint(TiltRouter.Waypoint waypoint, TiltRouter.Pose currentPose)
 	{
 		final TiltRouter.Pose waypointPose = convertToPose(waypoint);
 
-		if (!valueWithin(waypointPose.tiltAngleDeg, currentPose.tiltAngleDeg, 5.0))
+		if (!isValueWithin(waypointPose.tiltAngleDeg, currentPose.tiltAngleDeg, 5.0))
 			return false;
 
-		if (!valueWithin(waypointPose.slidePosition, currentPose.slidePosition, 10))
+		if (!isValueWithin(waypointPose.slidePosition, currentPose.slidePosition, 10))
 			return false;
 
-		if (!valueWithin(waypointPose.armPivotAngleDeg, currentPose.armPivotAngleDeg, 5.0))
+		if (!isValueWithin(waypointPose.armPivotAngleDeg, currentPose.armPivotAngleDeg, 5.0))
 			return false;
 
-		if (!valueWithin(waypointPose.wristPivotAngleDeg, currentPose.wristPivotAngleDeg, 5.0))
+		if (!isValueWithin(waypointPose.wristPivotAngleDeg, currentPose.wristPivotAngleDeg, 5.0))
 			return false;
 
-		if (!valueWithin(waypointPose.wristTwistAngleDeg, currentPose.wristTwistAngleDeg, 5.0))
+		if (!isValueWithin(waypointPose.wristTwistAngleDeg, currentPose.wristTwistAngleDeg, 5.0))
 			return false;
 
 		return true;

@@ -2,12 +2,35 @@ package org.firstinspires.ftc.teamcode.routerdemo;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class RobotMotors
 {
-	// This class provides a single structure to hold all of the tilt-related motor positions.
+	// Structure to hold drive motor power levels.
+	public static class DriveMotorPowerLevels
+	{
+		double driveMotorFrontLeft;
+		double driveMotorBackLeft;
+		double driveMotorFrontRight;
+		double driveMotorBackRight;
+
+		public DriveMotorPowerLevels(
+				double driveMotorFrontLeft,
+				double driveMotorBackLeft,
+				double driveMotorFrontRight,
+				double driveMotorBackRight)
+		{
+			this.driveMotorFrontLeft = driveMotorFrontLeft;
+			this.driveMotorBackLeft = driveMotorBackLeft;
+			this.driveMotorFrontRight = driveMotorFrontRight;
+			this.driveMotorBackRight = driveMotorBackRight;
+		}
+	}
+
+	// Structure to hold all of the tilt-related motor positions.
 	public static class TiltEncoderPositions
 	{
 		int tiltPosition;
@@ -37,7 +60,7 @@ public class RobotMotors
 		}
 	}
 
-	// Declare member variables for the motors and servos.
+	// Declare member variables for all motors and servos.
 	public DcMotor driveMotorFrontLeft = null;
 	public DcMotor driveMotorBackLeft = null;
 	public DcMotor driveMotorFrontRight = null;
@@ -69,6 +92,14 @@ public class RobotMotors
 		wristPivotServo = hardwareMap.get(Servo.class, "WRIST_PIVOT_SERVO");
 		wristTwistServo = hardwareMap.get(Servo.class, "WRIST_TWIST_SERVO");
 		clawGraspServo = hardwareMap.get(Servo.class, "CLAW_GRASP_SERVO");
+	}
+
+	public void setDriveMotorPowerLevels(@NonNull DriveMotorPowerLevels levels)
+	{
+		driveMotorFrontLeft.setPower(levels.driveMotorFrontLeft);
+		driveMotorFrontRight.setPower(levels.driveMotorFrontRight);
+		driveMotorBackLeft.setPower(levels.driveMotorBackLeft);
+		driveMotorBackRight.setPower(levels.driveMotorBackRight);
 	}
 
 	public void setClawTarget(double position)

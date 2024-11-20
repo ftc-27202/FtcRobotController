@@ -12,9 +12,10 @@ public class RouterTestTeleOpMode extends OpMode
 	@Override
 	public void init()
 	{
+		// Initialize motors using robot configuration.
 		motors.init();
 
-		// Initialize the routers to reflect the robot's starting state.
+		// Initialize the routers to match the robot's starting state.
 		tiltRouter.init(TiltRouter.Waypoint.COMPACT);
 		clawRouter.init(ClawRouter.Waypoint.OPEN);
 	}
@@ -22,8 +23,13 @@ public class RouterTestTeleOpMode extends OpMode
 	@Override
 	public void loop()
 	{
+		final RobotMotors.DriveMotorPowerLevels driveMotorPowerLevels = RobotGeometry.calculateDriveMotorPowerLevels(
+				gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_trigger);
+
+		motors.setDriveMotorPowerLevels(driveMotorPowerLevels);
+
 		//
-		// Handle driver inputs. Don't issue motor commands -- just set targets.
+		// Handle tilt and claw inputs but don't issue motor commands -- just set targets.
 		//
 
 		if (gamepad2.dpad_down)
@@ -47,7 +53,7 @@ public class RouterTestTeleOpMode extends OpMode
 		}
 
 		//
-		// Update the routers based on current state and capture updated targets.
+		// Update the routers based on current encoder states and capture any target updates.
 		//
 
 		final double currentClawPosition = motors.getClawEncoderPosition();
@@ -59,7 +65,7 @@ public class RouterTestTeleOpMode extends OpMode
 			motors.setClawTarget(newEncoderTarget);
 		}
 
-		// Update the tilt tracking based on the current encoder values. A new waypoint will be
+		// Update the tilt router based on the current encoder values. A new waypoint will be
 		// returned (one time) if the motors require new instructions.
 		final RobotMotors.TiltEncoderPositions currentTiltPositions = motors.getTiltEncoderPositions();
 		final TiltRouter.Waypoint newTiltWaypoint = tiltRouter.updateProgress(currentTiltPositions);
