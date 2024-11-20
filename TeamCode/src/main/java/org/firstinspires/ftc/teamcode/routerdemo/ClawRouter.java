@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.routerdemo;
 
 public class ClawRouter
 {
@@ -26,7 +26,7 @@ public class ClawRouter
 
 	// Update the Action motion progress against the measured encoder values. If the next waypoint
 	// has been reached then instruct the motors to advance to next waypoint.
-	public Waypoint updateProgress(/*ServoState servoState*/)
+	public Waypoint updateProgress(double clawEncoderPosition)
 	{
 		return target; // incomplete
 	}

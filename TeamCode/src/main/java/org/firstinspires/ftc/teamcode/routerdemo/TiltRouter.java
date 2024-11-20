@@ -1,19 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.routerdemo;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * The tilt router is responsible for safely moving the claw between preset poses, or waypoints.
- * The tilt mechanism consists of several components, including:
- *
- *   Tilt motor           tiltMotor         "TILT_MOTOR"
- *   Left linear slide    slideMotorLeft    "MOTOR_LEFT"
- *   Right linear slide   slideMotorRight   "MOTOR_RIGHT"
- *   Arm pivot servo      armPivotServo     "ARM_PIVOT_SERVO"
- *   Wrist pivot servo    wristPivotServo   "WRIST_PIVOT_SERVO"
- *   Wrist twist servo    wristTwistServo   "WRIST_TWISE_SERVO"
- */
+//
+// The tilt router is responsible for safely moving the claw between preset waypoint poses.
+//
 public class TiltRouter
 {
 	public enum Waypoint
@@ -21,33 +13,38 @@ public class TiltRouter
 		COMPACT,           // Fits inside an 18" cube.
 		DRIVE_CONFIG,      // Close to sample picking config but stable for driving.
 		SAFE_PASS_THROUGH, // Intermediate waypoint that won't collide with slides.
-		PICK_HOVER,        // Hover over sample for a photo opportunity.
-		PICK,              // x
-		BASKET_LOW,        // x
-		BASKET_HIGH,       // x
-		SPECIMEN_LOW,      // x
-		SPECIMEN_HIGH,     // x
-		ASCENT_LOW_HOVER,  // x
-		ASCENT_LOW_HANG,   // x
-		ASCENT_HIGH_HOVER, // x
-		ASCENT_HIGH_HANG   // x
+		PICK_HOVER,        // Hover over sample for a photo op.
+		PICK,              // Claw lowered to pick up a sample off the ground.
+		BASKET_LOW,        // Claw positioned over low basket.
+		BASKET_HIGH,       // Claw positioned over high basket.
+		SPECIMEN_LOW,      // Claw positioned over low specimen bar.
+		SPECIMEN_HIGH,     // Claw positioned over high specimen bar.
+		ASCENT_LOW_HOVER,  // Hook positioned over low ascent bar.
+		ASCENT_LOW_HANG,   // Hook hanging on low specimen bar.
+		ASCENT_HIGH_HOVER, // Hook positioned over high ascent bar.
+		ASCENT_HIGH_HANG   // Hook hanging on high specimen bar.
 	}
 
 	public static class Pose
 	{
-		double slidePosition;   // Linear slide extension value used by left and right slides.
-		double tiltAngle;       // Tilt angles are relative to world "up" when viewed from robot's left side.
-		double armPivotAngle;   // Arm pivot angles are relative to slide direction when viewed from robot's left side.
-		double wristPivotAngle; // Angle relative to arm when viewed from robot's left side.
-		double wristTwistAngle; // Angle relative to center when looking straight at it.
+		double tiltAngleDeg;       // Tilt angles are relative to world "up" when viewed from robot's left side.
+		int slidePosition;         // Linear slide extension value used by left and right slides.
+		double armPivotAngleDeg;   // Arm pivot angles are relative to slide direction when viewed from robot's left side.
+		double wristPivotAngleDeg; // Angle relative to arm when viewed from robot's left side.
+		double wristTwistAngleDeg; // Angle relative to center when looking straight at it.
 
-		Pose(double slidePosition, double tiltAngle, double armPivotAngle, double wristPivotAngle, double wristTwistAngle)
+		public Pose(
+				double tiltAngleDeg,
+				int slidePosition,
+				double armPivotAngleDeg,
+				double wristPivotAngleDeg,
+				double wristTwistAngleDeg)
 		{
+			this.tiltAngleDeg = tiltAngleDeg;
 			this.slidePosition = slidePosition;
-			this.tiltAngle = tiltAngle;
-			this.armPivotAngle = armPivotAngle;
-			this.wristPivotAngle = wristPivotAngle;
-			this.wristTwistAngle = wristTwistAngle;
+			this.armPivotAngleDeg = armPivotAngleDeg;
+			this.wristPivotAngleDeg = wristPivotAngleDeg;
+			this.wristTwistAngleDeg = wristTwistAngleDeg;
 		}
 	}
 
@@ -57,11 +54,6 @@ public class TiltRouter
 	public void init(Waypoint state)
 	{
 		target = state;
-	}
-
-	public Waypoint getTarget()
-	{
-		return target;
 	}
 
 	public void setTarget(Waypoint newTarget)
@@ -91,12 +83,15 @@ public class TiltRouter
 
 	// Update the tile router progress using the measured encoder values. If the current waypoint
 	// has been reached then instruct the motors to advance to next one.
-	public Waypoint updateProgress(/*Pose measuredPose*/)
+	public Waypoint updateProgress(RobotMotors.TiltEncoderPositions currentEncoderPositions)
 	{
-		if (waypoints.isEmpty()) return null; // Nothing to do: The action has reached its target.
+		if (waypoints.isEmpty())
+			return null; // Nothing to do: The action has reached its target.
 
+		final Pose currentPose = RobotGeometry.convertToPose(currentEncoderPositions);
 		final Waypoint nextWaypoint = waypoints.get(0);
-		if (true) // AreClose(measuredPose, nextWaypoint))
+
+		if (RobotGeometry.atWaypoint(nextWaypoint, currentPose))
 		{
 			// Reached the next waypoint. Pop it off and determine what's next.
 			waypoints.remove(0);
