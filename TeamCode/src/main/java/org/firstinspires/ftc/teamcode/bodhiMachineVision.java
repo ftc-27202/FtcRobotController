@@ -22,6 +22,8 @@
 package org.firstinspires.ftc.teamcode;
 
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
@@ -49,7 +51,10 @@ import org.openftc.easyopencv.OpenCvPipeline;
 @TeleOp(name = "Bodhi Machine Vision", group = "Robot")
 
 public class bodhiMachineVision extends LinearOpMode {
+
+
     OpenCvCamera phoneCam;
+    SkystoneDeterminationPipeline pipeline;
 
     @Override
     public void runOpMode()  {
@@ -59,12 +64,13 @@ public class bodhiMachineVision extends LinearOpMode {
 
         phoneCam = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
 
+        pipeline = new SkystoneDeterminationPipeline();
+
         // Specify the image processing pipeline we wish to invoke upon receipt of a frame from the camera.
         // Note that switching pipelines on-the-fly (while a streaming session is in flight) *IS* supported.
-        phoneCam.setPipeline(new SkystoneDeterminationPipeline());
+        phoneCam.setPipeline(pipeline);
 
-        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
+        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened()
             {
@@ -84,8 +90,7 @@ public class bodhiMachineVision extends LinearOpMode {
         // Wait for the user to press start on the Driver Station
         waitForStart();
 
-        while (opModeIsActive())
-        {
+        while (opModeIsActive()) {
             // Send some stats to the telemetry
             telemetry.addData("Frame Count", phoneCam.getFrameCount());
             telemetry.addData("FPS", String.format("%.2f", phoneCam.getFps()));
@@ -93,10 +98,10 @@ public class bodhiMachineVision extends LinearOpMode {
             telemetry.addData("Pipeline time ms", phoneCam.getPipelineTimeMs());
             telemetry.addData("Overhead time ms", phoneCam.getOverheadTimeMs());
             telemetry.addData("Theoretical max FPS", phoneCam.getCurrentPipelineMaxFps());
+            telemetry.addData("Angle", pipeline.getAnalysis());
             telemetry.update();
 
-            if (gamepad1.a)
-            {
+            if (gamepad1.a) {
                 // IMPORTANT NOTE: calling stopStreaming() will indeed stop the stream of images
                 // from the camera (and, by extension, stop calling your vision pipeline). HOWEVER,
                 // if the reason you wish to stop the stream early is to switch use of the camera
@@ -137,7 +142,7 @@ public class bodhiMachineVision extends LinearOpMode {
         Mat result = new Mat();
 
         // Volatile since accessed by OpMode thread w/o synchronization
-        private volatile int position = 0;
+        private volatile ArrayList<Double> angles;
 
         @Override
         public void init(Mat firstFrame) {
@@ -155,7 +160,7 @@ public class bodhiMachineVision extends LinearOpMode {
             region3_Cb = colorR.submat(new Rect(region3_pointA, region3_pointB));*/
         }
 
-        public void houghPolar(Mat input, Scalar color) {
+        public ArrayList<Double> houghPolar(Mat input, Scalar color) {
             // Edge detection
             Imgproc.Canny(input, dst, 50, 200, 3, false);
 
@@ -165,25 +170,34 @@ public class bodhiMachineVision extends LinearOpMode {
             Mat lines = new Mat(); // will hold the results of the detection
             Imgproc.HoughLines(dst, lines, 1, Math.PI/180, 60); // runs the actual detection
             // Draw the lines
+
+            ArrayList<Double> angles = new ArrayList<Double>();
+
             for (int x = 0; x < Math.min(lines.rows(), 2); x++) {
                 double rho = lines.get(x, 0)[0],
                         theta = lines.get(x, 0)[1];
                 double a = Math.cos(theta), b = Math.sin(theta);
-                double x0 = a*rho, y0 = b*rho;
-                Point pt1 = new Point(Math.round(x0 + 1000*(-b)), Math.round(y0 + 1000*(a)));
-                Point pt2 = new Point(Math.round(x0 - 1000*(-b)), Math.round(y0 - 1000*(a)));
+                double x0 = a * rho, y0 = b * rho;
+                Point pt1 = new Point(Math.round(x0 + 1000 * (-b)), Math.round(y0 + 1000 * (a)));
+                Point pt2 = new Point(Math.round(x0 - 1000 * (-b)), Math.round(y0 - 1000 * (a)));
+
                 Imgproc.line(result, pt1, pt2, color, 3, Imgproc.LINE_AA, 0);
+
+                double dy = pt1.y - pt2.y;
+                double dx = pt1.x - pt2.x;
+
+                angles.add(Math.atan2(dy, dx) * (180 / Math.PI));
             }
 
+            return angles;
         }
 
         @Override
-        public Mat processFrame(Mat input)
-        {
+        public Mat processFrame(Mat input) {
             Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV, 4);
             
             //red
-            Core.inRange(hsv, new Scalar(230, 15, 100), new Scalar(255, 255, 255), colorR0);
+            Core.inRange(hsv, new Scalar(160, 15, 170), new Scalar(180, 255, 255), colorR0);
             Core.inRange(hsv, new Scalar(0, 15, 170), new Scalar(15, 255, 255), colorR1);
 
             Core.add(colorR0, colorR1, colorR);
@@ -194,20 +208,21 @@ public class bodhiMachineVision extends LinearOpMode {
 
             result = input;
 
-            houghPolar(colorR, new Scalar(255, 0, 0));
-            houghPolar(colorG, new Scalar(255, 255, 0));
-            houghPolar(colorB, new Scalar(0, 0, 255));
+            ArrayList<Double> angleR = houghPolar(colorR, new Scalar(255, 0, 0));
+            ArrayList<Double> angleG = houghPolar(colorG, new Scalar(255, 255, 0));
+            ArrayList<Double> angleB = houghPolar(colorB, new Scalar(0, 0, 255));
+
+            angles = angleR;
 
             //return result;
-            List<Mat> listMat = Arrays.asList(colorR0, colorG, colorB);
-            Core.merge(listMat, result);
+            //List<Mat> listMat = Arrays.asList(colorR0, colorG, colorB);
+            //Core.merge(listMat, result);
             return result;
         }
 
         // Call this from the OpMode thread to obtain the latest analysis
-        public int getAnalysis()
-        {
-            return position;
+        public ArrayList<Double> getAnalysis() {
+            return angles;
         }
     }
 }
