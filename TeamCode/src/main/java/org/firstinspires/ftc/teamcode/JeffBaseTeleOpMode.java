@@ -9,7 +9,10 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.LLStatus;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 @TeleOp(name = "Jeff Base Two Driver TeleOp", group = "Robot")
@@ -17,7 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 public class JeffBaseTeleOpMode extends OpMode {
     public DcMotor leftSlide;
     public DcMotor rightSlide;
-
+    public Limelight3A limelight;
     public DcMotor leftFrontDrive;
     public DcMotor leftBackDrive;
     public DcMotor rightFrontDrive;
@@ -70,6 +73,10 @@ public class JeffBaseTeleOpMode extends OpMode {
     double lastSlideActionTime = getRuntime();
 
     public void init() {
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
+        limelight.start(); // This tells Limelight to start looking!
+        limelight.pipelineSwitch(0); // Switch to pipeline number 0
         leftSlide = hardwareMap.get(DcMotor.class, "leftSlide");
         leftSlide.setDirection(DcMotor.Direction.FORWARD);
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
