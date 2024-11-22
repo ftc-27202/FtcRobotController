@@ -124,14 +124,12 @@ public class JeffAutoBasketSide extends LinearOpMode {
                         * 1 / 360.0; // Ticks per degree, not per rotation
         final double ARM_COLLAPSED_INTO_ROBOT = 0;
         final double ARM_COLLECT = 225 * ARM_TICKS_PER_DEGREE;
-        final double ARM_CLEAR_BARRIER = 210 * ARM_TICKS_PER_DEGREE;
-//        final double ARM_CLEAR_BARRIER = 215 * ARM_TICKS_PER_DEGREE;
+        final double ARM_CLEAR_BARRIER = 200 * ARM_TICKS_PER_DEGREE;
         final double ARM_SCORE_SPECIMEN = 160 * ARM_TICKS_PER_DEGREE;
         final double ARM_SCORE_SAMPLE_IN_LOW = 160 * ARM_TICKS_PER_DEGREE;
         final double ARM_LEVEL_ONE_ASCENT = 125 * ARM_TICKS_PER_DEGREE;
         final double ARM_CLEAR_BUCKET = 105 * ARM_TICKS_PER_DEGREE;
         final double ARM_DEPOSIT = 74 * ARM_TICKS_PER_DEGREE;
-//        final double ARM_DEPOSIT = 80 * ARM_TICKS_PER_DEGREE;
         final double ARM_WINCH_ROBOT = 10 * ARM_TICKS_PER_DEGREE;
 
         public Arm(HardwareMap hardwareMap) {
@@ -425,18 +423,17 @@ public class JeffAutoBasketSide extends LinearOpMode {
                 .strafeToSplineHeading(new Vector2d(-54, -44), Math.toRadians(45));
 
         TrajectoryActionBuilder trajDriveToCollectSamplePosition3 = trajDriveToHighBasket3.endTrajectory().fresh()
-                .strafeToSplineHeading(new Vector2d(-50, -29), Math.toRadians(160));
+                .strafeToSplineHeading(new Vector2d(-50, -30), Math.toRadians(160));
 
         TrajectoryActionBuilder trajDriveForwardToCollectSample3 = trajDriveToCollectSamplePosition3.endTrajectory().fresh()
-                .strafeTo(new Vector2d(-53, -26), new TranslationalVelConstraint(10));
+                .strafeTo(new Vector2d(-53, -27), new TranslationalVelConstraint(10));
 
         TrajectoryActionBuilder trajDriveToHighBasket4 = trajDriveForwardToCollectSample3.endTrajectory().fresh()
                 .strafeToSplineHeading(new Vector2d(-54, -44), Math.toRadians(45));
 
         TrajectoryActionBuilder trajDriveToPark = trajDriveToHighBasket4.endTrajectory().fresh()
                 .strafeToSplineHeading(new Vector2d(-10, -60), Math.toRadians(0))
-                .strafeTo(new Vector2d(20, -60));
-//                .strafeToSplineHeading(new Vector2d(20, -62), Math.toRadians(0));
+                .strafeTo(new Vector2d(32, -60));
 
         while (!isStopRequested() && !opModeIsActive()) {
             telemetry.addData("x", drive.pose.position.x);
@@ -475,9 +472,12 @@ public class JeffAutoBasketSide extends LinearOpMode {
                     actDriveToCollectSamplePosition1,
                     wrist.WristOut(),
                     intake.IntakeCollect(),
-                    arm.ArmCollect()
+                    arm.ArmClearBarrier()
                 ),
-                actDriveForwardToCollectSample1,
+                new ParallelAction(
+                    arm.ArmCollect(),
+                    actDriveForwardToCollectSample1
+                ),
                 new ParallelAction(
                     new SequentialAction(
                         new ParallelAction(
