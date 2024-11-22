@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -9,6 +10,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -18,16 +20,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import java.lang.Math;
-
 @Config
-@Autonomous(name = "AA_Auto01 (Basket Side)", group = "Autonomous")
-public class JeffAutoBasketSide01 extends LinearOpMode {
+@Autonomous(name = "AA_Auto (Basket Side)", group = "Autonomous")
+public class JeffAutoBasketSide extends LinearOpMode {
     public class Slide {
         private DcMotorEx leftSlide;
         private DcMotorEx rightSlide;
@@ -48,8 +47,8 @@ public class JeffAutoBasketSide01 extends LinearOpMode {
             rightSlide.setDirection(DcMotorSimple.Direction.REVERSE);
             rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            leftSlide.setPower(0.8);
-            rightSlide.setPower(0.8);
+            leftSlide.setPower(1.0);
+            rightSlide.setPower(1.0);
             leftSlide.setTargetPosition(SLIDE_GROUND);
             rightSlide.setTargetPosition(SLIDE_GROUND);
             leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -62,15 +61,15 @@ public class JeffAutoBasketSide01 extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    leftSlide.setPower(0.8);
-                    rightSlide.setPower(0.8);
+                    leftSlide.setPower(1.0);
+                    rightSlide.setPower(1.0);
                     initialized = true;
                 }
 
                 double posLeftSlide = rightSlide.getCurrentPosition();
                 double posRightSlide = rightSlide.getCurrentPosition();
                 packet.put("posLeftSlide", posLeftSlide);
-                packet.put("rightSlidePos", posRightSlide);
+                packet.put("posRightSlide", posRightSlide);
                 if (posRightSlide < SLIDE_HIGH) {
                     leftSlide.setTargetPosition(SLIDE_HIGH);
                     rightSlide.setTargetPosition(SLIDE_HIGH);
@@ -91,15 +90,15 @@ public class JeffAutoBasketSide01 extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    leftSlide.setPower(0.8);
-                    rightSlide.setPower(0.8);
+                    leftSlide.setPower(1.0);
+                    rightSlide.setPower(1.0);
                     initialized = true;
                 }
 
                 double posLeftSlide = rightSlide.getCurrentPosition();
                 double posRightSlide = rightSlide.getCurrentPosition();
                 packet.put("posLeftSlide", posLeftSlide);
-                packet.put("rightSlidePos", posRightSlide);
+                packet.put("posRightSlide", posRightSlide);
                 if (posRightSlide > (SLIDE_GROUND + 100)) {
                     leftSlide.setTargetPosition(SLIDE_GROUND);
                     rightSlide.setTargetPosition(SLIDE_GROUND);
@@ -113,66 +112,6 @@ public class JeffAutoBasketSide01 extends LinearOpMode {
         public Action SlidesDownGround() {
             return new SlidesDownGround();
         }
-
-        public class SlidesDownHalf implements Action {
-            private boolean initialized = false;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    leftSlide.setPower(0.8);
-                    rightSlide.setPower(0.8);
-                    initialized = true;
-                }
-
-                double posLeftSlide = rightSlide.getCurrentPosition();
-                double posRightSlide = rightSlide.getCurrentPosition();
-                packet.put("posLeftSlide", posLeftSlide);
-                packet.put("rightSlidePos", posRightSlide);
-                if (posRightSlide > SLIDE_HALF) {
-                    leftSlide.setTargetPosition(SLIDE_HALF);
-                    rightSlide.setTargetPosition(SLIDE_HALF);
-                    return true;
-                } else {
-                    leftSlide.setPower(0);
-                    rightSlide.setPower(0);
-                    return false;
-                }
-            }
-        }
-
-        public Action SlidesDownHalf() {
-            return new SlidesDownHalf();
-        }
-
-        public class SlidesUpHalf implements Action {
-            private boolean initialized = false;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    leftSlide.setPower(0.8);
-                    rightSlide.setPower(0.8);
-                    initialized = true;
-                }
-
-                double posLeftSlide = rightSlide.getCurrentPosition();
-                double posRightSlide = rightSlide.getCurrentPosition();
-                packet.put("posLeftSlide", posLeftSlide);
-                packet.put("rightSlidePos", posRightSlide);
-                if (posRightSlide < SLIDE_HIGH) {
-                    leftSlide.setTargetPosition(SLIDE_HALF);
-                    rightSlide.setTargetPosition(SLIDE_HALF);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-
-        public Action SlidesUpHalf() {
-            return new SlidesUpHalf();
-        }
     }
 
     public class Arm {
@@ -185,12 +124,14 @@ public class JeffAutoBasketSide01 extends LinearOpMode {
                         * 1 / 360.0; // Ticks per degree, not per rotation
         final double ARM_COLLAPSED_INTO_ROBOT = 0;
         final double ARM_COLLECT = 225 * ARM_TICKS_PER_DEGREE;
-        final double ARM_CLEAR_BARRIER = 215 * ARM_TICKS_PER_DEGREE;
+        final double ARM_CLEAR_BARRIER = 210 * ARM_TICKS_PER_DEGREE;
+//        final double ARM_CLEAR_BARRIER = 215 * ARM_TICKS_PER_DEGREE;
         final double ARM_SCORE_SPECIMEN = 160 * ARM_TICKS_PER_DEGREE;
         final double ARM_SCORE_SAMPLE_IN_LOW = 160 * ARM_TICKS_PER_DEGREE;
         final double ARM_LEVEL_ONE_ASCENT = 125 * ARM_TICKS_PER_DEGREE;
-//        final double ARM_DEPOSIT = 74 * ARM_TICKS_PER_DEGREE;
-        final double ARM_DEPOSIT = 80 * ARM_TICKS_PER_DEGREE;
+        final double ARM_CLEAR_BUCKET = 105 * ARM_TICKS_PER_DEGREE;
+        final double ARM_DEPOSIT = 74 * ARM_TICKS_PER_DEGREE;
+//        final double ARM_DEPOSIT = 80 * ARM_TICKS_PER_DEGREE;
         final double ARM_WINCH_ROBOT = 10 * ARM_TICKS_PER_DEGREE;
 
         public Arm(HardwareMap hardwareMap) {
@@ -207,7 +148,7 @@ public class JeffAutoBasketSide01 extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    armMotor.setPower(0.8);
+                    armMotor.setPower(1.0);
                     initialized = true;
                 }
 
@@ -232,7 +173,7 @@ public class JeffAutoBasketSide01 extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    armMotor.setPower(0.8);
+                    armMotor.setPower(1.0);
                     initialized = true;
                 }
 
@@ -251,13 +192,63 @@ public class JeffAutoBasketSide01 extends LinearOpMode {
             return new ArmDeposit();
         }
 
+        public class ArmClearBucket implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    armMotor.setPower(1.0);
+                    initialized = true;
+                }
+
+                double pos = armMotor.getCurrentPosition();
+                packet.put("armMotorPos", pos / ARM_TICKS_PER_DEGREE);
+                if (pos < ARM_CLEAR_BUCKET) {
+                    armMotor.setTargetPosition((int) ARM_CLEAR_BUCKET);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        public Action ArmClearBucket() {
+            return new ArmClearBucket();
+        }
+
+        public class ArmClearBarrier implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    armMotor.setPower(1.0);
+                    initialized = true;
+                }
+
+                double pos = armMotor.getCurrentPosition();
+                packet.put("armMotorPos", pos / ARM_TICKS_PER_DEGREE);
+                if (pos < ARM_CLEAR_BARRIER) {
+                    armMotor.setTargetPosition((int) ARM_CLEAR_BARRIER);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        public Action ArmClearBarrier() {
+            return new ArmClearBarrier();
+        }
+
         public class ArmCollapsedIntoRobot implements Action {
             private boolean initialized = false;
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    armMotor.setPower(0.8);
+                    armMotor.setPower(1.0);
                     initialized = true;
                 }
 
@@ -274,31 +265,6 @@ public class JeffAutoBasketSide01 extends LinearOpMode {
 
         public Action ArmCollapsedIntoRobot() {
             return new ArmCollapsedIntoRobot();
-        }
-
-        public class ArmScoreSampleInLow implements Action {
-            private boolean initialized = false;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    armMotor.setPower(0.8);
-                    initialized = true;
-                }
-
-                double pos = armMotor.getCurrentPosition();
-                packet.put("armMotorPos", pos / ARM_TICKS_PER_DEGREE);
-                if (pos < ARM_SCORE_SAMPLE_IN_LOW) {
-                    armMotor.setTargetPosition((int) ARM_SCORE_SAMPLE_IN_LOW);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-
-        public Action ArmScoreSampleInLow() {
-            return new ArmScoreSampleInLow();
         }
     }
 
@@ -317,7 +283,6 @@ public class JeffAutoBasketSide01 extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket packet) {
                 bucket.setPosition(BUCKET_DUMP);
                 packet.put("BucketPos", bucket.getPosition());
-                sleep(500);
                 return false;
             }
         }
@@ -442,22 +407,36 @@ public class JeffAutoBasketSide01 extends LinearOpMode {
                 .strafeTo(new Vector2d(-43, -60));
 
         TrajectoryActionBuilder trajDriveToCollectSamplePosition1 = trajDriveToHighBasket.endTrajectory().fresh()
-                .strafeToSplineHeading(new Vector2d(-29, -27), Math.toRadians(160));
+                .strafeToSplineHeading(new Vector2d(-30, -33), Math.toRadians(160));
 
         TrajectoryActionBuilder trajDriveForwardToCollectSample1 = trajDriveToCollectSamplePosition1.endTrajectory().fresh()
-                .strafeTo(new Vector2d(-33, -23), new TranslationalVelConstraint(10));
+                .strafeTo(new Vector2d(-34, -29), new TranslationalVelConstraint(10));
 
         TrajectoryActionBuilder trajDriveToHighBasket2 = trajDriveForwardToCollectSample1.endTrajectory().fresh()
-                .strafeToSplineHeading(new Vector2d(-45, -60), Math.toRadians(0));
+                .strafeToSplineHeading(new Vector2d(-54, -44), Math.toRadians(45));
 
         TrajectoryActionBuilder trajDriveToCollectSamplePosition2 = trajDriveToHighBasket2.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(-45, 2))
-                .strafeToConstantHeading(new Vector2d(-55, 2))
-                .strafeToConstantHeading(new Vector2d(-55, -54))
-                .strafeToConstantHeading(new Vector2d(-55, 2))
-                .strafeToConstantHeading(new Vector2d(-60, 2))
-                .strafeToConstantHeading(new Vector2d(-60, -54))
-                .strafeToConstantHeading(new Vector2d(48, -60));
+                .strafeToSplineHeading(new Vector2d(-40, -22), Math.toRadians(180));
+
+        TrajectoryActionBuilder trajDriveForwardToCollectSample2 = trajDriveToCollectSamplePosition2.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-46, -22), new TranslationalVelConstraint(10));
+
+        TrajectoryActionBuilder trajDriveToHighBasket3 = trajDriveForwardToCollectSample2.endTrajectory().fresh()
+                .strafeToSplineHeading(new Vector2d(-54, -44), Math.toRadians(45));
+
+        TrajectoryActionBuilder trajDriveToCollectSamplePosition3 = trajDriveToHighBasket3.endTrajectory().fresh()
+                .strafeToSplineHeading(new Vector2d(-50, -29), Math.toRadians(160));
+
+        TrajectoryActionBuilder trajDriveForwardToCollectSample3 = trajDriveToCollectSamplePosition3.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-53, -26), new TranslationalVelConstraint(10));
+
+        TrajectoryActionBuilder trajDriveToHighBasket4 = trajDriveForwardToCollectSample3.endTrajectory().fresh()
+                .strafeToSplineHeading(new Vector2d(-54, -44), Math.toRadians(45));
+
+        TrajectoryActionBuilder trajDriveToPark = trajDriveToHighBasket4.endTrajectory().fresh()
+                .strafeToSplineHeading(new Vector2d(-10, -60), Math.toRadians(0))
+                .strafeTo(new Vector2d(20, -60));
+//                .strafeToSplineHeading(new Vector2d(20, -62), Math.toRadians(0));
 
         while (!isStopRequested() && !opModeIsActive()) {
             telemetry.addData("x", drive.pose.position.x);
@@ -471,56 +450,127 @@ public class JeffAutoBasketSide01 extends LinearOpMode {
         Action actDriveForwardToCollectSample1 = trajDriveForwardToCollectSample1.build();
         Action actDriveToHighBasket2 = trajDriveToHighBasket2.build();
         Action actDriveToCollectSamplePosition2 = trajDriveToCollectSamplePosition2.build();
+        Action actDriveForwardToCollectSample2 = trajDriveForwardToCollectSample2.build();
+        Action actDriveToHighBasket3 = trajDriveToHighBasket3.build();
+        Action actDriveToCollectSamplePosition3 = trajDriveToCollectSamplePosition3.build();
+        Action actDriveForwardToCollectSample3 = trajDriveForwardToCollectSample3.build();
+        Action actDriveToHighBasket4 = trajDriveToHighBasket3.build();
+        Action actDriveToPark = trajDriveToPark.build();
 
         waitForStart();
         this.resetRuntime();
 
         if (isStopRequested()) return;
-
         Actions.runBlocking(
-                new SequentialAction(
-                        new ParallelAction(
-                            bucket.BucketCatch(),
-                            slide.SlidesUpHigh(),
-                            actDriveToHighBasket
-                        ),
-                        bucket.BucketDump(),
-                        new ParallelAction(
-                            slide.SlidesDownHalf(),
-                            actDriveToCollectSamplePosition1,
-                            wrist.WristOut(),
-                            intake.IntakeCollect(),
-                            arm.ArmScoreSampleInLow(),
-                            new SequentialAction(
-                                arm.ArmCollect(),
-                                slide.SlidesDownGround()
-                            )
-                        ),
-                        actDriveForwardToCollectSample1,
+            new SequentialAction(
+                new ParallelAction(
+                    bucket.BucketCatch(),
+                    slide.SlidesUpHigh(),
+                    actDriveToHighBasket
+                ),
+                bucket.BucketDump(),
+                new SleepAction(0.5),
+                new ParallelAction(
+                    slide.SlidesDownGround(),
+                    actDriveToCollectSamplePosition1,
+                    wrist.WristOut(),
+                    intake.IntakeCollect(),
+                    arm.ArmCollect()
+                ),
+                actDriveForwardToCollectSample1,
+                new ParallelAction(
+                    new SequentialAction(
                         new ParallelAction(
                             bucket.BucketCatch(),
                             wrist.WristIn(),
                             arm.ArmDeposit()
                         ),
-                        new ParallelAction(
+                        new SequentialAction(
                             intake.IntakeDeposit(),
-                            new SequentialAction(
-                                arm.ArmScoreSampleInLow(),
-                                intake.IntakeOff(),
-                                slide.SlidesUpHigh()
-                            ),
-                            actDriveToHighBasket2
+                            new SleepAction(0.5)
                         ),
-                        bucket.BucketDump(),
+                        new ParallelAction(
+                            arm.ArmClearBucket(),
+                            slide.SlidesUpHigh()
+                        ),
+                        intake.IntakeOff()
+                    ),
+                    actDriveToHighBasket2
+                ),
+                bucket.BucketDump(),
+                new SleepAction(0.5),
+                new ParallelAction(
+                    slide.SlidesDownGround(),
+                    actDriveToCollectSamplePosition2,
+                    wrist.WristOut(),
+                    intake.IntakeCollect(),
+                    arm.ArmClearBarrier()
+                ),
+                new ParallelAction(
+                    arm.ArmCollect(),
+                    actDriveForwardToCollectSample2
+                ),
+                new ParallelAction(
+                    new SequentialAction(
                         new ParallelAction(
                             bucket.BucketCatch(),
-                            new SequentialAction(
-                                arm.ArmCollapsedIntoRobot(),
-                                slide.SlidesDownGround()
-                            ),
-                            actDriveToCollectSamplePosition2
-                        )
+                            wrist.WristIn(),
+                            arm.ArmDeposit()
+                        ),
+                        new SequentialAction(
+                            intake.IntakeDeposit(),
+                            new SleepAction(0.5)
+                        ),
+                        new ParallelAction(
+                            arm.ArmClearBucket(),
+                            slide.SlidesUpHigh()
+                        ),
+                        intake.IntakeOff()
+                    ),
+                    actDriveToHighBasket3
+                ),
+                bucket.BucketDump(),
+                new SleepAction(0.5),
+                new ParallelAction(
+                    slide.SlidesDownGround(),
+                    actDriveToCollectSamplePosition3,
+                    wrist.WristOut(),
+                    intake.IntakeCollect(),
+                    arm.ArmClearBarrier()
+                ),
+                new ParallelAction(
+                    arm.ArmCollect(),
+                    actDriveForwardToCollectSample3
+                ),
+                new ParallelAction(
+                    new SequentialAction(
+                        new ParallelAction(
+                            bucket.BucketCatch(),
+                            wrist.WristIn(),
+                            arm.ArmDeposit()
+                        ),
+                        new SequentialAction(
+                            intake.IntakeDeposit(),
+                            new SleepAction(0.5)
+                        ),
+                        new ParallelAction(
+                            arm.ArmClearBucket(),
+                            slide.SlidesUpHigh()
+                        ),
+                        intake.IntakeOff()
+                    ),
+                    actDriveToHighBasket4
+                ),
+                bucket.BucketDump(),
+                new SleepAction(0.5),
+                new ParallelAction(
+                    bucket.BucketCatch(),
+                    arm.ArmCollapsedIntoRobot(),
+                    slide.SlidesDownGround()
+                        ,
+                    actDriveToPark
                 )
+            )
         );
 
         telemetry.addData("Duration", this.getRuntime());
