@@ -32,10 +32,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-@TeleOp(name = "Jeff Two Driver TeleOp", group = "Robot")
+@TeleOp(name = "Two Driver TeleOp", group = "Robot")
 
-//@Disabled
-public class TwoDriverTeleOpModeSurge extends SurgeBaseTeleOpMode {
+public class TwoDriverTeleOpMode extends BaseTeleOpMode {
 
     public void loop () {
         //if left_trigger: speed = 0.6; else speed = 1.0

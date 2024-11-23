@@ -12,9 +12,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-@TeleOp(name = "Surge Base Two Driver TeleOp", group = "Robot")
+@TeleOp(name = "Base Two Driver TeleOp", group = "Robot")
 @Disabled
-public class SurgeBaseTeleOpMode extends OpMode {
+public class BaseTeleOpMode extends OpMode {
     public DcMotor leftFrontDrive;
     public DcMotor leftBackDrive;
     public DcMotor rightFrontDrive;
