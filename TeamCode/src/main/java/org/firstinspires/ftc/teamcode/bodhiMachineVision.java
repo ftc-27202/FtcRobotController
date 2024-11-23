@@ -142,7 +142,7 @@ public class bodhiMachineVision extends LinearOpMode {
         Mat result = new Mat();
 
         // Volatile since accessed by OpMode thread w/o synchronization
-        private volatile ArrayList<Double> angles;
+        private volatile double angles;
 
         @Override
         public void init(Mat firstFrame) {
@@ -160,7 +160,7 @@ public class bodhiMachineVision extends LinearOpMode {
             region3_Cb = colorR.submat(new Rect(region3_pointA, region3_pointB));*/
         }
 
-        public ArrayList<Double> houghPolar(Mat input, Scalar color) {
+        public double houghPolar(Mat input, Scalar color) {
             // Edge detection
             Imgproc.Canny(input, dst, 50, 200, 3, false);
 
@@ -186,9 +186,20 @@ public class bodhiMachineVision extends LinearOpMode {
                 double dy = pt1.y - pt2.y;
                 double dx = pt1.x - pt2.x;
 
-                angles.add(Math.atan2(dy, dx) * (180 / Math.PI));
+                double angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                angles.add(angle);
+                //angles.add(angle < 0 ? 180 - Math.abs(angle) : angle);
             }
-            return angles;
+
+            double fAngle = 0;
+            double sumAngles = 0;
+
+            for (int i = 0; i < angles.size(); i++) {
+                sumAngles += angles.get(i);
+            }
+            fAngle = angles.isEmpty() ? 0 : sumAngles / angles.size();
+
+            return fAngle;
         }
 
         @Override
@@ -207,9 +218,9 @@ public class bodhiMachineVision extends LinearOpMode {
 
             result = input;
 
-            ArrayList<Double> angleR = houghPolar(colorR, new Scalar(255, 0, 0));
-            ArrayList<Double> angleG = houghPolar(colorG, new Scalar(255, 255, 0));
-            ArrayList<Double> angleB = houghPolar(colorB, new Scalar(0, 0, 255));
+            double angleR = houghPolar(colorR, new Scalar(255, 0, 0));
+            double angleG = houghPolar(colorG, new Scalar(255, 255, 0));
+            double angleB = houghPolar(colorB, new Scalar(0, 0, 255));
 
             angles = angleR;
 
@@ -220,7 +231,7 @@ public class bodhiMachineVision extends LinearOpMode {
         }
 
         // Call this from the OpMode thread to obtain the latest analysis
-        public ArrayList<Double> getAnalysis() {
+        public double getAnalysis() {
             return angles;
         }
     }
