@@ -92,7 +92,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 @Autonomous(name = "Test Auto", group = "drive")
-
+@Disabled
 public class TestAuto extends LinearOpMode {
     @Override
     public void runOpMode() {

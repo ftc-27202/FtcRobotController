@@ -32,7 +32,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-@TeleOp(name = "Two Driver TeleOp", group = "Robot")
+@TeleOp(name = "Two Driver TeleOpX", group = "Robot")
 
 public class TwoDriverTeleOpMode extends BaseTeleOpMode {
 

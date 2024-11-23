@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.sandbox;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name = "2 Driver TeleOp", group = "Iterative OpMode")
-
+@Disabled
 public class TwoDriverTeleOpMode extends BaseTeleOpMode {
 
     @Override
