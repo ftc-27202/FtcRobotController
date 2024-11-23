@@ -191,7 +191,7 @@ public class bodhiMachineVision extends LinearOpMode {
 
                 double rawAngle = Math.atan2(dy, dx) * (180 / Math.PI);
                 double angle = 180 - Math.abs(rawAngle);
-                angles.add(angle * (rawAngle < 0 ? 1 : -1));
+                angles.add(angle * (rawAngle < 0 ? -1 : 1));
                 //angles.add(angle < 0 ? 180 - Math.abs(angle) : angle);
             }
 
@@ -208,6 +208,7 @@ public class bodhiMachineVision extends LinearOpMode {
                 for (int j = 0; j < angleIncrements.length; j++) {
                     if (areClose(mainAngle, cAngle + angleIncrements[j], 1)) {
                         sumAngles += cAngle + angleIncrements[j];
+                        validAngles += 1;
                         break;
                     }
                 }
