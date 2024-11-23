@@ -186,8 +186,9 @@ public class bodhiMachineVision extends LinearOpMode {
                 double dy = pt1.y - pt2.y;
                 double dx = pt1.x - pt2.x;
 
-                double angle = Math.atan2(dy, dx) * (180 / Math.PI);
-                angles.add(angle);
+                double rawAngle = Math.atan2(dy, dx) * (180 / Math.PI);
+                double angle = 180 - Math.abs(rawAngle);
+                angles.add(angle * (rawAngle < 0 ? 1 : -1));
                 //angles.add(angle < 0 ? 180 - Math.abs(angle) : angle);
             }
 
