@@ -168,7 +168,7 @@ public class bodhiMachineVision extends LinearOpMode {
             Imgproc.cvtColor(dst, cdst, Imgproc.COLOR_GRAY2BGR);
             // Standard Hough Line Transform
             Mat lines = new Mat(); // will hold the results of the detection
-            Imgproc.HoughLines(dst, lines, 1, Math.PI/180, 60); // runs the actual detection
+            Imgproc.HoughLines(dst, lines, 1, Math.PI / 180, 60); // runs the actual detection
             // Draw the lines
 
             ArrayList<Double> angles = new ArrayList<Double>();
@@ -188,7 +188,6 @@ public class bodhiMachineVision extends LinearOpMode {
 
                 angles.add(Math.atan2(dy, dx) * (180 / Math.PI));
             }
-
             return angles;
         }
 
