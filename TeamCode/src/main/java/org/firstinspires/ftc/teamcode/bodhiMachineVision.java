@@ -160,6 +160,9 @@ public class bodhiMachineVision extends LinearOpMode {
             region3_Cb = colorR.submat(new Rect(region3_pointA, region3_pointB));*/
         }
 
+        public boolean areClose(double i1, double i2, double range) {
+            return Math.abs(i1 - i2) <= range;
+        }
         public double houghPolar(Mat input, Scalar color) {
             // Edge detection
             Imgproc.Canny(input, dst, 50, 200, 3, false);
@@ -193,13 +196,24 @@ public class bodhiMachineVision extends LinearOpMode {
             }
 
             double fAngle = 0;
-            double sumAngles = 0;
+            double mainAngle = angles.isEmpty() ? 0 : angles.get(0);
+            double sumAngles = mainAngle;
+            double validAngles = angles.isEmpty() ? 0 : 1;
 
-            for (int i = 0; i < angles.size(); i++) {
-                sumAngles += angles.get(i);
+            int[] angleIncrements = {0, -90, 90};
+
+            for (int i = 1; i < angles.size(); i++) {
+                double cAngle = angles.get(i);
+
+                for (int j = 0; j < angleIncrements.length; j++) {
+                    if (areClose(mainAngle, cAngle + angleIncrements[j], 1)) {
+                        sumAngles += cAngle + angleIncrements[j];
+                        break;
+                    }
+                }
             }
-            fAngle = angles.isEmpty() ? 0 : sumAngles / angles.size();
 
+            fAngle = angles.isEmpty() ? 0 : sumAngles / validAngles;
             return fAngle;
         }
 
