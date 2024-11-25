@@ -44,7 +44,7 @@ public class TiltRouter
 		}
 		else // Robot is moving toward the restingPreset.
 		{
-			if (target == resetingPreset)
+			if (target == restingPreset)
 				return; // Nothing to do: Action was already moving toward this restingPreset.
 
 			// Switch to the new restingPreset by replacing the existing routePresets, but allow the current leg
@@ -61,7 +61,7 @@ public class TiltRouter
 
 	// Update the tile route progress using the measured encoder values. If the current waypoint
 	// has been reached then instruct the motors to advance to next one.
-	public Preset updateProgress(TiltMotors.Pose currentPose)
+	public TiltMotors.Pose updateProgress(TiltMotors.Pose currentPose)
 	{
 		if (routePresets.isEmpty())
 			return null; // Nothing to do: The action has reached its restingPreset.
@@ -69,7 +69,7 @@ public class TiltRouter
 		final Preset nextPreset = routePresets.get(0);
 		final TiltMotors.Pose nextPose = RobotGeometry.toPose(nextPreset);
 
-		if (currentPose.isCloseTo(nextPose))
+		if (TiltMotors.areClose(currentPose, nextPose))
 		{
 			// Reached the next waypoint. Pop it off and determine what's next.
 			routePresets.remove(0);
@@ -83,7 +83,7 @@ public class TiltRouter
 			}
 			else
 			{
-				return routePresets.get(0);
+				return RobotGeometry.toPose(routePresets.get(0));
 			}
 		}
 		else // Not there yet.

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.routerdemo;
 
+import androidx.annotation.NonNull;
+
 public class ClawRouter
 {
 	public enum Preset
@@ -26,9 +28,9 @@ public class ClawRouter
 
 	// Update the Action motion progress against the measured encoder values. If the next waypoint
 	// has been reached then instruct the motors to advance to next waypoint.
-	public Preset updateProgress(@NonNull double clawEncoderPosition)
+	public ClawServo.Pose updateProgress(ClawServo.Pose currentPose)
 	{
-		return target; // incomplete
+		return currentPose; // incomplete
 	}
 
 	// there needs to be something different than Preset to report "holding sample"

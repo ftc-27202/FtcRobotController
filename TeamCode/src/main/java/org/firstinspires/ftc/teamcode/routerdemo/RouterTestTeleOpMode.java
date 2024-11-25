@@ -27,7 +27,7 @@ public class RouterTestTeleOpMode extends OpMode
 	@Override
 	public void loop()
 	{
-		final DriveMotors.PowerLevels drivePowerLevels = RobotGeometry.calculateDrivePowers(gamepad1);
+		final DriveMotors.PowerLevels drivePowerLevels = RobotGeometry.calculateDrivePower(gamepad1);
 
 		driveMotors.setPowerLevels(drivePowerLevels);
 
@@ -72,7 +72,7 @@ public class RouterTestTeleOpMode extends OpMode
 		final TiltMotors.Pose currentTiltPose = tiltMotors.getCurrentPose();
 		final TiltMotors.Pose newTiltPoseTarget = tiltRouter.updateProgress(currentTiltPose);
 
-		if (newTiltTarget != null)
+		if (newTiltPoseTarget != null)
 		{
 			tiltMotors.setTarget(newTiltPoseTarget);
 		}

@@ -18,10 +18,10 @@ public class DriveMotors
 		double backRight;
 
 		public PowerLevels(
-				@NonNull double frontLeft,
-				@NonNull double frontRight,
-				@NonNull double backLeft,
-				@NonNull double backRight)
+				double frontLeft,
+				double frontRight,
+				double backLeft,
+				double backRight)
 		{
 			this.frontLeft = frontLeft;
 			this.frontRight = frontRight;
@@ -46,9 +46,9 @@ public class DriveMotors
 
 	public void setPowerLevels(@NonNull PowerLevels levels)
 	{
-		frontLeftMotor.setPower(levels.frontLeftMotor);
-		frontRightMotor.setPower(levels.frontRightMotor);
-		backLeftMotor.setPower(levels.backLeftMotor);
-		backRightMotor.setPower(levels.backRightMotor);
+		frontLeftMotor.setPower(levels.frontLeft);
+		frontRightMotor.setPower(levels.frontRight);
+		backLeftMotor.setPower(levels.backLeft);
+		backRightMotor.setPower(levels.backRight);
 	}
 }

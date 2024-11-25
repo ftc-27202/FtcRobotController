@@ -21,13 +21,13 @@ public class TiltMotors
 		double wristTwistPosition;
 
 		public Pose(
-				@NonNull int tiltPosition,
-				@NonNull int slidePositionLeft,
-				@NonNull int slidePositionRight,
-				@NonNull double armPivotPositionLeft,
-				@NonNull double armPivotPositionRight,
-				@NonNull double wristPivotPosition,
-				@NonNull double wristTwistPosition)
+				int tiltPosition,
+				int slidePositionLeft,
+				int slidePositionRight,
+				double armPivotPositionLeft,
+				double armPivotPositionRight,
+				double wristPivotPosition,
+				double wristTwistPosition)
 		{
 			this.tiltPosition = tiltPosition;
 			this.slidePositionLeft = slidePositionLeft;
@@ -36,33 +36,6 @@ public class TiltMotors
 			this.armPivotPositionRight = armPivotPositionRight;
 			this.wristPivotPosition = wristPivotPosition;
 			this.wristTwistPosition = wristTwistPosition;
-		}
-
-		boolean isClose(int lhs, int rhs, int maxDelta)
-		{
-			return Math.abs(lhs - rhs) <= maxDelta;
-		}
-
-		boolean isClose(double lhs, double rhs, double maxDelta)
-		{
-			return Math.abs(lhs - rhs) <= maxDelta;
-		}
-
-		boolean isCloseTo(Pose rhs)
-		{
-			static final int maxTiltDelta = 50;
-			static final int maxSlideDelta = 50;
-			static final double maxArmPivotDelta = 0.1;
-			static final double maxWristPivotDelta = 0.1;
-			static final double maxWristTwistDelta = 0.1;
-
-			return isClose(tiltPosition, rhs.tiltPosition, maxTiltDelta) &&
-				isClose(slidePositionLeft, rhs.slidePositionLeft, maxSlideDelta) &&
-				isClose(slidePositionRight, rhs.slidePositionRight, maxSlideDelta) &&
-				isClose(armPivotPositionLeft, rhs.armPivotPositionLeft, maxArmPivotDelta) &&
-				isClose(armPivotPositionRight, rhs.armPivotPositionRight, maxArmPivotDelta) &&
-				isClose(wristPivotPosition, rhs.wristPivotPosition, maxWristPivotDelta) &&
-				isClose(wristTwistPosition, rhs.wristTwistPosition, maxWristTwistDelta);
 		}
 	}
 
@@ -77,11 +50,6 @@ public class TiltMotors
 
 	public void init()
 	{
-		driveMotorFrontLeft = hardwareMap.get(DcMotor.class, "DRIVE_MOTOR_FL");
-		driveMotorBackLeft = hardwareMap.get(DcMotor.class, "DRIVE_MOTOR_BL");
-		driveMotorFrontRight = hardwareMap.get(DcMotor.class, "DRIVE_MOTOR_FR");
-		driveMotorBackRight = hardwareMap.get(DcMotor.class, "DRIVE_MOTOR_BR");
-
 		tiltMotor = hardwareMap.get(DcMotor.class, "TILT_MOTOR");
 		slideMotorLeft = hardwareMap.get(DcMotor.class, "SLIDE_MOTOR_L");
 		slideMotorRight = hardwareMap.get(DcMotor.class, "SLIDE_MOTOR_R");
@@ -115,5 +83,32 @@ public class TiltMotors
 				wristPivotServo.getPosition(),
 				wristTwistServo.getPosition()
 		);
+	}
+
+	private static boolean areClose(int lhs, int rhs, int maxDelta)
+	{
+		return Math.abs(lhs - rhs) <= maxDelta;
+	}
+
+	private static boolean areClose(double lhs, double rhs, double maxDelta)
+	{
+		return Math.abs(lhs - rhs) <= maxDelta;
+	}
+
+	public static boolean areClose(@NonNull Pose lhs, @NonNull Pose rhs)
+	{
+		final int maxTiltDelta = 50;
+		final int maxSlideDelta = 50;
+		final double maxArmPivotDelta = 0.1;
+		final double maxWristPivotDelta = 0.1;
+		final double maxWristTwistDelta = 0.1;
+
+		return areClose(lhs.tiltPosition, rhs.tiltPosition, maxTiltDelta) &&
+				areClose(lhs.slidePositionLeft, rhs.slidePositionLeft, maxSlideDelta) &&
+				areClose(lhs.slidePositionRight, rhs.slidePositionRight, maxSlideDelta) &&
+				areClose(lhs.armPivotPositionLeft, rhs.armPivotPositionLeft, maxArmPivotDelta) &&
+				areClose(lhs.armPivotPositionRight, rhs.armPivotPositionRight, maxArmPivotDelta) &&
+				areClose(lhs.wristPivotPosition, rhs.wristPivotPosition, maxWristPivotDelta) &&
+				areClose(lhs.wristTwistPosition, rhs.wristTwistPosition, maxWristTwistDelta);
 	}
 }
