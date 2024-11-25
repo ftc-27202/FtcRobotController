@@ -19,8 +19,9 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.sandbox;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -40,7 +41,7 @@ import org.openftc.easyopencv.OpenCvPipeline;
 // Android camera API
 
 @TeleOp(name = "Camera Example TeleOp", group = "Robot")
-
+@Disabled
 public class CameraExampleTeleOp extends LinearOpMode
 {
 	OpenCvCamera phoneCam;

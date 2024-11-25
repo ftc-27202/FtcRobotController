@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.sandbox;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -51,7 +51,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name = "Test Motor and Encoder (one motor at a time)", group = "Linear OpMode")
-
+@Disabled
 public class TestMotorAndEncoderNumber extends LinearOpMode {
 
     // Declare OpMode members.

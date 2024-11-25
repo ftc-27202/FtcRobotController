@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.sandbox;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -92,7 +92,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 @Autonomous(name = "Test Auto", group = "drive")
-
+@Disabled
 public class TestAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
