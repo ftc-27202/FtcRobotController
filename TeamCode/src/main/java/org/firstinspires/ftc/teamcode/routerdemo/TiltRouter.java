@@ -98,7 +98,7 @@ public class TiltRouter
 	// Build a list of routePresets that will safely transition the robot from startPreset to
 	// restingPreset. The resulting list includes startPreset, restingPreset, and any intermediate
 	// poses required for safe travel.
-	public List<Preset> findRoute(Preset startPreset, Preset restingPreset)
+	public List<Preset> findRoute(Preset startPreset, Preset restingPreset) // twistOrientation
 	{
 		ArrayList<Preset> routePresets = new ArrayList<Preset>();
 
@@ -106,6 +106,20 @@ public class TiltRouter
 
 		switch (startPreset)
 		{
+			case CENTERED_PHOTO_HOVER:
+				if (restingPreset == ORIENTED_FLOOR_PICK)
+				{
+					final Pose orientedPhotoHover = toPose(Preset.ORIENTED_PHOTO_HOVER);
+					orientedPhotoHover.twist = twistOrientation;
+
+					final Pose orientedFloorPick = toPose(Preset.ORIENTED_FLOOR_PICK);
+					orientedFloorPick.twist = twistOrientation;
+
+					routePresets.add(orientedHover); // need to change routePresets to routePoses
+					routePresets.add(orientedFloorPick);
+				}
+				break;
+
 			case BASKET_LOW:
 			case BASKET_HIGH:
 				routePresets.add(Preset.SAFE_PASS_THROUGH);
