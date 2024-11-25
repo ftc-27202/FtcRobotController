@@ -4,7 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 public class RouterTestTeleOpMode extends OpMode
 {
-	private final RobotMotors motors = new RobotMotors();
+	private final DriveMotors driveMotors = new DriveMotors();
+	private final TiltMotors tiltMotors = new TiltMotors();
+	private final ClawServo clawServo = new ClawServo();
 
 	private final TiltRouter tiltRouter = new TiltRouter();
 	private final ClawRouter clawRouter = new ClawRouter();
@@ -13,67 +15,66 @@ public class RouterTestTeleOpMode extends OpMode
 	public void init()
 	{
 		// Initialize motors using robot configuration.
-		motors.init();
+		driveMotors.init();
+		tiltMotors.init();
+		clawServo.init();
 
 		// Initialize the routers to match the robot's starting state.
-		tiltRouter.init(TiltRouter.Waypoint.COMPACT);
-		clawRouter.init(ClawRouter.Waypoint.OPEN);
+		tiltRouter.init(TiltRouter.Preset.COMPACT);
+		clawRouter.init(ClawRouter.Preset.OPEN);
 	}
 
 	@Override
 	public void loop()
 	{
-		final RobotMotors.DriveMotorPowerLevels driveMotorPowerLevels = RobotGeometry.calculateDriveMotorPowerLevels(
-				gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, gamepad1.right_trigger);
+		final DriveMotors.PowerLevels drivePowerLevels = RobotGeometry.calculateDrivePowers(gamepad1);
 
-		motors.setDriveMotorPowerLevels(driveMotorPowerLevels);
+		driveMotors.setPowerLevels(drivePowerLevels);
 
 		//
-		// Handle tilt and claw inputs but don't issue motor commands -- just set targets.
+		// Set tilt and claw targets based on inputs. Allow the routers to convert targets into motor commands later.
 		//
 
 		if (gamepad2.dpad_down)
 		{
-			tiltRouter.setTarget(TiltRouter.Waypoint.DRIVE_CONFIG);
+			tiltRouter.setTarget(TiltRouter.Preset.DRIVE_CONFIG);
 		}
 		else if (gamepad2.dpad_up)
 		{
-			tiltRouter.setTarget(TiltRouter.Waypoint.COMPACT);
+			tiltRouter.setTarget(TiltRouter.Preset.COMPACT);
 		}
 
 		if (gamepad2.dpad_left)
 		{
-			clawRouter.setTarget(ClawRouter.Waypoint.GRASP);
+			clawRouter.setTarget(ClawRouter.Preset.GRASP);
 		}
 		else if (gamepad2.dpad_right)
 		{
 			// Retreat after dropping into basket, pretending that it needs to be closed to fit between towers.
-			clawRouter.setTarget(ClawRouter.Waypoint.CLOSED);
-			tiltRouter.setTarget(TiltRouter.Waypoint.DRIVE_CONFIG);
+			clawRouter.setTarget(ClawRouter.Preset.CLOSED);
+			tiltRouter.setTarget(TiltRouter.Preset.DRIVE_CONFIG);
 		}
 
 		//
 		// Update the routers based on current encoder states and capture any target updates.
 		//
 
-		final double currentClawPosition = motors.getClawEncoderPosition();
-		final ClawRouter.Waypoint newClawWaypoint = clawRouter.updateProgress(currentClawPosition);
+		final ClawServo.Pose currentClawPose = clawServo.getCurrentPose();
+		final ClawServo.Pose newClawPoseTarget = clawRouter.updateProgress(currentClawPose);
 
-		if (newClawWaypoint != null)
+		if (newClawPoseTarget != null)
 		{
-			final double newEncoderTarget = RobotGeometry.convertToEncoderPosition(newClawWaypoint);
-			motors.setClawTarget(newEncoderTarget);
+			clawServo.setTarget(newClawPoseTarget);
 		}
 
 		// Update the tilt router based on the current encoder values. A new waypoint will be
-		// returned (one time) if the motors require new instructions.
-		final RobotMotors.TiltEncoderPositions currentTiltPositions = motors.getTiltEncoderPositions();
-		final TiltRouter.Waypoint newTiltWaypoint = tiltRouter.updateProgress(currentTiltPositions);
+		// returned (once) if the motors require new instructions.
+		final TiltMotors.Pose currentTiltPose = tiltMotors.getCurrentPose();
+		final TiltMotors.Pose newTiltPoseTarget = tiltRouter.updateProgress(currentTiltPose);
 
-		if (newTiltWaypoint != null)
+		if (newTiltTarget != null)
 		{
-			final RobotMotors.TiltEncoderPositions newEncoderTargets = RobotGeometry.convertToEncoderPositions(newTiltWaypoint);
-			motors.setTiltEncoderTargets(newEncoderTargets);
+			tiltMotors.setTarget(newTiltPoseTarget);
 		}
 	}
 }

@@ -25,17 +25,16 @@ public class RobotGeometry
 	public static final int WRIST_PIVOT_MAX_DEG = 90;       //
 	public static final int WRIST_TWIST_MIN_DEG = -90;      //
 	public static final int WRIST_TWIST_MAX_DEG = 90;       //
-
-	public static RobotMotors.DriveMotorPowerLevels calculateDriveMotorPowerLevels(
-			float leftStickX, float leftStickY, float rightStickX, float rightTrigger)
+ 
+	public static RobotDriveMotors.PowerLevels calculateDrivePower(Gamepad gamepad)
 	{
 		final double speed = rightTrigger > 0 ? 0.6 : 1.0;
 		final double turnSpeed = rightTrigger > 0 ? 0.2 : 1.0;
 
 		// POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-		final double axial = -leftStickY;  // Note: pushing stick forward gives negative value
-		final double lateral = leftStickX;
-		final double yaw = rightStickX * turnSpeed;
+		final double axial = -gamepad.left_stick_y;  // Note: pushing stick forward gives negative value
+		final double lateral = gamepad.left_stick_x;
+		final double yaw = gamepad.right_stick_x * turnSpeed;
 
 		// Combine the joystick requests for each axis-motion to determine each wheel's power.
 		// Set up a variable for each drive wheel to save the power level for telemetry.
@@ -59,13 +58,14 @@ public class RobotGeometry
 			backRightPower /= max;
 		}
 
-		return new RobotMotors.DriveMotorPowerLevels(
+		return new RobotMotors.PowerLevels(
 				frontLeftPower * speed,
 				backLeftPower * speed,
 				frontRightPower * speed,
 				backRightPower * speed);
 	}
 
+/*
 	public static double convertToEncoderPosition(@NonNull ClawRouter.Waypoint waypoint)
 	{
 		switch (waypoint)
@@ -79,10 +79,11 @@ public class RobotGeometry
 				return 0.0;
 		}
 	}
+*/
 
-	public static TiltRouter.Pose convertToPose(@NonNull TiltRouter.Waypoint waypoint)
+	public static TiltMotors.Pose toPose(@NonNull TiltRouter.Preset preset)
 	{
-		switch (waypoint)
+		switch (preset)
 		{
 			case COMPACT:
 			case PICK_HOVER:
@@ -177,6 +178,7 @@ public class RobotGeometry
 		}
 	}
 
+/*
 	public static RobotMotors.TiltEncoderPositions convertToEncoderPositions(TiltRouter.Pose pose)
 	{
 		final double armPivotPosition = pose.armPivotAngleDeg / 180.0;
@@ -210,7 +212,9 @@ public class RobotGeometry
 		final TiltRouter.Pose pose = convertToPose(waypoint);
 		return convertToEncoderPositions(pose);
 	}
+*/
 
+/*
 	private static boolean isValueWithin(double v0, double v1, double delta)
 	{
 		return Math.abs(v0 - v1) <= delta;
@@ -242,4 +246,5 @@ public class RobotGeometry
 
 		return true;
 	}
+*/
 }

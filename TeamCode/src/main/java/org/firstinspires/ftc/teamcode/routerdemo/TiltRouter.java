@@ -8,7 +8,7 @@ import java.util.List;
 //
 public class TiltRouter
 {
-	public enum Waypoint
+	public enum Preset
 	{
 		COMPACT,           // Fits inside an 18" cube.
 		DRIVE_CONFIG,      // Close to sample picking config but stable for driving.
@@ -25,90 +25,65 @@ public class TiltRouter
 		ASCENT_HIGH_HANG   // Hook hanging on high specimen bar.
 	}
 
-	// Structure that describes the tilt mechanism state in human-readable terms (like degrees).
-	public static class Pose
-	{
-		double tiltAngleDeg;       // Tilt angles are relative to world "up" when viewed from robot's left side.
-		int slidePosition;         // Linear slide extension value used by left and right slides.
-		double armPivotAngleDeg;   // Arm pivot angles are relative to slide direction when viewed from robot's left side.
-		double wristPivotAngleDeg; // Angle relative to arm when viewed from robot's left side.
-		double wristTwistAngleDeg; // Angle relative to center when looking straight at it.
-
-		public Pose(
-				double tiltAngleDeg,
-				int slidePosition,
-				double armPivotAngleDeg,
-				double wristPivotAngleDeg,
-				double wristTwistAngleDeg)
-		{
-			this.tiltAngleDeg = tiltAngleDeg;
-			this.slidePosition = slidePosition;
-			this.armPivotAngleDeg = armPivotAngleDeg;
-			this.wristPivotAngleDeg = wristPivotAngleDeg;
-			this.wristTwistAngleDeg = wristTwistAngleDeg;
-		}
-	}
+	private Preset restingPreset;
+	private List<Preset> routePresets = new ArrayList<>();
 
 	private long lastTargetChangeTimeMillis;
-	private Waypoint target;
-	private List<Waypoint> waypoints = new ArrayList<>();
 
-	public void init(Waypoint state)
+	public void init(Preset initialPreset)
 	{
-		target = state;
+		restingPreset = initialPreset;
 	}
 
-	public void setTarget(Waypoint newTarget)
+	public void setTarget(Preset target)
 	{
-		if (waypoints.isEmpty()) // Robot is currently at rest.
+		if (routePresets.isEmpty()) // Robot is currently at rest.
 		{
-			// Set new waypoints so the next call to updateProgress() will command the motors to start.
-			waypoints = findRoute(target, newTarget);
+			// Set new routePresets so the next call to updateProgress() will command the motors to start.
+			routePresets = findRoute(restingPreset, target);
 		}
-		else // Robot is currently moving toward a target.
+		else // Robot is moving toward the restingPreset.
 		{
-			Waypoint finalWaypoint = waypoints.get(waypoints.size() - 1);
+			if (target == resetingPreset)
+				return; // Nothing to do: Action was already moving toward this restingPreset.
 
-			if (newTarget == finalWaypoint)
-				return; // Nothing to do: Action was already moving toward this target.
-
-			// Switch to the new target by replacing the existing waypoints, but allow the current leg
-			// to finish before starting toward the new target. Routes ensure safe motion between known
-			// waypoints but changing the path between arbitrary waypoints could cause a collision.
-			final Waypoint nextWaypoint = waypoints.get(0);
-			waypoints.clear(); // Abandon old unreached waypoints.
-			waypoints = findRoute(nextWaypoint, newTarget); // Re-route to new target.
+			// Switch to the new restingPreset by replacing the existing routePresets, but allow the current leg
+			// to finish before starting toward the new restingPreset. Routes ensure safe motion between known
+			// routePresets but changing the path between arbitrary routePresets could cause a collision.
+			final Preset nextPreset = routePresets.get(0);
+			routePresets.clear(); // Abandon old unreached routePresets.
+			routePresets = findRoute(nextPreset, target); // Re-route to new restingPreset, keeping next preset.
 		}
 
+		restingPreset = target;
 		lastTargetChangeTimeMillis = System.currentTimeMillis();
-		target = newTarget;
 	}
 
-	// Update the tile router progress using the measured encoder values. If the current waypoint
+	// Update the tile route progress using the measured encoder values. If the current waypoint
 	// has been reached then instruct the motors to advance to next one.
-	public Waypoint updateProgress(RobotMotors.TiltEncoderPositions currentEncoderPositions)
+	public Preset updateProgress(TiltMotors.Pose currentPose)
 	{
-		if (waypoints.isEmpty())
-			return null; // Nothing to do: The action has reached its target.
+		if (routePresets.isEmpty())
+			return null; // Nothing to do: The action has reached its restingPreset.
 
-		final Pose currentPose = RobotGeometry.convertToPose(currentEncoderPositions);
-		final Waypoint nextWaypoint = waypoints.get(0);
+		final Preset nextPreset = routePresets.get(0);
+		final TiltMotors.Pose nextPose = RobotGeometry.toPose(nextPreset);
 
-		if (RobotGeometry.isAtWaypoint(nextWaypoint, currentPose))
+		if (currentPose.isCloseTo(nextPose))
 		{
 			// Reached the next waypoint. Pop it off and determine what's next.
-			waypoints.remove(0);
+			routePresets.remove(0);
 
-			if (waypoints.isEmpty()) // Tilt has reached its destination.
+			if (routePresets.isEmpty()) // Tilt has reached its destination.
 			{
-				if (target == Waypoint.COMPACT)
+				if (restingPreset == Preset.COMPACT)
 					; // Turn off motor power at a resting position?
 
-				// TODO(mike): How do we kill power? (and where do we start it up again?)
+				// Should we kill power? (and where do we start it up again?)
 			}
 			else
 			{
-				return waypoints.get(0);
+				return routePresets.get(0);
 			}
 		}
 		else // Not there yet.
@@ -120,19 +95,20 @@ public class TiltRouter
 		return null;
 	}
 
-	// Build a list of waypoints that will safely transform the robot from startWaypoint to endWaypoint. The
-	// resulting list includes startWaypoint, endWaypoint, and any intermediate poses required for safe travel.
-	public List<Waypoint> findRoute(Waypoint startWaypoint, Waypoint endWaypoint)
+	// Build a list of routePresets that will safely transition the robot from startPreset to
+	// restingPreset. The resulting list includes startPreset, restingPreset, and any intermediate
+	// poses required for safe travel.
+	public List<Preset> findRoute(Preset startPreset, Preset restingPreset)
 	{
-		ArrayList<Waypoint> route = new ArrayList<Waypoint>();
-		route.add(startWaypoint);
+		ArrayList<Preset> routePresets = new ArrayList<Preset>();
 
-		switch (startWaypoint)
+		routePresets.add(startPreset);
+
+		switch (startPreset)
 		{
 			case BASKET_LOW:
 			case BASKET_HIGH:
-				route.add(Waypoint.SAFE_PASS_THROUGH);
-				route.add(endWaypoint);
+				routePresets.add(Preset.SAFE_PASS_THROUGH);
 				break;
 
 			case SPECIMEN_HIGH:
@@ -144,25 +120,21 @@ public class TiltRouter
 				break;
 
 			case DRIVE_CONFIG:
-				route.add(endWaypoint); // DRIVE_CONFIG can go directly to any other state
 				break;
 
 			case PICK_HOVER:
 				break;
 
 			case PICK:
-				if (endWaypoint == Waypoint.DRIVE_CONFIG)
+				if (restingPreset != Preset.DRIVE_CONFIG)
 				{
-					route.add(endWaypoint);
-				}
-				else
-				{
-					route.add(Waypoint.DRIVE_CONFIG);
-					route.add(endWaypoint);
+					routePresets.add(Preset.DRIVE_CONFIG);
 				}
 				break;
 		}
 
-		return route;
+		routePresets.add(restingPreset);
+
+		return routePresets;
 	}
 }

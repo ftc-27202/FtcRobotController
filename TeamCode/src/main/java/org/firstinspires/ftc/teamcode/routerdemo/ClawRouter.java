@@ -2,36 +2,36 @@ package org.firstinspires.ftc.teamcode.routerdemo;
 
 public class ClawRouter
 {
-	public enum Waypoint
+	public enum Preset
 	{
 		OPEN, CLOSED, GRASP
 	}
 
-	private Waypoint target;
+	private Preset target;
 
-	public Waypoint getTarget()
+	public Preset getTarget()
 	{
 		return target;
 	}
 
-	public void setTarget(Waypoint target)
+	public void setTarget(@NonNull Preset target)
 	{
 		this.target = target;
 	}
 
-	public void init(Waypoint target)
+	public void init(@NonNull Preset target)
 	{
 		this.target = target;
 	}
 
 	// Update the Action motion progress against the measured encoder values. If the next waypoint
 	// has been reached then instruct the motors to advance to next waypoint.
-	public Waypoint updateProgress(double clawEncoderPosition)
+	public Preset updateProgress(@NonNull double clawEncoderPosition)
 	{
 		return target; // incomplete
 	}
 
-	// there needs to be something different than Waypoint to report "holding sample"
+	// there needs to be something different than Preset to report "holding sample"
 	public boolean holdsSample()
 	{
 		return false;
