@@ -138,10 +138,13 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
         } else if (gamepad2.y) {
             wrist.setPosition(WRIST_FOLDED_IN);
         }
+
+        //Limelight stuff starts here
         LLResult result = limelight.getLatestResult();
-
-
+        //gamepad2.dpad_right will target the robot to a seen sample (rn only yellow works)
+        // if gamepad2.dpad_right is pressed and target is seen, identify direction and try to move towards the target until target is within tolerance
         if (gamepad2.dpad_right && (result != null && result.isValid()) ) {
+            //gets results from LL
             double tx = result.getTx(); // How far left or right the target is (degrees)
             double ty = result.getTy(); // How far up or down the target is (degrees)
             double ta = result.getTa(); // How big the target looks (0%-100% of the image)
@@ -150,12 +153,23 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             telemetry.addData("Target Y", ty);
             telemetry.addData("Target Area", ta);
             //move left or right based on data
-            if (tx >= 0 ){
-                telemetry.addData("Move Left", tx);
-            }else{
+            //Target tolerance is how many units the centre of the target has to be offset for the robot to decide to move
+            // Right now it is arbitrarily set at 5, but can be changed, IDK what it should actually be
+            //Set as constant in jeff base teleop
+            //right is positive I think?
+            if (tx >= LLTargetTolerance ){
                 telemetry.addData("Move Right", tx);
+                // Fill in with code to actually strafe the robot slowly to the right
+            }else if((-1*LLTargetTolerance) >= tx){
+                telemetry.addData("Move Left", tx);
+                // Fill in with code to actually strafe the robot slowly to the left
+
+            }else if((Math.abs(tx)) < LLTargetTolerance ){
+                telemetry.addData("Target within tolerance, current offset:", tx);
             }
+
         } else if (result != null && result.isValid()) {
+            // if LL detects target but right dpad not pressed, just display target in telemetry
             double tx = result.getTx(); // How far left or right the target is (degrees)
             double ty = result.getTy(); // How far up or down the target is (degrees)
             double ta = result.getTa(); // How big the target looks (0%-100% of the image)
@@ -164,9 +178,9 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             telemetry.addData("Target Y", ty);
             telemetry.addData("Target Area", ta);
         }  else if (gamepad2.dpad_right) {
-            telemetry.addLine("No Targets");
+            telemetry.addLine("No Targets Found"); //If gamepad is pressed but no result, telemetry says no targets
         } else {
-            telemetry.addData("Limelight", "No Targets");
+            telemetry.addData("Limelight", "No Targets or LL not working"); //Also no targets even if gamepad not pressed
         }
         //slides not in position
         if (getRuntime() >= lastSlideActionTime + SLIDE_STALL_TIME) {
