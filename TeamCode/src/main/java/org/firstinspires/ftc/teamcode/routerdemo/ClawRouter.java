@@ -6,7 +6,12 @@ public class ClawRouter
 {
 	public enum Preset
 	{
-		OPEN, CLOSED, GRASP
+		CENTERED_CLOSED, // x
+		CENTERED_OPEN,   // x
+		CENTERED_GRASP,  // x
+		ORIENTED_CLOSED, // x
+		ORIENTED_OPEN,   // x
+		ORIENTED_GRASP   // x
 	}
 
 	private Preset target;
@@ -28,7 +33,7 @@ public class ClawRouter
 
 	// Update the Action motion progress against the measured encoder values. If the next waypoint
 	// has been reached then instruct the motors to advance to next waypoint.
-	public ClawServo.Pose updateProgress(ClawServo.Pose currentPose)
+	public ClawServos.Pose updateProgress(ClawServos.Pose currentPose)
 	{
 		return currentPose; // incomplete
 	}

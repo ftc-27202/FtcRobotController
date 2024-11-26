@@ -95,59 +95,31 @@ public class TiltRouter
 		return null;
 	}
 
+	private isFloorZone(Preset preset)
+	{
+		return preset == (DRIVE_CONFIG || preset == PICK_HOVER || preset == PICK_FLOOR);
+	}
+
 	// Build a list of routePresets that will safely transition the robot from startPreset to
 	// restingPreset. The resulting list includes startPreset, restingPreset, and any intermediate
 	// poses required for safe travel.
-	public List<Preset> findRoute(Preset startPreset, Preset restingPreset) // twistOrientation
+	public List<Preset> findRoute(Preset startPreset, Preset endPreset)
 	{
 		ArrayList<Preset> routePresets = new ArrayList<Preset>();
 
 		routePresets.add(startPreset);
 
-		switch (startPreset)
-		{
-			case CENTERED_PHOTO_HOVER:
-				if (restingPreset == ORIENTED_FLOOR_PICK)
-				{
-					final Pose orientedPhotoHover = toPose(Preset.ORIENTED_PHOTO_HOVER);
-					orientedPhotoHover.twist = twistOrientation;
+		// The tilt arm can safely move between poses in the "near floor" zone, and also between poses
+		// in the "vertical reach" zone (e.g., baskets and ascent), but moving between zones requires
+		// it to pass between the linear slides. For these cases add an intermediate SAFE_PASS_THROUGH
+		// pose that aligns the tilt arm into a safe orientation.
+		final bool startIsInFloorZone = inFloorZone(startPreset);
+		final bool endIsInFloorZone = inFloorZone(endPreset);
 
-					final Pose orientedFloorPick = toPose(Preset.ORIENTED_FLOOR_PICK);
-					orientedFloorPick.twist = twistOrientation;
+		if (startIsInFloorZone != endIsInFloorZone)
+			routePresets.add(Preset.SAFE_PASS_THROUGH);
 
-					routePresets.add(orientedHover); // need to change routePresets to routePoses
-					routePresets.add(orientedFloorPick);
-				}
-				break;
-
-			case BASKET_LOW:
-			case BASKET_HIGH:
-				routePresets.add(Preset.SAFE_PASS_THROUGH);
-				break;
-
-			case SPECIMEN_HIGH:
-				// not implemented
-				break;
-
-			case SPECIMEN_LOW:
-				// not implemented
-				break;
-
-			case DRIVE_CONFIG:
-				break;
-
-			case PICK_HOVER:
-				break;
-
-			case PICK:
-				if (restingPreset != Preset.DRIVE_CONFIG)
-				{
-					routePresets.add(Preset.DRIVE_CONFIG);
-				}
-				break;
-		}
-
-		routePresets.add(restingPreset);
+		routePresets.add(endPreset);
 
 		return routePresets;
 	}
