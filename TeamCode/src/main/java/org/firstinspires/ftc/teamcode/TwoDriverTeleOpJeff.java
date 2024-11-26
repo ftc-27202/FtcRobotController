@@ -139,7 +139,9 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             wrist.setPosition(WRIST_FOLDED_IN);
         }
         LLResult result = limelight.getLatestResult();
-        if (result != null && result.isValid()) {
+
+
+        if (gamepad2.dpad_right && (result != null && result.isValid()) ) {
             double tx = result.getTx(); // How far left or right the target is (degrees)
             double ty = result.getTy(); // How far up or down the target is (degrees)
             double ta = result.getTa(); // How big the target looks (0%-100% of the image)
@@ -147,10 +149,25 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             telemetry.addData("Target X", tx);
             telemetry.addData("Target Y", ty);
             telemetry.addData("Target Area", ta);
+            //move left or right based on data
+            if (tx >= 0 ){
+                telemetry.addData("Move Left", tx);
+            }else{
+                telemetry.addData("Move Right", tx);
+            }
+        } else if (result != null && result.isValid()) {
+            double tx = result.getTx(); // How far left or right the target is (degrees)
+            double ty = result.getTy(); // How far up or down the target is (degrees)
+            double ta = result.getTa(); // How big the target looks (0%-100% of the image)
+
+            telemetry.addData("Target X", tx);
+            telemetry.addData("Target Y", ty);
+            telemetry.addData("Target Area", ta);
+        }  else if (gamepad2.dpad_right) {
+            telemetry.addLine("No Targets");
         } else {
             telemetry.addData("Limelight", "No Targets");
         }
-        telemetry.update();
         //slides not in position
         if (getRuntime() >= lastSlideActionTime + SLIDE_STALL_TIME) {
            final double leftSlideRemaining = Math.abs(leftSlide.getTargetPosition() - leftSlide.getCurrentPosition());

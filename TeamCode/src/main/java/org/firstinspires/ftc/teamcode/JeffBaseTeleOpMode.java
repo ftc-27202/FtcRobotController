@@ -70,7 +70,6 @@ public class JeffBaseTeleOpMode extends OpMode {
     double armPositionFudgeFactor;
     int slideTargetPosition;
     double lastSlideActionTime = getRuntime();
-
     public void init() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
@@ -122,6 +121,7 @@ public class JeffBaseTeleOpMode extends OpMode {
         }
 
         /* send telemetry to the driver of the arm's current position and target position */
+
         telemetry.addData("Left Linear Slide: ", "%d", leftSlide.getCurrentPosition());
         telemetry.addData("Right Linear Slide: ", "%d", rightSlide.getCurrentPosition());
         telemetry.addData("arm Target: ", armMotor.getTargetPosition());
