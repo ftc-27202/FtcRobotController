@@ -10,19 +10,19 @@ public class TiltRouter
 {
 	public enum Preset
 	{
-		COMPACT,           // Fits inside an 18" cube.
-		DRIVE_CONFIG,      // Close to sample picking config but stable for driving.
-		SAFE_PASS_THROUGH, // Intermediate waypoint that won't collide with slides.
-		PICK_HOVER,        // Hover over sample for a photo op.
-		PICK,              // Claw lowered to pick up a sample off the ground.
-		BASKET_LOW,        // Claw positioned over low basket.
-		BASKET_HIGH,       // Claw positioned over high basket.
-		SPECIMEN_LOW,      // Claw positioned over low specimen bar.
-		SPECIMEN_HIGH,     // Claw positioned over high specimen bar.
+		ASCENT_HIGH_HOVER, // Hook positioned over high ascent bar.
+		ASCENT_HIGH_HANG,  // Hook hanging on high specimen bar.
 		ASCENT_LOW_HOVER,  // Hook positioned over low ascent bar.
 		ASCENT_LOW_HANG,   // Hook hanging on low specimen bar.
-		ASCENT_HIGH_HOVER, // Hook positioned over high ascent bar.
-		ASCENT_HIGH_HANG   // Hook hanging on high specimen bar.
+		BASKET_LOW,        // Claw positioned over low basket.
+		BASKET_HIGH,       // Claw positioned over high basket.
+		COMPACT,           // Fits inside an 18" cube.
+		INTAKE_FLOOR,      // Claw lowered to pick up a sample off the ground.
+		INTAKE_HOVER,      // Hover over sample for a photo op.
+		SAFE_PASS_THROUGH, // Intermediate waypoint that won't collide with slides.
+		SPECIMEN_LOW,      // Claw positioned over low specimen bar.
+		SPECIMEN_HIGH,     // Claw positioned over high specimen bar.
+		TRANSPORT          // Close to sample picking config but stable for driving.
 	}
 
 	private Preset restingPreset;
@@ -33,6 +33,11 @@ public class TiltRouter
 	public void init(Preset initialPreset)
 	{
 		restingPreset = initialPreset;
+	}
+
+	public TiltRouter.Preset resting()
+	{
+		return routePresets.isEmpty() ? restingPreset : null;
 	}
 
 	public void setTarget(Preset target)
@@ -95,9 +100,11 @@ public class TiltRouter
 		return null;
 	}
 
-	private isFloorZone(Preset preset)
+	private boolean inFloorZone(Preset preset)
 	{
-		return preset == (DRIVE_CONFIG || preset == PICK_HOVER || preset == PICK_FLOOR);
+		return (preset == Preset.TRANSPORT ||
+				preset == Preset.INTAKE_HOVER ||
+				preset == Preset.INTAKE_FLOOR);
 	}
 
 	// Build a list of routePresets that will safely transition the robot from startPreset to
@@ -113,8 +120,8 @@ public class TiltRouter
 		// in the "vertical reach" zone (e.g., baskets and ascent), but moving between zones requires
 		// it to pass between the linear slides. For these cases add an intermediate SAFE_PASS_THROUGH
 		// pose that aligns the tilt arm into a safe orientation.
-		final bool startIsInFloorZone = inFloorZone(startPreset);
-		final bool endIsInFloorZone = inFloorZone(endPreset);
+		final boolean startIsInFloorZone = inFloorZone(startPreset);
+		final boolean endIsInFloorZone = inFloorZone(endPreset);
 
 		if (startIsInFloorZone != endIsInFloorZone)
 			routePresets.add(Preset.SAFE_PASS_THROUGH);

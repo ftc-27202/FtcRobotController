@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.routerdemo;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import static org.firstinspires.ftc.teamcode.routerdemo.RobotGeometry.CLAW_CLOSED;
+import static org.firstinspires.ftc.teamcode.routerdemo.RobotGeometry.CLAW_OPEN;
 
 import androidx.annotation.NonNull;
 
@@ -12,7 +14,7 @@ public class ClawServos
 	{
 		double twistPosition;
 
-		public Pose(double twistPosition, double graspPosition)
+		public Pose(double twistPosition)
 		{
 			this.twistPosition = twistPosition;
 		}
@@ -34,16 +36,16 @@ public class ClawServos
 
 	public Pose getCurrentPose()
 	{
-		return new Pose(twistServo.getPostion());
+		return new Pose(twistServo.getPosition());
 	}
 
-   public void close()
-   {
-      graspServo.setPosition(SERVO_GRASP_CLOSED);
-   }
+	public void close()
+	{
+		graspServo.setPosition(CLAW_CLOSED);
+	}
 
-   public void open()
-   {
-      graspServo.setPosition(SERVO_GRASP_OPEN);
-   }
+	public void open()
+	{
+		graspServo.setPosition(CLAW_OPEN);
+	}
 }

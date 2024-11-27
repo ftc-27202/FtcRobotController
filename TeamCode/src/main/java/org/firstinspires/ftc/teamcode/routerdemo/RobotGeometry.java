@@ -27,16 +27,20 @@ public class RobotGeometry
 	public static final int TILT_FLOOR_PICK = 600;          // Tilting toward front of robot.
 
 	public static final double ARM_PIVOT_MIN = 0.0;         // Claw hovering over floor.
-	public static final double ARM_PIVOT_COLLAPSED = 0.5;   // Fully collapsed inside with slides.
+	public static final double ARM_PIVOT_COMPACT = 0.5;     //
+	public static final double ARM_PIVOT_HOVER = 0.4;       //
 	public static final double ARM_PIVOT_MAX = 1.0;         // Fully extended inline with slides.
 
 	public static final double WRIST_PIVOT_MIN = 0.0;       //
-	public static final double WRIST_PIVOT_MID = 0.5;       //
+	public static final double WRIST_PIVOT_STRAIGHT = 0.5;  //
 	public static final double WRIST_PIVOT_MAX = 1.0;       //
 
 	public static final double CLAW_TWIST_MIN = 0.0;        // 90 deg CCW
 	public static final double CLAW_TWIST_MID = 0.5;        //  0 deg
 	public static final double CLAW_TWIST_MAX = 1.0;        // 90 deg CW
+
+	public static final double CLAW_OPEN = 1.0;             //
+	public static final double CLAW_CLOSED = 0.0;           //
 
 	@NonNull
 	@Contract("_ -> new")
@@ -87,53 +91,89 @@ public class RobotGeometry
 		{
 			case COMPACT:
 				return new TiltMotors.Pose(
-					TILT_COMPACT, SLIDE_COLLAPSED, SLIDE_COLLAPSED, ARM_PIVOT_COMPACT, ARM_PIVOT_COMPACT, WRIST_COMPACT);
+						TILT_COMPACT,
+						SLIDE_COLLAPSED, SLIDE_COLLAPSED,
+						ARM_PIVOT_COMPACT, ARM_PIVOT_COMPACT,
+						WRIST_PIVOT_STRAIGHT);
 
-			case PICK_HOVER:
-			case PICK_FLOOR:
+			case INTAKE_HOVER:
+			case INTAKE_FLOOR:
 				return new TiltMotors.Pose(
-					TILT_FLOOR_HOVER, SLIDE_COLLAPSED, SLIDE_COLLAPSED, ARM_PIVOT_X, ARM_PIVOT_X, WRIST_COMPACT);
+						TILT_FLOOR_HOVER,
+						SLIDE_COLLAPSED, SLIDE_COLLAPSED,
+						ARM_PIVOT_HOVER, ARM_PIVOT_HOVER,
+						WRIST_PIVOT_STRAIGHT);
 
-			case DRIVE_CONFIG:
+			case TRANSPORT:
 				return new TiltMotors.Pose(
-					TILT_FLOOR_HOVER, SLIDE_COLLAPSED, SLIDE_DRIVE_CONFIG, 0.0, 0.0, 0.0);
+						TILT_FLOOR_HOVER,
+						SLIDE_COLLAPSED, SLIDE_COLLAPSED,
+						0.0, 0.0,
+						0.0);
 
 			case BASKET_LOW:
 				return new TiltMotors.Pose(
-					TILT_FLOOR_HOVER, SLIDE_BASKET_LOW, SLIDE_BASKET_LOW, 0.0, 0.0, 0.0);
+						TILT_FLOOR_HOVER,
+						SLIDE_BASKET_LOW, SLIDE_BASKET_LOW,
+						0.0, 0.0,
+						0.0);
 
 			case BASKET_HIGH:
 				return new TiltMotors.Pose(
-					TILT_FLOOR_HOVER, SLIDE_BASKET_HIGH, SLIDE_BASKET_HIGH, 0.0, 0.0, 0.0);
+						TILT_FLOOR_HOVER,
+						SLIDE_BASKET_HIGH, SLIDE_BASKET_HIGH,
+						0.0, 0.0,
+						0.0);
 
 			case SPECIMEN_LOW:
 				return new TiltMotors.Pose(
-					TILT_FLOOR_HOVER, SLIDE_SPECIMEN_LOW, SLIDE_SPECIMEN_LOW, 0.0, 0.0, 0.0);
+						TILT_FLOOR_HOVER,
+						SLIDE_SPECIMEN_LOW, SLIDE_SPECIMEN_LOW,
+						0.0, 0.0,
+						0.0);
 
 			case SPECIMEN_HIGH:
 				return new TiltMotors.Pose(
-					TILT_FLOOR_HOVER, SLIDE_SPECIMEN_HIGH, SLIDE_SPECIMEN_HIGH, 0.0, 0.0, 0.0);
+						TILT_FLOOR_HOVER,
+						SLIDE_SPECIMEN_HIGH, SLIDE_SPECIMEN_HIGH,
+						0.0, 0.0,
+						0.0);
 
 			case ASCENT_LOW_HOVER:
 				return new TiltMotors.Pose(
-					TILT_FLOOR_HOVER, SLIDE_ASCENT_LOW_HOVER, SLIDE_ASCENT_LOW_HOVER, 0.0, 0.0, 0.0);
+						TILT_FLOOR_HOVER,
+						SLIDE_ASCENT_LOW_HOVER, SLIDE_ASCENT_LOW_HOVER,
+						0.0, 0.0,
+						0.0);
 
 			case ASCENT_LOW_HANG:
 				return new TiltMotors.Pose(
-					TILT_FLOOR_HOVER, SLIDE_ASCENT_LOW_HANG, SLIDE_ASCENT_LOW_HANG, 0.0, 0.0, 0.0);
+						TILT_FLOOR_HOVER,
+						SLIDE_ASCENT_LOW_HANG, SLIDE_ASCENT_LOW_HANG,
+						0.0, 0.0,
+						0.0);
 
 			case ASCENT_HIGH_HOVER:
 				return new TiltMotors.Pose(
-					TILT_FLOOR_HOVER, SLIDE_ASCENT_HIGH_HOVER, SLIDE_ASCENT_HIGH_HOVER, 0.0, 0.0, 0.0);
+						TILT_FLOOR_HOVER,
+						SLIDE_ASCENT_HIGH_HOVER, SLIDE_ASCENT_HIGH_HOVER,
+						0.0, 0.0,
+						0.0);
 
 			case ASCENT_HIGH_HANG:
 				return new TiltMotors.Pose(
-					TILT_FLOOR_HOVER, SLIDE_COLLAPSED, SLIDE_COLLAPSED, 0.0, 0.0, 0.0);
+						TILT_FLOOR_HOVER,
+						SLIDE_COLLAPSED, SLIDE_COLLAPSED,
+						0.1, 0.0,
+						0.0);
 
 			case SAFE_PASS_THROUGH:
 			default:
 				return new TiltMotors.Pose(
-					TILT_FLOOR_HOVER, SLIDE_SAFE_PASS_THROUGH, SLIDE_SAFE_PASS_THROUGH, 0.0, 0.0, 0.0);
+						TILT_FLOOR_HOVER,
+						SLIDE_SAFE_PASS_THROUGH, SLIDE_SAFE_PASS_THROUGH,
+						0.0, 0.0,
+						0.0);
 		}
 	}
 }

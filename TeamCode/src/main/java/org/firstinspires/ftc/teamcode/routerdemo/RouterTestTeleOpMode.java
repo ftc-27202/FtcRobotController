@@ -1,11 +1,21 @@
 package org.firstinspires.ftc.teamcode.routerdemo;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.Gamepad;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class RouterTestTeleOpMode extends OpMode
 {
-	public enum RobotMode { ASCENT, BUCKET, COMPACT, INTAKE, SPECIMEN, TRANSPORT }
-	public enum SelectCommand { SELECT, UP, DOWN, LEFT, RIGHT }
+	public enum RobotMode
+	{NO_CHANGE, ASCENT, BASKET, COMPACT, INTAKE, SPECIMEN, TRANSPORT}
+
+	public enum SelectCommand
+	{SELECT, UP, DOWN, LEFT, RIGHT}
 
 	private final DriveMotors driveMotors = new DriveMotors();
 	private final TiltMotors tiltMotors = new TiltMotors();
@@ -14,8 +24,8 @@ public class RouterTestTeleOpMode extends OpMode
 	private final TiltRouter tiltRouter = new TiltRouter();
 	private final ClawRouter clawRouter = new ClawRouter();
 
-	private final RobotMode robotMode = RobotMode.COMPACT;
-	private final List<SelectCommand> selectSequence = new ArrayList<SelectComment>();
+	private final List<SelectCommand> selectSequence = new ArrayList<SelectCommand>();
+	RobotMode robotMode = RobotMode.COMPACT;
 
 	@Override
 	public void init()
@@ -27,7 +37,7 @@ public class RouterTestTeleOpMode extends OpMode
 
 		// Initialize the routers to match the robot's starting state.
 		tiltRouter.init(TiltRouter.Preset.COMPACT);
-		clawRouter.init(ClawRouter.Preset.COMPACT);
+		clawRouter.init(ClawRouter.Preset.CENTERED);
 
 		robotMode = RobotMode.COMPACT;
 	}
@@ -57,12 +67,12 @@ public class RouterTestTeleOpMode extends OpMode
 		//
 
 		final RobotMode newRobotMode = detectRobotModeSelection(gamepad2, selectSequence);
-		if (newRobotMode != NO_CHANGE && newRobotMode != robotMode)
+		if (newRobotMode != RobotMode.NO_CHANGE && newRobotMode != robotMode)
 		{
 			robotMode = newRobotMode;
 
-			// Vision pipeline should only run in INTAKE mode.
 /*
+			// Vision pipeline should only run in INTAKE mode.
 			if (newRobotMode == RobotMode.INTAKE)
 				startCameraPipeline();
 			else
@@ -72,28 +82,25 @@ public class RouterTestTeleOpMode extends OpMode
 			// Some modes define a starting pose.
 			switch (newRobotMode)
 			{
-				case RobotMode.ASCENT:
-					tiltRouter.setTarget(TiltRouter.Preset.ASCEND_LOW);
+				case ASCENT:
+					tiltRouter.setTarget(TiltRouter.Preset.ASCENT_LOW_HOVER);
 					break;
-				case RobotMode.BUCKET:
+				case BASKET:
 					tiltRouter.setTarget(TiltRouter.Preset.BASKET_HIGH);
 					break;
-				case RobotMode.COMPACT:
+				case COMPACT:
 					tiltRouter.setTarget(TiltRouter.Preset.COMPACT);
 					break;
-				case RobotMode.INTAKE:
-					tiltRouter.setTarget(TiltRouter.Preset.HOVER);
+				case INTAKE:
+					tiltRouter.setTarget(TiltRouter.Preset.INTAKE_HOVER);
 					clawRouter.setTarget(ClawRouter.Preset.CENTERED);
 					clawServos.open();
 					break;
-				case RobotMode.FLOOR:
-					tiltRouter.setTarget(TiltRouter.Preset.FLOOR);
-					break;
-				case RobotMode.SPECIMEN:
+				case SPECIMEN:
 					tiltRouter.setTarget(TiltRouter.Preset.SPECIMEN_HIGH);
 					break;
-				case RobotMode.TRANSPORT:
-					tiltRouter.setTarget(TiltRouter.Preset.INTAKE);
+				case TRANSPORT:
+					tiltRouter.setTarget(TiltRouter.Preset.INTAKE_HOVER);
 					break;
 				default:
 					break;
@@ -131,33 +138,37 @@ public class RouterTestTeleOpMode extends OpMode
 				final TiltRouter.Preset tiltResting = tiltRouter.resting();
 				final ClawRouter.Preset clawResting = clawRouter.resting();
 
-				if (tiltResting ?= PHOTO_HOVER && clawResting ?= CENTERED_OPEN && camera_stream_open)
+				if (tiltResting == TiltRouter.Preset.INTAKE_HOVER &&
+						clawResting == ClawRouter.Preset.CENTERED)
+				// && camera_stream_open)
 				{
-					orientation = getOrientation();
-					ClawRouter.setTarget(ClawRouter.Preset.ORIENTED, orientation);
+					//orientation = getOrientation();
+					//ClawRouter.setTarget(ClawRouter.Preset.ORIENTED, orientation);
 				}
 			}
 			else if (gamepad2.dpad_down) // Lower claw to floor with current claw state.
 			{
-				TiltRouter.setTarget(TiltRouter.Preset.FLOOR_INTAKE);
+				tiltRouter.setTarget(TiltRouter.Preset.INTAKE_FLOOR);
 			}
 			else if (gamepad2.dpad_up) // Raise claw to hover with current claw state.
 			{
-				TiltRouter.setTarget(TiltRouter.Preset.PHOTO_HOVER);
+				tiltRouter.setTarget(TiltRouter.Preset.INTAKE_HOVER);
 			}
 			else // Handle manual analog inputs.
 			{
+/*
 				if (Math.abs(gamepad2.left_stick_y) > 0.5) // Left joystick Y raises/lowers arm manually.
-					tiltMotors.setElevation(gamepad2.left_stick.y);
+					tiltMotors.setElevation(gamepad2.left_stick_y);
 
 				if (Math.abs(gamepad2.right_stick_x) > 0.5) // Right joystick X orients the claw manually.
 					clawServos.setTwist(gamepad2.right_stick_x);
+ */
 			}
 
-			if (gamepad2.left_trigger) // Left trigger opens grasp.
-				clawServos.open();
-			else if (gamepad2.right_trigger) // Right trigger closes grasp.
-				clawServos.close();
+			if (gamepad2.left_trigger > 0.5) // Left trigger opens grasp.
+				; // clawServos.open();
+			else if (gamepad2.right_trigger > 0.5) // Right trigger closes grasp.
+				; // clawServos.close();
 		}
 
 		//
@@ -180,6 +191,7 @@ public class RouterTestTeleOpMode extends OpMode
 			clawServos.setTarget(newClawPoseTarget); // Issue servo commands.
 		}
 
+/*
 		// Update LED indicator.
 		Color indicatorColor = Color.OFF;
 
@@ -194,55 +206,72 @@ public class RouterTestTeleOpMode extends OpMode
 					inicatorColor = sampleColor
 			}
 		}
+*/
 	}
 
-	private static RobotMode detectRobotModeSelection(@NonNull Gamepad gamepad, List<SelectCommand> selectSequence)
+	static private RobotMode detectRobotModeSelection(@NonNull Gamepad gamepad, List<SelectCommand> selectSequence)
 	{
+		final List<SelectCommand> ascentSequence = Arrays.asList(
+				SelectCommand.SELECT, SelectCommand.UP, SelectCommand.UP);
+
+		final List<SelectCommand> basketSequence = Arrays.asList(
+				SelectCommand.SELECT, SelectCommand.UP, SelectCommand.LEFT);
+
+		final List<SelectCommand> specimenSequence = Arrays.asList(
+				SelectCommand.SELECT, SelectCommand.UP, SelectCommand.RIGHT);
+
+		final List<SelectCommand> intakeSequence = Arrays.asList(
+				SelectCommand.SELECT, SelectCommand.DOWN, SelectCommand.RIGHT);
+
+		final List<SelectCommand> compactSequence = Arrays.asList(
+				SelectCommand.SELECT, SelectCommand.DOWN, SelectCommand.RIGHT);
+
 		if (gamepad.a) // "A" clears command sequence and puts robot into TRANSPORT mode.
 		{
-			selectSequence.Clear();
+			selectSequence.clear();
 			return RobotMode.TRANSPORT;
 		}
 		else if (gamepad.x) // "X" starts a new select command sequence.
 		{
-			selectSequence = { SelectCommand.SELECT };
+			selectSequence.clear();
+			selectSequence.add(SelectCommand.SELECT);
 		}
 		else if (gamepad.b) // "B" cancels a partial command sequence.
 		{
-			selectSequence.Clear();
+			selectSequence.clear();
 		}
 
 		// Only add to the select sequence if it's already started (not empty).
-		if (!selectSequence.empty())
+		if (!selectSequence.isEmpty())
 		{
-			if (dpad_up)
-				selectSequence.Add(SelectCommand.UP);
-			else if (dpad_down)
-				selectSequence.Add(SelectCommand.DOWN);
-			else if (dpad_left)
-				selectSequence.Add(SelectCommand.LEFT);
-			else if (dpad_right)
-				selectSequence.Add(SelectCommand.RIGHT);
+			if (gamepad.dpad_up)
+				selectSequence.add(SelectCommand.UP);
+			else if (gamepad.dpad_down)
+				selectSequence.add(SelectCommand.DOWN);
+			else if (gamepad.dpad_left)
+				selectSequence.add(SelectCommand.LEFT);
+			else if (gamepad.dpad_right)
+				selectSequence.add(SelectCommand.RIGHT);
 
 			// Check if we now hold complete a select sequence.
-			if (selectSequence.Size() == 3)
+			if (selectSequence.size() == 3)
 			{
-				RobotMode newRobotMode = RobotMode.NO_CHANGE;
+				RobotMode newRobotMode;
 
-				if (selectSequence == { SELECT, UP, UP })
+				if (selectSequence.equals(ascentSequence))
 					newRobotMode = RobotMode.ASCENT;
-				else if (selectSequence == { SELECT, UP, LEFT })
-					newRobotMode = RobotMode.BUCKET;
-				else if (selectSequence == { SELECT, UP, RIGHT })
+				else if (selectSequence.equals(basketSequence))
+					newRobotMode = RobotMode.BASKET;
+				else if (selectSequence.equals(specimenSequence))
 					newRobotMode = RobotMode.SPECIMEN;
-				else if (selectSequence == { SELECT, DOWN, RIGHT })
+				else if (selectSequence.equals(intakeSequence))
 					newRobotMode = RobotMode.INTAKE;
-				else if (selectSequence == { SELECT, DOWN, DOWN })
+				else if (selectSequence.equals(compactSequence))
 					newRobotMode = RobotMode.COMPACT;
 				else
 					newRobotMode = RobotMode.NO_CHANGE; // Unrecognized sequence.
 
-				selectSequence.Clear();
+				selectSequence.clear();
 				return newRobotMode;
 			}
 		}
