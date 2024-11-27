@@ -11,10 +11,10 @@ import java.util.List;
 
 public class RouterTestTeleOpMode extends OpMode
 {
-	public enum RobotMode
-	{NO_CHANGE, ASCENT, BASKET, COMPACT, INTAKE, SPECIMEN, TRANSPORT}
+	private enum RobotMode
+	{UNCHANGED, ASCENT, BASKET, COMPACT, INTAKE, SPECIMEN, TRANSPORT}
 
-	public enum SelectCommand
+	private enum SelectCommand
 	{SELECT, UP, DOWN, LEFT, RIGHT}
 
 	private final DriveMotors driveMotors = new DriveMotors();
@@ -67,7 +67,7 @@ public class RouterTestTeleOpMode extends OpMode
 		//
 
 		final RobotMode newRobotMode = detectRobotModeSelection(gamepad2, selectSequence);
-		if (newRobotMode != RobotMode.NO_CHANGE && newRobotMode != robotMode)
+		if (newRobotMode != RobotMode.UNCHANGED && newRobotMode != robotMode)
 		{
 			robotMode = newRobotMode;
 
@@ -79,7 +79,7 @@ public class RouterTestTeleOpMode extends OpMode
 				stopCameraPipeline();
 */
 
-			// Some modes define a starting pose.
+			// Some modes need a starting pose.
 			switch (newRobotMode)
 			{
 				case ASCENT:
@@ -154,20 +154,20 @@ public class RouterTestTeleOpMode extends OpMode
 			{
 				tiltRouter.setTarget(TiltRouter.Preset.INTAKE_HOVER);
 			}
-			else // Handle manual analog inputs.
+			else // Handle manual joystick inputs.
 			{
 /*
-				if (Math.abs(gamepad2.left_stick_y) > 0.5) // Left joystick Y raises/lowers arm manually.
+				if (Math.abs(gamepad2.left_stick_y) > gamepad2.joystickDeadzone) // Left joystick Y raises/lowers arm manually.
 					tiltMotors.setElevation(gamepad2.left_stick_y);
 
-				if (Math.abs(gamepad2.right_stick_x) > 0.5) // Right joystick X orients the claw manually.
+				if (Math.abs(gamepad2.right_stick_x) > gamepad2.joystickDeadzoen) // Right joystick X orients the claw manually.
 					clawServos.setTwist(gamepad2.right_stick_x);
  */
 			}
 
-			if (gamepad2.left_trigger > 0.5) // Left trigger opens grasp.
+			if (gamepad2.left_trigger > 0.1) // Left trigger opens grasp.
 				; // clawServos.open();
-			else if (gamepad2.right_trigger > 0.5) // Right trigger closes grasp.
+			else if (gamepad2.right_trigger > 0.1) // Right trigger closes grasp.
 				; // clawServos.close();
 		}
 
@@ -209,23 +209,27 @@ public class RouterTestTeleOpMode extends OpMode
 */
 	}
 
+	//
+	// Predefined mode select sequences for comparison.
+	//
+
+	private static final List<SelectCommand> ascentSequence = Arrays.asList(
+			SelectCommand.SELECT, SelectCommand.UP, SelectCommand.UP);
+
+	private static final List<SelectCommand> basketSequence = Arrays.asList(
+			SelectCommand.SELECT, SelectCommand.UP, SelectCommand.LEFT);
+
+	private static final List<SelectCommand> specimenSequence = Arrays.asList(
+			SelectCommand.SELECT, SelectCommand.UP, SelectCommand.RIGHT);
+
+	private static final List<SelectCommand> intakeSequence = Arrays.asList(
+			SelectCommand.SELECT, SelectCommand.DOWN, SelectCommand.RIGHT);
+
+	private static final List<SelectCommand> compactSequence = Arrays.asList(
+			SelectCommand.SELECT, SelectCommand.DOWN, SelectCommand.RIGHT);
+
 	static private RobotMode detectRobotModeSelection(@NonNull Gamepad gamepad, List<SelectCommand> selectSequence)
 	{
-		final List<SelectCommand> ascentSequence = Arrays.asList(
-				SelectCommand.SELECT, SelectCommand.UP, SelectCommand.UP);
-
-		final List<SelectCommand> basketSequence = Arrays.asList(
-				SelectCommand.SELECT, SelectCommand.UP, SelectCommand.LEFT);
-
-		final List<SelectCommand> specimenSequence = Arrays.asList(
-				SelectCommand.SELECT, SelectCommand.UP, SelectCommand.RIGHT);
-
-		final List<SelectCommand> intakeSequence = Arrays.asList(
-				SelectCommand.SELECT, SelectCommand.DOWN, SelectCommand.RIGHT);
-
-		final List<SelectCommand> compactSequence = Arrays.asList(
-				SelectCommand.SELECT, SelectCommand.DOWN, SelectCommand.RIGHT);
-
 		if (gamepad.a) // "A" clears command sequence and puts robot into TRANSPORT mode.
 		{
 			selectSequence.clear();
@@ -236,12 +240,12 @@ public class RouterTestTeleOpMode extends OpMode
 			selectSequence.clear();
 			selectSequence.add(SelectCommand.SELECT);
 		}
-		else if (gamepad.b) // "B" cancels a partial command sequence.
+		else if (gamepad.b) // "B" cancels the current command sequence (if any).
 		{
 			selectSequence.clear();
 		}
 
-		// Only add to the select sequence if it's already started (not empty).
+		// Only add to the select sequence if it has been started (not empty).
 		if (!selectSequence.isEmpty())
 		{
 			if (gamepad.dpad_up)
@@ -269,13 +273,13 @@ public class RouterTestTeleOpMode extends OpMode
 				else if (selectSequence.equals(compactSequence))
 					newRobotMode = RobotMode.COMPACT;
 				else
-					newRobotMode = RobotMode.NO_CHANGE; // Unrecognized sequence.
+					newRobotMode = RobotMode.UNCHANGED; // Unrecognized sequence.
 
 				selectSequence.clear();
 				return newRobotMode;
 			}
 		}
 
-		return RobotMode.NO_CHANGE;
+		return RobotMode.UNCHANGED;
 	}
 }
