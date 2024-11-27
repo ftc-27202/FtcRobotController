@@ -4,7 +4,6 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
 
 import androidx.annotation.NonNull;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class ClawServos
@@ -12,12 +11,10 @@ public class ClawServos
 	public static class Pose
 	{
 		double twistPosition;
-		double graspPosition;
 
 		public Pose(double twistPosition, double graspPosition)
 		{
 			this.twistPosition = twistPosition;
-			this.graspPosition = graspPosition;
 		}
 	}
 
@@ -33,11 +30,20 @@ public class ClawServos
 	public void setTarget(@NonNull Pose target)
 	{
 		twistServo.setPosition(target.twistPosition);
-		graspServo.setPosition(target.graspPosition);
 	}
 
 	public Pose getCurrentPose()
 	{
-		return new Pose(twistServo.getPostion(), graspServo.getPosition());
+		return new Pose(twistServo.getPostion());
 	}
+
+   public void close()
+   {
+      graspServo.setPosition(SERVO_GRASP_CLOSED);
+   }
+
+   public void open()
+   {
+      graspServo.setPosition(SERVO_GRASP_OPEN);
+   }
 }

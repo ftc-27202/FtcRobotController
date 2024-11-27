@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 public class RouterTestTeleOpMode extends OpMode
 {
-	public enum RobotMode { ASCENT, BUCKET, COMPACT, FLOOR_PICK, SELECT, SPECIMEN, TRANSPORT }
+	public enum RobotMode { ASCENT, BUCKET, COMPACT, INTAKE, SPECIMEN, TRANSPORT }
 	public enum SelectCommand { SELECT, UP, DOWN, LEFT, RIGHT }
 
 	private final DriveMotors driveMotors = new DriveMotors();
@@ -14,7 +14,8 @@ public class RouterTestTeleOpMode extends OpMode
 	private final TiltRouter tiltRouter = new TiltRouter();
 	private final ClawRouter clawRouter = new ClawRouter();
 
-	private final RobotMode robotMode = new RobotMode();
+	private final RobotMode robotMode = RobotMode.COMPACT;
+	private final List<SelectCommand> selectSequence = new ArrayList<SelectComment>();
 
 	@Override
 	public void init()
@@ -26,7 +27,9 @@ public class RouterTestTeleOpMode extends OpMode
 
 		// Initialize the routers to match the robot's starting state.
 		tiltRouter.init(TiltRouter.Preset.COMPACT);
-		clawRouter.init(ClawRouter.Preset.OPEN);
+		clawRouter.init(ClawRouter.Preset.COMPACT);
+
+		robotMode = RobotMode.COMPACT;
 	}
 
 	// A = RobotMode.TRANSPORT
@@ -35,7 +38,7 @@ public class RouterTestTeleOpMode extends OpMode
 	//     X up up = RobotMode.ASCENT
 	//     X up lf = RobotMode.BUCKET
 	//     X up rt = RobotMode.SPECIMEN
-	//     X dn rt = RobotMode.FLOOR_PICK
+	//     X dn rt = RobotMode.INTAKE
 	//     X dn dn = RobotMode.COMPACT
 	//     X up B  = Cancel (example)
 	//     X B     = Cancel (example)
@@ -58,13 +61,15 @@ public class RouterTestTeleOpMode extends OpMode
 		{
 			robotMode = newRobotMode;
 
-			// Vision pipeline should only run in PICK mode.
-			if (newRobotMode == RobotMode.PICK)
+			// Vision pipeline should only run in INTAKE mode.
+/*
+			if (newRobotMode == RobotMode.INTAKE)
 				startCameraPipeline();
 			else
 				stopCameraPipeline();
+*/
 
-			// Go to the default pose for the new mode.
+			// Some modes define a starting pose.
 			switch (newRobotMode)
 			{
 				case RobotMode.ASCENT:
@@ -73,15 +78,22 @@ public class RouterTestTeleOpMode extends OpMode
 				case RobotMode.BUCKET:
 					tiltRouter.setTarget(TiltRouter.Preset.BASKET_HIGH);
 					break;
+				case RobotMode.COMPACT:
+					tiltRouter.setTarget(TiltRouter.Preset.COMPACT);
+					break;
+				case RobotMode.INTAKE:
+					tiltRouter.setTarget(TiltRouter.Preset.HOVER);
+					clawRouter.setTarget(ClawRouter.Preset.CENTERED);
+					clawServos.open();
+					break;
+				case RobotMode.FLOOR:
+					tiltRouter.setTarget(TiltRouter.Preset.FLOOR);
+					break;
 				case RobotMode.SPECIMEN:
 					tiltRouter.setTarget(TiltRouter.Preset.SPECIMEN_HIGH);
 					break;
-				case RobotMode.PICK:
-					tiltRouter.setTarget(TiltRouter.Preset.PICK_HOVER);
-					clawRouter.setTarget(ClawRouter.Preset.CENTERED_OPEN);
-					break;
-				case RobotMode.COMPACT:
-					tiltRouter.setTarget(TiltRouter.Preset.COMPACT);
+				case RobotMode.TRANSPORT:
+					tiltRouter.setTarget(TiltRouter.Preset.INTAKE);
 					break;
 				default:
 					break;
@@ -89,8 +101,8 @@ public class RouterTestTeleOpMode extends OpMode
 		}
 
 		//
-		// gamepad2's controls depend on robot mode. Inputs affect the tilt and claw routers, which
-		// will be converted into motor commands below.
+		// gamepad2's motion controls depend on the robot mode. Inputs should affect the tilt and
+		// claw routers, which will be converted into motor commands below.
 		//
 
 		if (robotMode == RobotMode.ASCENT)
@@ -112,47 +124,40 @@ public class RouterTestTeleOpMode extends OpMode
 			l_joystick_y raises/lowers slides manually
 */
 		}
-		else if (robotMode == RobotMode.PICK)
+		else if (robotMode == RobotMode.INTAKE)
 		{
-			if (gamepad2.dpad_left)
+			if (gamepad2.dpad_right) // Auto-orient claw using camera.
 			{
-				// Driver requested centered (not auto-orientated) claw.
-				ClawRouter.setTarget(ClawRouter.Preset.CENTERED_OPEN);
-			}
-			else if (gamepad2.dpad_right)
-			{
-				// Driver requested auto claw orientation. Only proceed if robot is ready.
 				final TiltRouter.Preset tiltResting = tiltRouter.resting();
 				final ClawRouter.Preset clawResting = clawRouter.resting();
 
 				if (tiltResting ?= PHOTO_HOVER && clawResting ?= CENTERED_OPEN && camera_stream_open)
 				{
 					orientation = getOrientation();
-					ClawRouter.setTarget(ClawRouter.Preset.ORIENTED_OPEN, orientation);
+					ClawRouter.setTarget(ClawRouter.Preset.ORIENTED, orientation);
 				}
 			}
-			else if (gamepad2.dpad_down)
+			else if (gamepad2.dpad_down) // Lower claw to floor with current claw state.
 			{
-				// Driver requested to drop claw to floor.
-				TiltRouter.setTarget(TiltRouter.Preset.FLOOR_PICK);
+				TiltRouter.setTarget(TiltRouter.Preset.FLOOR_INTAKE);
 			}
-			else if (gamepad2.dpad_up)
+			else if (gamepad2.dpad_up) // Raise claw to hover with current claw state.
 			{
-				// Driver requested to raise claw to hover.
 				TiltRouter.setTarget(TiltRouter.Preset.PHOTO_HOVER);
 			}
-			else
+			else // Handle manual analog inputs.
 			{
-				// If no dpad inputs are active then handle any manual stick inputs.
-				if (Math.abs(gamepad2.l_joystick_y) > 0.5)
-					; // l_joystick_y raises/lowers arm manually
-				if (Math.abs(gamepad2.r_joystick_x) > 0.5)
-					; // r_joystick_x twists orientation manually
+				if (Math.abs(gamepad2.left_stick_y) > 0.5) // Left joystick Y raises/lowers arm manually.
+					tiltMotors.setElevation(gamepad2.left_stick.y);
 
-				// right trigger closes grasp
-
-				// left trigger opens grasp
+				if (Math.abs(gamepad2.right_stick_x) > 0.5) // Right joystick X orients the claw manually.
+					clawServos.setTwist(gamepad2.right_stick_x);
 			}
+
+			if (gamepad2.left_trigger) // Left trigger opens grasp.
+				clawServos.open();
+			else if (gamepad2.right_trigger) // Right trigger closes grasp.
+				clawServos.close();
 		}
 
 		//
@@ -178,7 +183,7 @@ public class RouterTestTeleOpMode extends OpMode
 		// Update LED indicator.
 		Color indicatorColor = Color.OFF;
 
-		if (FLOOR_PICK)
+		if (FLOOR_INTAKE)
 		{
 			if (camera stream open)
 			{
@@ -191,26 +196,23 @@ public class RouterTestTeleOpMode extends OpMode
 		}
 	}
 
-	private RobotMode detectRobotModeSelection(@NonNull Gamepad gamepad, List<SelectCommand> selectSequence)
+	private static RobotMode detectRobotModeSelection(@NonNull Gamepad gamepad, List<SelectCommand> selectSequence)
 	{
-		if (gamepad.a)
+		if (gamepad.a) // "A" clears command sequence and puts robot into TRANSPORT mode.
 		{
-			// "A" button clears any partial command sequence and immediately puts robot into TRANSPORT mode.
 			selectSequence.Clear();
 			return RobotMode.TRANSPORT;
 		}
-		else if (gamepad.x)
+		else if (gamepad.x) // "X" starts a new select command sequence.
 		{
-			// "X" button starts a new select command sequence but doesn't not affect the current robot mode.
 			selectSequence = { SelectCommand.SELECT };
 		}
-		else if (gamepad.b)
+		else if (gamepad.b) // "B" cancels a partial command sequence.
 		{
-			// "B" button cancels a partial command sequence.
 			selectSequence.Clear();
 		}
 
-		// Only add to the select sequence if it's started (not empty).
+		// Only add to the select sequence if it's already started (not empty).
 		if (!selectSequence.empty())
 		{
 			if (dpad_up)
@@ -234,7 +236,7 @@ public class RouterTestTeleOpMode extends OpMode
 				else if (selectSequence == { SELECT, UP, RIGHT })
 					newRobotMode = RobotMode.SPECIMEN;
 				else if (selectSequence == { SELECT, DOWN, RIGHT })
-					newRobotMode = RobotMode.FLOOR_PICK;
+					newRobotMode = RobotMode.INTAKE;
 				else if (selectSequence == { SELECT, DOWN, DOWN })
 					newRobotMode = RobotMode.COMPACT;
 				else

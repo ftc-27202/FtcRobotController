@@ -37,12 +37,12 @@ public class TiltRouter
 
 	public void setTarget(Preset target)
 	{
-		if (routePresets.isEmpty()) // Robot is currently at rest.
+		if (routePresets.isEmpty()) // Robot tilt mechanism is currently at rest.
 		{
 			// Set new routePresets so the next call to updateProgress() will command the motors to start.
 			routePresets = findRoute(restingPreset, target);
 		}
-		else // Robot is moving toward the restingPreset.
+		else // Robot tilt mechanism is moving.
 		{
 			if (target == restingPreset)
 				return; // Nothing to do: Action was already moving toward this restingPreset.
@@ -105,7 +105,7 @@ public class TiltRouter
 	// poses required for safe travel.
 	public List<Preset> findRoute(Preset startPreset, Preset endPreset)
 	{
-		ArrayList<Preset> routePresets = new ArrayList<Preset>();
+		List<Preset> routePresets = new ArrayList<Preset>();
 
 		routePresets.add(startPreset);
 

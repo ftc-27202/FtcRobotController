@@ -6,12 +6,9 @@ public class ClawRouter
 {
 	public enum Preset
 	{
-		CENTERED_CLOSED, // x
-		CENTERED_OPEN,   // x
-		CENTERED_GRASP,  // x
-		ORIENTED_CLOSED, // x
-		ORIENTED_OPEN,   // x
-		ORIENTED_GRASP   // x
+		CENTERED, // x
+		ORIENTED, // x
+		MANUAL    // x
 	}
 
 	private Preset target;
@@ -36,11 +33,5 @@ public class ClawRouter
 	public ClawServos.Pose updateProgress(ClawServos.Pose currentPose)
 	{
 		return currentPose; // incomplete
-	}
-
-	// there needs to be something different than Preset to report "holding sample"
-	public boolean holdsSample()
-	{
-		return false;
 	}
 }
