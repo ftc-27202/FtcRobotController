@@ -14,18 +14,21 @@ public class RouterTestTeleOpMode extends OpMode
 	private enum RobotMode
 	{UNCHANGED, ASCENT, BASKET, COMPACT, INTAKE, SPECIMEN, TRANSPORT}
 
-	private enum SelectCommand
+	private enum ModeSelectCommand
 	{SELECT, UP, DOWN, LEFT, RIGHT}
 
+	// Motors and servos.
 	private final DriveMotors driveMotors = new DriveMotors();
 	private final TiltMotors tiltMotors = new TiltMotors();
 	private final ClawServos clawServos = new ClawServos();
 
+	// Routers for determining motor and servo targets.
 	private final TiltRouter tiltRouter = new TiltRouter();
 	private final ClawRouter clawRouter = new ClawRouter();
 
-	private final List<SelectCommand> selectSequence = new ArrayList<SelectCommand>();
+	// Robot mode and mode selection commands.
 	RobotMode robotMode = RobotMode.COMPACT;
+	private final List<ModeSelectCommand> modeSelectSequence = new ArrayList<ModeSelectCommand>();
 
 	@Override
 	public void init()
@@ -42,35 +45,24 @@ public class RouterTestTeleOpMode extends OpMode
 		robotMode = RobotMode.COMPACT;
 	}
 
-	// A = RobotMode.TRANSPORT
-	// B = Cancel selection
-	// X = Select robot mode
-	//     X up up = RobotMode.ASCENT
-	//     X up lf = RobotMode.BUCKET
-	//     X up rt = RobotMode.SPECIMEN
-	//     X dn rt = RobotMode.INTAKE
-	//     X dn dn = RobotMode.COMPACT
-	//     X up B  = Cancel (example)
-	//     X B     = Cancel (example)
 	@Override
 	public void loop()
 	{
 		//
-		// Set drive motors based on gamepad1 inputs.
+		// Calculate and set drive motors based on gamepad1 inputs.
 		//
 
 		final DriveMotors.PowerLevels levels = RobotGeometry.calculateDrivePower(gamepad1);
 		driveMotors.setPowerLevels(levels);
 
 		//
-		// Handle mode changes based on gamepad2 inputs.
+		// Detect mode change requests based on gamepad2 inputs.
 		//
 
-		final RobotMode newRobotMode = detectRobotModeSelection(gamepad2, selectSequence);
+		final RobotMode newRobotMode = detectRobotModeSelection(gamepad2, modeSelectSequence);
 		if (newRobotMode != RobotMode.UNCHANGED && newRobotMode != robotMode)
 		{
 			robotMode = newRobotMode;
-
 /*
 			// Vision pipeline should only run in INTAKE mode.
 			if (newRobotMode == RobotMode.INTAKE)
@@ -78,8 +70,7 @@ public class RouterTestTeleOpMode extends OpMode
 			else
 				stopCameraPipeline();
 */
-
-			// Some modes need a starting pose.
+			// Some modes have a starting pose.
 			switch (newRobotMode)
 			{
 				case ASCENT:
@@ -93,7 +84,7 @@ public class RouterTestTeleOpMode extends OpMode
 					break;
 				case INTAKE:
 					tiltRouter.setTarget(TiltRouter.Preset.INTAKE_HOVER);
-					clawRouter.setTarget(ClawRouter.Preset.CENTERED);
+					clawRouter.setRestingPreset(ClawRouter.Preset.CENTERED);
 					clawServos.open();
 					break;
 				case SPECIMEN:
@@ -108,8 +99,8 @@ public class RouterTestTeleOpMode extends OpMode
 		}
 
 		//
-		// gamepad2's motion controls depend on the robot mode. Inputs should affect the tilt and
-		// claw routers, which will be converted into motor commands below.
+		// gamepad2's motion controls depend on which mode the robot is in. Inputs should affect the
+		// tilt and claw routers, which will be converted into motor commands below.
 		//
 
 		if (robotMode == RobotMode.ASCENT)
@@ -166,13 +157,13 @@ public class RouterTestTeleOpMode extends OpMode
 			}
 
 			if (gamepad2.left_trigger > 0.1) // Left trigger opens grasp.
-				; // clawServos.open();
+				clawServos.open();
 			else if (gamepad2.right_trigger > 0.1) // Right trigger closes grasp.
-				; // clawServos.close();
+				clawServos.close();
 		}
 
 		//
-		// Done handling driver inputs. Now update the routers to receive new motor targets (if any).
+		// Done handling driver inputs. Now update routers to determine new motor targets (if any).
 		//
 
 		final TiltMotors.Pose currentTiltPose = tiltMotors.getCurrentPose();
@@ -190,7 +181,6 @@ public class RouterTestTeleOpMode extends OpMode
 		{
 			clawServos.setTarget(newClawPoseTarget); // Issue servo commands.
 		}
-
 /*
 		// Update LED indicator.
 		Color indicatorColor = Color.OFF;
@@ -210,25 +200,36 @@ public class RouterTestTeleOpMode extends OpMode
 	}
 
 	//
-	// Predefined mode select sequences for comparison.
+	// Predefined mode select sequences to compare against.
 	//
 
-	private static final List<SelectCommand> ascentSequence = Arrays.asList(
-			SelectCommand.SELECT, SelectCommand.UP, SelectCommand.UP);
+	private static final List<ModeSelectCommand> ascentSequence = Arrays.asList(
+			ModeSelectCommand.SELECT, ModeSelectCommand.UP, ModeSelectCommand.UP);
 
-	private static final List<SelectCommand> basketSequence = Arrays.asList(
-			SelectCommand.SELECT, SelectCommand.UP, SelectCommand.LEFT);
+	private static final List<ModeSelectCommand> basketSequence = Arrays.asList(
+			ModeSelectCommand.SELECT, ModeSelectCommand.UP, ModeSelectCommand.LEFT);
 
-	private static final List<SelectCommand> specimenSequence = Arrays.asList(
-			SelectCommand.SELECT, SelectCommand.UP, SelectCommand.RIGHT);
+	private static final List<ModeSelectCommand> specimenSequence = Arrays.asList(
+			ModeSelectCommand.SELECT, ModeSelectCommand.UP, ModeSelectCommand.RIGHT);
 
-	private static final List<SelectCommand> intakeSequence = Arrays.asList(
-			SelectCommand.SELECT, SelectCommand.DOWN, SelectCommand.RIGHT);
+	private static final List<ModeSelectCommand> intakeSequence = Arrays.asList(
+			ModeSelectCommand.SELECT, ModeSelectCommand.DOWN, ModeSelectCommand.RIGHT);
 
-	private static final List<SelectCommand> compactSequence = Arrays.asList(
-			SelectCommand.SELECT, SelectCommand.DOWN, SelectCommand.RIGHT);
+	private static final List<ModeSelectCommand> compactSequence = Arrays.asList(
+			ModeSelectCommand.SELECT, ModeSelectCommand.DOWN, ModeSelectCommand.RIGHT);
 
-	static private RobotMode detectRobotModeSelection(@NonNull Gamepad gamepad, List<SelectCommand> selectSequence)
+	// Gamepad button mapping:
+	//   A = RobotMode.TRANSPORT
+	//   B = Cancel selection
+	//   X = Select robot mode
+	//       X up up = RobotMode.ASCENT
+	//       X up lf = RobotMode.BUCKET
+	//       X up rt = RobotMode.SPECIMEN
+	//       X dn rt = RobotMode.INTAKE
+	//       X dn dn = RobotMode.COMPACT
+	//       X up B  = Cancel (example)
+	//       X B     = Cancel (example)
+	static private RobotMode detectRobotModeSelection(@NonNull Gamepad gamepad, List<ModeSelectCommand> selectSequence)
 	{
 		if (gamepad.a) // "A" clears command sequence and puts robot into TRANSPORT mode.
 		{
@@ -238,7 +239,7 @@ public class RouterTestTeleOpMode extends OpMode
 		else if (gamepad.x) // "X" starts a new select command sequence.
 		{
 			selectSequence.clear();
-			selectSequence.add(SelectCommand.SELECT);
+			selectSequence.add(ModeSelectCommand.SELECT);
 		}
 		else if (gamepad.b) // "B" cancels the current command sequence (if any).
 		{
@@ -249,13 +250,13 @@ public class RouterTestTeleOpMode extends OpMode
 		if (!selectSequence.isEmpty())
 		{
 			if (gamepad.dpad_up)
-				selectSequence.add(SelectCommand.UP);
+				selectSequence.add(ModeSelectCommand.UP);
 			else if (gamepad.dpad_down)
-				selectSequence.add(SelectCommand.DOWN);
+				selectSequence.add(ModeSelectCommand.DOWN);
 			else if (gamepad.dpad_left)
-				selectSequence.add(SelectCommand.LEFT);
+				selectSequence.add(ModeSelectCommand.LEFT);
 			else if (gamepad.dpad_right)
-				selectSequence.add(SelectCommand.RIGHT);
+				selectSequence.add(ModeSelectCommand.RIGHT);
 
 			// Check if we now hold complete a select sequence.
 			if (selectSequence.size() == 3)
