@@ -130,7 +130,6 @@ public class bodhiMachineVision extends LinearOpMode {
     static class SkystoneDeterminationPipeline extends OpenCvPipeline {
         // An enum to define the skystone position
 
-        Mat input = new Mat();
         Mat colorR0 = new Mat();
         Mat colorR1 = new Mat();
         Mat colorR = new Mat();
@@ -191,7 +190,7 @@ public class bodhiMachineVision extends LinearOpMode {
 
                 double rawAngle = Math.atan2(dy, dx) * (180 / Math.PI);
                 double angle = 180 - Math.abs(rawAngle);
-                angles.add(angle * (rawAngle < 0 ? -1 : 1));
+                angles.add(angle * (rawAngle < 0 ? 1 : -1));
                 //angles.add(angle < 0 ? 180 - Math.abs(angle) : angle);
             }
 
@@ -220,7 +219,8 @@ public class bodhiMachineVision extends LinearOpMode {
 
         @Override
         public Mat processFrame(Mat input) {
-            Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV, 4);
+            //Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV, 4);
+            hsv = input;
             
             //red
             Core.inRange(hsv, new Scalar(160, 15, 170), new Scalar(180, 255, 255), colorR0);
@@ -241,7 +241,7 @@ public class bodhiMachineVision extends LinearOpMode {
             angles = angleR;
 
             //return result;
-            //List<Mat> listMat = Arrays.asList(colorR0, colorG, colorB);
+            //List<Mat> listMat = Arrays.asList(colorR, colorG, colorB);
             //Core.merge(listMat, result);
             return result;
         }
