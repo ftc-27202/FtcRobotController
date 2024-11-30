@@ -51,35 +51,31 @@ import org.openftc.easyopencv.OpenCvPipeline;
 @TeleOp(name = "Bodhi Machine Vision", group = "Robot")
 
 public class bodhiMachineVision extends LinearOpMode {
-
-
-    OpenCvCamera phoneCam;
-    SkystoneDeterminationPipeline pipeline;
+    OpenCvCamera webCam;
+    SampleAlignmentPipeline pipeline;
 
     @Override
-    public void runOpMode()  {
+    public void runOpMode() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
-        phoneCam = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+        webCam = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
 
-        pipeline = new SkystoneDeterminationPipeline();
+        pipeline = new SampleAlignmentPipeline();
 
         // Specify the image processing pipeline we wish to invoke upon receipt of a frame from the camera.
         // Note that switching pipelines on-the-fly (while a streaming session is in flight) *IS* supported.
-        phoneCam.setPipeline(pipeline);
+        webCam.setPipeline(pipeline);
 
-        phoneCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+        webCam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
-            public void onOpened()
-            {
-                phoneCam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
+            public void onOpened() {
+                webCam.startStreaming(640, 480, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
-            public void onError(int errorCode)
-            {
+            public void onError(int errorCode) {
                 // This will be called if the camera could not be opened
             }
         });
@@ -92,12 +88,12 @@ public class bodhiMachineVision extends LinearOpMode {
 
         while (opModeIsActive()) {
             // Send some stats to the telemetry
-            telemetry.addData("Frame Count", phoneCam.getFrameCount());
-            telemetry.addData("FPS", String.format("%.2f", phoneCam.getFps()));
-            telemetry.addData("Total frame time ms", phoneCam.getTotalFrameTimeMs());
-            telemetry.addData("Pipeline time ms", phoneCam.getPipelineTimeMs());
-            telemetry.addData("Overhead time ms", phoneCam.getOverheadTimeMs());
-            telemetry.addData("Theoretical max FPS", phoneCam.getCurrentPipelineMaxFps());
+            telemetry.addData("Frame Count", webCam.getFrameCount());
+            telemetry.addData("FPS", String.format("%.2f", webCam.getFps()));
+            telemetry.addData("Total frame time ms", webCam.getTotalFrameTimeMs());
+            telemetry.addData("Pipeline time ms", webCam.getPipelineTimeMs());
+            telemetry.addData("Overhead time ms", webCam.getOverheadTimeMs());
+            telemetry.addData("Theoretical max FPS", webCam.getCurrentPipelineMaxFps());
             telemetry.addData("Angle", pipeline.getAnalysis());
             telemetry.update();
 
@@ -119,7 +115,7 @@ public class bodhiMachineVision extends LinearOpMode {
                 // it the next time you wish to activate your vision pipeline, which can take a bit of
                 // time. Of course, this comment is irrelevant in light of the use case described in
                 // the above "important note".
-                phoneCam.stopStreaming();
+                webCam.stopStreaming();
                 //phoneCam.closeCameraDevice();
             }
 
@@ -127,7 +123,7 @@ public class bodhiMachineVision extends LinearOpMode {
         }
     }
 
-    static class SkystoneDeterminationPipeline extends OpenCvPipeline {
+    static class SampleAlignmentPipeline extends OpenCvPipeline {
         // An enum to define the skystone position
 
         Mat colorR0 = new Mat();
@@ -162,6 +158,7 @@ public class bodhiMachineVision extends LinearOpMode {
         public boolean areClose(double i1, double i2, double range) {
             return Math.abs(i1 - i2) <= range;
         }
+
         public double houghPolar(Mat input, Scalar color) {
             // Edge detection
             Imgproc.Canny(input, dst, 50, 200, 3, false);
@@ -240,7 +237,6 @@ public class bodhiMachineVision extends LinearOpMode {
 
             angles = angleR;
 
-            //return result;
             //List<Mat> listMat = Arrays.asList(colorR, colorG, colorB);
             //Core.merge(listMat, result);
             return result;
