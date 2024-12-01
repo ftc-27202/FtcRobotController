@@ -37,7 +37,8 @@ public class JeffBaseTeleOpMode extends OpMode {
                     * 1 / 360.0; // Ticks per degree, not per rotation
 
     final double ARM_COLLAPSED_INTO_ROBOT = 0;
-    final double ARM_COLLECT = 225 * ARM_TICKS_PER_DEGREE;
+//    final double ARM_COLLECT = 225 * ARM_TICKS_PER_DEGREE;
+    final double ARM_COLLECT = 221 * ARM_TICKS_PER_DEGREE;
     final double ARM_CLEAR_BARRIER = 200 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SPECIMEN = 160 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SAMPLE_IN_LOW = 160 * ARM_TICKS_PER_DEGREE;
