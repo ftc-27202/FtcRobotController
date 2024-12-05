@@ -38,6 +38,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 //@Disabled
 public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
 
+    public void startStrafing(int power) {
+        leftFrontDrive.setPower(-power);
+        rightFrontDrive.setPower(power);
+        leftBackDrive.setPower(power);
+        rightBackDrive.setPower(-power);
+    }
+
     public void loop () {
         //if left_trigger: speed = 0.6; else speed = 1.0
         double speed = gamepad1.right_trigger > 0 ? 0.6 : 1.0;
