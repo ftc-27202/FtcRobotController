@@ -146,6 +146,10 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             wrist.setPosition(WRIST_FOLDED_IN);
         }
 
+        if (gamepad2.left_trigger > 0 && gamepad2.right_trigger > 0) {
+            slideTargetPosition -= (int) (gamepad2.right_stick_y * 10.0);
+        }
+
         //Limelight stuff starts here
         LLResult result = limelight.getLatestResult();
         //gamepad2.dpad_right will target the robot to a seen sample (rn only yellow works)
