@@ -38,14 +38,14 @@ public class JeffBaseTeleOpMode extends OpMode {
 
     final double ARM_COLLAPSED_INTO_ROBOT = 0;
 //    final double ARM_COLLECT = 225 * ARM_TICKS_PER_DEGREE;
-    final double ARM_COLLECT = 225 * ARM_TICKS_PER_DEGREE;
+    final double ARM_COLLECT = 224 * ARM_TICKS_PER_DEGREE;
     final double ARM_CLEAR_BARRIER = 200 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SPECIMEN = 160 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SAMPLE_IN_LOW = 160 * ARM_TICKS_PER_DEGREE;
 //    final double ARM_DEPOSIT = 74 * ARM_TICKS_PER_DEGREE;
     final double ARM_DEPOSIT = 78 * ARM_TICKS_PER_DEGREE;
     final double ARM_WINCH_ROBOT = 10 * ARM_TICKS_PER_DEGREE;
-
+    double LLSPEED = .4;
     final int SLIDE_GROUND = 0;
     final int SLIDE_HALF = 1350;
     final int SLIDE_HIGH = 2650;
@@ -63,13 +63,13 @@ public class JeffBaseTeleOpMode extends OpMode {
 
     final double FUDGE_FACTOR = 15 * ARM_TICKS_PER_DEGREE;
 
-    final double BUCKET_CATCH = 0.5;
+    final double BUCKET_CATCH = 0.45;
     final double BUCKET_DUMP = 0;
 
 //    final double BUCKET_CATCH = 0.80;
 //    final double BUCKET_DUMP = 0.3;
     // Target tolerance for limelight, if target is within this value from centre of LL's cam, robot will not move
-    final double LLTargetTolerance = 5;
+    final double LLTargetTolerance = 3;
     /* Variables that are used to set the arm to a specific position */
 
     double armPosition = (int) ARM_COLLAPSED_INTO_ROBOT;

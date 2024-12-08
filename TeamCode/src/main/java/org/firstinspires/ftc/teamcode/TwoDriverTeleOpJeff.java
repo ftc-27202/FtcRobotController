@@ -170,13 +170,23 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             //right is positive I think?
             if (tx >= LLTargetTolerance ){
                 telemetry.addData("Move Right", tx);
-                // Fill in with code to actually strafe the robot slowly to the right
+                leftFrontDrive.setPower(LLSPEED);
+                rightFrontDrive.setPower(-LLSPEED);
+                leftBackDrive.setPower(-LLSPEED);
+                rightBackDrive.setPower(LLSPEED);
             }else if((-1*LLTargetTolerance) >= tx){
                 telemetry.addData("Move Left", tx);
                 // Fill in with code to actually strafe the robot slowly to the left
-
+                leftFrontDrive.setPower(-LLSPEED);
+                rightFrontDrive.setPower(LLSPEED);
+                leftBackDrive.setPower(LLSPEED);
+                rightBackDrive.setPower(-LLSPEED);
             }else if((Math.abs(tx)) < LLTargetTolerance ){
                 telemetry.addData("Target within tolerance, current offset:", tx);
+                leftFrontDrive.setPower(0);
+                rightFrontDrive.setPower(0);
+                leftBackDrive.setPower(0);
+                rightBackDrive.setPower(0);
             }
 
         } else if (result != null && result.isValid()) {
