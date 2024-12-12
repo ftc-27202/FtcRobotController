@@ -140,18 +140,22 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             bucket.setPosition(BUCKET_DUMP);
         }
 
-        if (gamepad2.x) {
-            wrist.setPosition(WRIST_FOLDED_OUT);
-        } else if (gamepad2.y) {
-            wrist.setPosition(WRIST_FOLDED_IN);
+        if (gamepad2.y) {
+            limelight.pipelineSwitch(0);
+        } else if (gamepad2.b) {
+            limelight.pipelineSwitch(1);
+        } else if (gamepad2.x){
+            limelight.pipelineSwitch(2);
         }
 
         if (gamepad2.left_trigger > 0 && gamepad2.right_trigger > 0) {
-            slideTargetPosition -= (int) (gamepad2.right_stick_y * 10.0);
+           slideTargetPosition -= (int) (gamepad2.right_stick_y * 10.0);
+           slideError -= (int) (gamepad2.right_stick_y * 10.0);
         }
 
         //Limelight stuff starts here
         LLResult result = limelight.getLatestResult();
+        telemetry. addData("Pipeline:", result.getPipelineIndex());
         //gamepad2.dpad_right will target the robot to a seen sample (rn only yellow works)
         // if gamepad2.dpad_right is pressed and target is seen, identify direction and try to move towards the target until target is within tolerance
         if (gamepad2.dpad_right && (result != null && result.isValid()) ) {
@@ -221,11 +225,11 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             slideTargetPosition = SLIDE_HALF;
         }
 
-        leftSlide.setTargetPosition(slideTargetPosition);
+        leftSlide.setTargetPosition(slideTargetPosition - slideError);
         leftSlide.setPower(1.0);
         leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        rightSlide.setTargetPosition(slideTargetPosition);
+        rightSlide.setTargetPosition(slideTargetPosition - slideError);
         rightSlide.setPower(1.0);
         rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 

@@ -433,7 +433,10 @@ public class JeffAutoBasketSide extends LinearOpMode {
                 .strafeTo(new Vector2d(-43, -60));
 
         TrajectoryActionBuilder trajDriveToCollectSamplePosition1 = trajDriveToHighBasket.endTrajectory().fresh()
-                .strafeToSplineHeading(new Vector2d(-31, -32), Math.toRadians(160));
+                // Origal test code
+                .strafeToSplineHeading(new Vector2d(-31, -33), Math.toRadians(165));
+//              Working code
+//                .strafeToSplineHeading(new Vector2d(-31, -32), Math.toRadians(160));
 //              Meet 2
 //                .strafeToSplineHeading(new Vector2d(-30, -33), Math.toRadians(160));
 
@@ -448,7 +451,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
 //                .strafeToSplineHeading(new Vector2d(-56, -46), Math.toRadians(45));
 
         TrajectoryActionBuilder trajDriveToCollectSamplePosition2 = trajDriveToHighBasket2.endTrajectory().fresh()
-                .strafeToSplineHeading(new Vector2d(-40, -23), Math.toRadians(180));
+                .strafeToSplineHeading(new Vector2d(-40, -24), Math.toRadians(180));
 //              Meet 2
 //                .strafeToSplineHeading(new Vector2d(-40, -24), Math.toRadians(180));
 
@@ -471,7 +474,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
 //                .strafeTo(new Vector2d(-54.5, -30), new TranslationalVelConstraint(10));
 
         TrajectoryActionBuilder trajDriveToHighBasket4 = trajDriveForwardToCollectSample3.endTrajectory().fresh()
-                .strafeToSplineHeading(new Vector2d(-53, -44), Math.toRadians(45));
+                .strafeToSplineHeading(new Vector2d(-53, -43), Math.toRadians(45));
 
         TrajectoryActionBuilder trajDriveToPark = trajDriveToHighBasket4.endTrajectory().fresh()
                 .strafeToSplineHeading(new Vector2d(-10, -62), Math.toRadians(0))
@@ -536,7 +539,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
                         new ParallelAction(
                             arm.ArmClearBucket(),
                             new SequentialAction(
-                                new SleepAction(0.10),
+                                new SleepAction(0.15),
                                 slide.SlidesUpHigh()
                             )
                         )
@@ -575,7 +578,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
                         new ParallelAction(
                             arm.ArmClearBucket(),
                             new SequentialAction(
-                                new SleepAction(0.10),
+                                new SleepAction(0.15),
                                 slide.SlidesUpHigh()
                             )
                         )
@@ -613,7 +616,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
                         new ParallelAction(
                             arm.ArmClearBucket(),
                             new SequentialAction(
-                                new SleepAction(0.10),
+                                new SleepAction(0.15),
                                 slide.SlidesUpHigh()
                             )
                         )

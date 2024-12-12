@@ -75,8 +75,9 @@ public class JeffBaseTeleOpMode extends OpMode {
     /* Variables that are used to set the arm to a specific position */
 
     double armPosition = (int) ARM_COLLAPSED_INTO_ROBOT;
+    int slideError = 0;
     double armPositionFudgeFactor;
-    int slideTargetPosition;
+   int slideTargetPosition;
     double lastSlideActionTime = getRuntime();
     public void init() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
