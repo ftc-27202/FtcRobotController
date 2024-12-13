@@ -442,7 +442,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
 //                .strafeToSplineHeading(new Vector2d(-30, -33), Math.toRadians(160));
 
         TrajectoryActionBuilder trajDriveForwardToCollectSample1 = trajDriveToCollectSamplePosition1.endTrajectory().fresh()
-                .strafeTo(new Vector2d(-34, -29));
+                .strafeTo(new Vector2d(-36, -27));
 //              Meet 2
 //                .strafeTo(new Vector2d(-34, -29), new TranslationalVelConstraint(10));
 
@@ -457,7 +457,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
 //                .strafeToSplineHeading(new Vector2d(-40, -24), Math.toRadians(180));
 
         TrajectoryActionBuilder trajDriveForwardToCollectSample2 = trajDriveToCollectSamplePosition2.endTrajectory().fresh()
-                .strafeTo(new Vector2d(-44, -23));
+                .strafeTo(new Vector2d(-46, -23));
 //              Meet 2
 //                .strafeTo(new Vector2d(-46, -24), new TranslationalVelConstraint(10));
 
@@ -475,7 +475,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
 //                .strafeTo(new Vector2d(-54.5, -30), new TranslationalVelConstraint(10));
 
         TrajectoryActionBuilder trajDriveToHighBasket4 = trajDriveForwardToCollectSample3.endTrajectory().fresh()
-                .strafeToSplineHeading(new Vector2d(-53, -44), Math.toRadians(45));
+                .strafeToSplineHeading(new Vector2d(-55, -46), Math.toRadians(45));
 
         TrajectoryActionBuilder trajDriveToPark = trajDriveToHighBasket4.endTrajectory().fresh()
                 .strafeToSplineHeading(new Vector2d(-10, -64), Math.toRadians(0))
