@@ -61,7 +61,7 @@ public class JeffBaseTeleOpMode extends OpMode {
 //    final double WRIST_SPECIMEN = 0.4;
     final double WRIST_SPECIMEN = 0.3;
 //    final double WRIST_FOLDED_OUT = 1.0;
-    final double WRIST_FOLDED_OUT = 0.7;
+    final double WRIST_FOLDED_OUT = 0.69;
 
     final double FUDGE_FACTOR = 15 * ARM_TICKS_PER_DEGREE;
 

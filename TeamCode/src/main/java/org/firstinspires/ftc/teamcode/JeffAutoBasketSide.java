@@ -337,7 +337,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
         /* Variables to store the positions that the wrist should be set to when folding in, or folding out. */
         final double WRIST_FOLDED_IN = 0.0;
         final double WRIST_SPECIMEN = 0.3;
-        final double WRIST_FOLDED_OUT = 0.7;
+        final double WRIST_FOLDED_OUT = 0.69;
 //        final double WRIST_FOLDED_OUT = 1.0;
 
         public Wrist(HardwareMap hardwareMap) {
@@ -433,15 +433,16 @@ public class JeffAutoBasketSide extends LinearOpMode {
                 .strafeTo(new Vector2d(-43, -60));
 
         TrajectoryActionBuilder trajDriveToCollectSamplePosition1 = trajDriveToHighBasket.endTrajectory().fresh()
+                .strafeToSplineHeading(new Vector2d(-30, -33), Math.toRadians(160));
                 // Origal test code
-                .strafeToSplineHeading(new Vector2d(-31, -33), Math.toRadians(165));
+//                .strafeToSplineHeading(new Vector2d(-31, -33), Math.toRadians(165));
 //              Working code
 //                .strafeToSplineHeading(new Vector2d(-31, -32), Math.toRadians(160));
 //              Meet 2
 //                .strafeToSplineHeading(new Vector2d(-30, -33), Math.toRadians(160));
 
         TrajectoryActionBuilder trajDriveForwardToCollectSample1 = trajDriveToCollectSamplePosition1.endTrajectory().fresh()
-                .strafeTo(new Vector2d(-35, -28));
+                .strafeTo(new Vector2d(-34, -29));
 //              Meet 2
 //                .strafeTo(new Vector2d(-34, -29), new TranslationalVelConstraint(10));
 
@@ -451,7 +452,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
 //                .strafeToSplineHeading(new Vector2d(-56, -46), Math.toRadians(45));
 
         TrajectoryActionBuilder trajDriveToCollectSamplePosition2 = trajDriveToHighBasket2.endTrajectory().fresh()
-                .strafeToSplineHeading(new Vector2d(-40, -24), Math.toRadians(180));
+                .strafeToSplineHeading(new Vector2d(-40, -23), Math.toRadians(180));
 //              Meet 2
 //                .strafeToSplineHeading(new Vector2d(-40, -24), Math.toRadians(180));
 
@@ -474,11 +475,11 @@ public class JeffAutoBasketSide extends LinearOpMode {
 //                .strafeTo(new Vector2d(-54.5, -30), new TranslationalVelConstraint(10));
 
         TrajectoryActionBuilder trajDriveToHighBasket4 = trajDriveForwardToCollectSample3.endTrajectory().fresh()
-                .strafeToSplineHeading(new Vector2d(-53, -43), Math.toRadians(45));
+                .strafeToSplineHeading(new Vector2d(-53, -44), Math.toRadians(45));
 
         TrajectoryActionBuilder trajDriveToPark = trajDriveToHighBasket4.endTrajectory().fresh()
-                .strafeToSplineHeading(new Vector2d(-10, -62), Math.toRadians(0))
-                .strafeTo(new Vector2d(32, -62));
+                .strafeToSplineHeading(new Vector2d(-10, -64), Math.toRadians(0))
+                .strafeTo(new Vector2d(32, -64));
 
         while (!isStopRequested() && !opModeIsActive()) {
             telemetry.addData("x", drive.pose.position.x);
@@ -520,9 +521,11 @@ public class JeffAutoBasketSide extends LinearOpMode {
                     arm.ArmClearBarrier()
                 ),
                 new ParallelAction(
-                    arm.ArmCollect(),
+                    arm.ArmCollect()
+                        ,
                     actDriveForwardToCollectSample1
-                ),
+                )
+                    ,
                 intake.IntakeOff(),
                 new ParallelAction(
                     new SequentialAction(
