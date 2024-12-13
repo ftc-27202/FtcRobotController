@@ -297,7 +297,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
     public class Bucket {
         private Servo bucket;
 
-        final double BUCKET_CATCH = 0.45;
+        final double BUCKET_CATCH = 0.5;
         final double BUCKET_DUMP = 0.0;
 
         public Bucket(HardwareMap hardwareMap) {
@@ -447,7 +447,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
 //                .strafeTo(new Vector2d(-34, -29), new TranslationalVelConstraint(10));
 
         TrajectoryActionBuilder trajDriveToHighBasket2 = trajDriveForwardToCollectSample1.endTrajectory().fresh()
-                .strafeToSplineHeading(new Vector2d(-53, -44), Math.toRadians(45));
+                .strafeToSplineHeading(new Vector2d(-55, -45), Math.toRadians(45));
 //              Meet 2
 //                .strafeToSplineHeading(new Vector2d(-56, -46), Math.toRadians(45));
 
@@ -462,7 +462,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
 //                .strafeTo(new Vector2d(-46, -24), new TranslationalVelConstraint(10));
 
         TrajectoryActionBuilder trajDriveToHighBasket3 = trajDriveForwardToCollectSample2.endTrajectory().fresh()
-                .strafeToSplineHeading(new Vector2d(-53, -44), Math.toRadians(45));
+                .strafeToSplineHeading(new Vector2d(-55, -45), Math.toRadians(45));
 
         TrajectoryActionBuilder trajDriveToCollectSamplePosition3 = trajDriveToHighBasket3.endTrajectory().fresh()
                 .strafeToSplineHeading(new Vector2d(-48, -23), Math.toRadians(180));
@@ -475,7 +475,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
 //                .strafeTo(new Vector2d(-54.5, -30), new TranslationalVelConstraint(10));
 
         TrajectoryActionBuilder trajDriveToHighBasket4 = trajDriveForwardToCollectSample3.endTrajectory().fresh()
-                .strafeToSplineHeading(new Vector2d(-55, -46), Math.toRadians(45));
+                .strafeToSplineHeading(new Vector2d(-55, -45), Math.toRadians(45));
 
         TrajectoryActionBuilder trajDriveToPark = trajDriveToHighBasket4.endTrajectory().fresh()
                 .strafeToSplineHeading(new Vector2d(-10, -64), Math.toRadians(0))
@@ -518,8 +518,9 @@ public class JeffAutoBasketSide extends LinearOpMode {
                     actDriveToCollectSamplePosition1,
                     wrist.WristOut(),
                     intake.IntakeCollect(),
-                    arm.ArmClearBarrier()
-                ),
+                    arm.ArmClearBarrier(),
+                    bucket.BucketCatch()
+            ),
                 new ParallelAction(
                     arm.ArmCollect()
                         ,
@@ -531,8 +532,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
                     new SequentialAction(
                         new ParallelAction(
                             arm.ArmDeposit(),
-                            wrist.WristIn(),
-                            bucket.BucketCatch()
+                            wrist.WristIn()
                         ),
                         new SequentialAction(
                             intake.IntakeDeposit(),
@@ -556,7 +556,8 @@ public class JeffAutoBasketSide extends LinearOpMode {
                     actDriveToCollectSamplePosition2,
                     wrist.WristOut(),
                     intake.IntakeCollect(),
-                    arm.ArmClearBarrier()
+                    arm.ArmClearBarrier(),
+                    bucket.BucketCatch()
                 ),
                 new ParallelAction(
                     arm.ArmCollect()
@@ -569,8 +570,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
                     new SequentialAction(
                         new ParallelAction(
                             arm.ArmDeposit(),
-                            wrist.WristIn(),
-                            bucket.BucketCatch()
+                            wrist.WristIn()
                         ),
                         new SequentialAction(
                             intake.IntakeDeposit(),
@@ -595,7 +595,8 @@ public class JeffAutoBasketSide extends LinearOpMode {
                     actDriveToCollectSamplePosition3,
                     wrist.WristOut(),
                     intake.IntakeCollect(),
-                    arm.ArmClearBarrier()
+                    arm.ArmClearBarrier(),
+                    bucket.BucketCatch()
                 ),
                 new ParallelAction(
                     arm.ArmCollectSample3()
@@ -608,8 +609,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
                     new SequentialAction(
                         new ParallelAction(
                             arm.ArmDeposit(),
-                            wrist.WristIn(),
-                            bucket.BucketCatch()
+                            wrist.WristIn()
                         ),
                         new SequentialAction(
                             intake.IntakeDeposit(),

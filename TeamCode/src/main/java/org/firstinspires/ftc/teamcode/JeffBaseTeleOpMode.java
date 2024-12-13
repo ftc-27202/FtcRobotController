@@ -65,7 +65,7 @@ public class JeffBaseTeleOpMode extends OpMode {
 
     final double FUDGE_FACTOR = 15 * ARM_TICKS_PER_DEGREE;
 
-    final double BUCKET_CATCH = 0.45;
+    final double BUCKET_CATCH = 0.5;
     final double BUCKET_DUMP = 0;
 
 //    final double BUCKET_CATCH = 0.80;
