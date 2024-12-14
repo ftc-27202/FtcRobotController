@@ -71,7 +71,7 @@ public class JeffBaseTeleOpMode extends OpMode {
 //    final double BUCKET_CATCH = 0.80;
 //    final double BUCKET_DUMP = 0.3;
     // Target tolerance for limelight, if target is within this value from centre of LL's cam, robot will not move
-    final double LLTargetTolerance = 3;
+    final double LLTargetTolerance = 2;
     /* Variables that are used to set the arm to a specific position */
 
     double armPosition = (int) ARM_COLLAPSED_INTO_ROBOT;
