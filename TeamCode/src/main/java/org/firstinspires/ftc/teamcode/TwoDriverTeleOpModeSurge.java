@@ -73,8 +73,7 @@ public class TwoDriverTeleOpModeSurge extends SurgeBaseTeleOpMode {
         rightFrontDrive.setPower(rightFrontPower * speed);
         leftBackDrive.setPower(leftBackPower * speed);
         rightBackDrive.setPower(rightBackPower * speed);
-
-
+/*
         if (gamepad1.a) {
             testServo.setPower(1);
         } else if (gamepad1.x) {
@@ -82,7 +81,7 @@ public class TwoDriverTeleOpModeSurge extends SurgeBaseTeleOpMode {
         } else if (gamepad1.b) {
             testServo.setPower(-1);
         }
-
+ */
         super.loop();
     }
 }
