@@ -72,7 +72,6 @@ public class TiltMotors
 		slideMotorRight.setTargetPosition(0);
 		slideMotorRight.setPower(0.5);
 		slideMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-*/
 	}
 
 	public void setTarget(@NonNull Pose target, Telemetry telemetry)

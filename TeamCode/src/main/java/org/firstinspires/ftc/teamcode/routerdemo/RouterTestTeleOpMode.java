@@ -246,14 +246,14 @@ public class RouterTestTeleOpMode extends OpMode
 			return oldRobotMode;
 		}
 
-		final ModeCommand dpadCommand =
+		final RobotModeSelectCommand dpadCommand =
 			gamepad.dpad_up ? RobotModeSelectCommand.UP :
 			gamepad.dpad_down ? RobotModeSelectCommand.DOWN :
 			gamepad.dpad_left ? RobotModeSelectCommand.LEFT :
 			gamepad.dpad_right ? RobotModeSelectCommand.RIGHT :
 				RobotModeSelectCommand.NONE;
 
-		if (selectSequence.length() > 1 && selectSequence.last() != dpadCommand)
+		if (selectSequence.size() > 1 && selectSequence.get(selectSequence.size()-1) != dpadCommand)
 			selectSequence.add(dpadCommand);
 
 		// Only add to the select sequence if it has been started (not empty).
