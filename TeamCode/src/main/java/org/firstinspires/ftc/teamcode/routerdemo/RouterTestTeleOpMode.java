@@ -243,7 +243,18 @@ public class RouterTestTeleOpMode extends OpMode
 		{
 			selectSequence.add(dpadCommand);
 			telemetry.addData("command", "%s (%d)", dpadCommand.toString(), selectSequence.size());
+			return oldRobotMode;
 		}
+
+		final ModeCommand dpadCommand =
+			gamepad.dpad_up ? RobotModeSelectCommand.UP :
+			gamepad.dpad_down ? RobotModeSelectCommand.DOWN :
+			gamepad.dpad_left ? RobotModeSelectCommand.LEFT :
+			gamepad.dpad_right ? RobotModeSelectCommand.RIGHT :
+				RobotModeSelectCommand.NONE;
+
+		if (selectSequence.length() > 1 && selectSequence.last() != dpadCommand)
+			selectSequence.add(dpadCommand);
 
 		// Only add to the select sequence if it has been started (not empty).
 		if (selectSequence.size() == 4)
