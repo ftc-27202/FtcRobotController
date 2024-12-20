@@ -53,6 +53,26 @@ public class TiltMotors
 		armPivotServoLeft = hardwareMap.get(Servo.class, "ARM_PIVOT_SERVO_L");
 		armPivotServoRight = hardwareMap.get(Servo.class, "ARM_PIVOT_SERVO_R");
 		wristPivotServo = hardwareMap.get(Servo.class, "WRIST_PIVOT_SERVO");
+/*
+		slideMotorLeft.setDirection(DcMotor.Direction.FORWARD);
+		slideMotorRight.setDirection(DcMotor.Direction.REVERSE);
+
+		tiltMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		slideMotorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		slideMotorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+		tiltMotor.setTargetPosition(0.0);
+		slideMotorLeft.setTargetPosition(0.0);
+		slideMotorRight.setTargetPosition(0.0);
+
+		tiltMotor.setPower(0.5);
+		slideMotorLeft.setPower(0.5);
+		slideMotorRight.setPower(0.5);
+
+		tiltMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		slideMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		slideMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+*/
 	}
 
 	public void setTarget(@NonNull Pose target)

@@ -17,7 +17,7 @@ public class RouterTestTeleOpMode extends OpMode
 
 	// These commands (issued by dpad) are strung together to request a new robot mode.
 	private enum RobotModeSelectCommand
-	{SELECT, UP, DOWN, LEFT, RIGHT}
+	{NONE, SELECT, UP, DOWN, LEFT, RIGHT}
 
 	// Variables for interacting with motors and servos.
 	private final DriveMotors driveMotors = new DriveMotors();
@@ -61,7 +61,7 @@ public class RouterTestTeleOpMode extends OpMode
 		// Detect robot mode requests based on gamepad2 inputs.
 		//
 
-		final RobotMode newRobotMode = checkForCompletedCommandSequence(gamepad2, commandSequence, robotMode);
+		final RobotMode newRobotMode = updateModeSelectSequence(gamepad2, robotMode);
 		if (newRobotMode != robotMode)
 		{
 			// Robot mode change has been requested.
@@ -181,46 +181,53 @@ public class RouterTestTeleOpMode extends OpMode
 	 *   A = RobotMode.TRANSPORT
 	 *   B = Cancel selection
 	 *   X = Select robot mode
-	 *       [ X, up, up ] = RobotMode.ASCENT
-	 *       [ X, up, lf ] = RobotMode.BUCKET
-	 *       [ X, up, rt ] = RobotMode.SPECIMEN
-	 *       [ X, dn, rt ] = RobotMode.INTAKE
-	 *       [ X, dn, dn ] = RobotMode.COMPACT
-	 *       [ X, up, B  ] = Cancel (example)
-	 *       [ X, B      ] = Cancel (example)
+	 *       [ SELECT, UP,   NONE, UP      ] = RobotMode.ASCENT
+	 *       [ SELECT, UP,   NONE, LEFT    ] = RobotMode.BUCKET
+	 *       [ SELECT, UP,   NONE, RIGHT   ] = RobotMode.SPECIMEN
+	 *       [ SELECT, DOWN, NONE, RIGHT   ] = RobotMode.INTAKE
+	 *       [ SELECT, DOWN, NONE, DOWN    ] = RobotMode.COMPACT
+	 *       [ SELECT, UP,   NONE, CANCEL  ] = Cancel (example)
+	 *       [ SELECT, CANCEL              ] = Cancel (example)
 	 */
-	static private RobotMode checkForCompletedCommandSequence(@NonNull Gamepad gamepad,
-		List<RobotModeSelectCommand> selectSequence, RobotMode oldRobotMode)
+	static private RobotMode updateModeSelectSequence(
+		@NonNull Gamepad gamepad,
+		List<RobotModeSelectCommand> selectSequence,
+		RobotMode oldRobotMode)
 	{
-		if (gamepad.a) // "A" clears command sequence and puts robot into TRANSPORT mode.
+		if (gamepad.x && not already selecting)
 		{
-			selectSequence.clear();
-			return RobotMode.TRANSPORT;
-		}
-		else if (gamepad.x) // "X" starts a new select command sequence.
-		{
+			// SELECT
 			selectSequence.clear();
 			selectSequence.add(RobotModeSelectCommand.SELECT);
 		}
-		else if (gamepad.b) // "B" cancels the current command sequence (if any).
+		else if (gamepad.a)
 		{
+			// Slam into TRANSPORT mode.
 			selectSequence.clear();
+			return RobotMode.TRANSPORT;
 		}
+		else if (gamepad.b)
+		{
+			// CANCEL
+			selectSequence.clear();
+			return oldRobotMode;
+		}
+
+		final ModeCommand dpadCommand =
+			gamepad.dpad_up ? RobotModeSelectCommand.UP :
+			gamepad.dpad_down ? RobotModeSelectCommand.DOWN :
+			gamepad.dpad_left ? RobotModeSelectCommand.LEFT :
+			gamepad.dpad_right ? RobotModeSelectCommand.RIGHT :
+				RobotModeSelectCommand.NONE;
+
+		if (selectSequence.length() > 1 && selectSequence.last() != dpadCommand)
+			selectSequence.add(dpadCommand);
 
 		// Only add to the select sequence if it has been started (not empty).
 		if (!selectSequence.isEmpty())
 		{
-			if (gamepad.dpad_up)
-				selectSequence.add(RobotModeSelectCommand.UP);
-			else if (gamepad.dpad_down)
-				selectSequence.add(RobotModeSelectCommand.DOWN);
-			else if (gamepad.dpad_left)
-				selectSequence.add(RobotModeSelectCommand.LEFT);
-			else if (gamepad.dpad_right)
-				selectSequence.add(RobotModeSelectCommand.RIGHT);
-
 			// Check if we now hold complete a select sequence.
-			if (selectSequence.size() == 3)
+			if (selectSequence.size() == 4)
 			{
 				RobotMode newRobotMode;
 
