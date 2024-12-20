@@ -38,10 +38,10 @@ public class DriveMotors
 
 	public void init()
 	{
-		frontLeftMotor = hardwareMap.get(DcMotor.class, "DRIVE_MOTOR_FL");
-		frontRightMotor = hardwareMap.get(DcMotor.class, "DRIVE_MOTOR_FR");
-		backLeftMotor = hardwareMap.get(DcMotor.class, "DRIVE_MOTOR_BL");
-		backRightMotor = hardwareMap.get(DcMotor.class, "DRIVE_MOTOR_BR");
+		frontLeftMotor = hardwareMap.get(DcMotor.class, "leftFront");
+		frontRightMotor = hardwareMap.get(DcMotor.class, "rightFront");
+		backLeftMotor = hardwareMap.get(DcMotor.class, "leftRear");
+		backRightMotor = hardwareMap.get(DcMotor.class, "rightRear");
 	}
 
 	public void setPowerLevels(@NonNull PowerLevels levels)

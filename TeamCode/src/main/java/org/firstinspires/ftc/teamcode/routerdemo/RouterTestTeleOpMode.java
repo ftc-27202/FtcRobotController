@@ -61,7 +61,7 @@ public class RouterTestTeleOpMode extends OpMode
 		// Detect robot mode requests based on gamepad2 inputs.
 		//
 
-		final RobotMode newRobotMode = updateModeSelectSequence(gamepad2, robotMode);
+		final RobotMode newRobotMode = updateModeSelectSequence(gamepad2, commandSequence, robotMode);
 		if (newRobotMode != robotMode)
 		{
 			// Robot mode change has been requested.
@@ -194,10 +194,9 @@ public class RouterTestTeleOpMode extends OpMode
 		List<RobotModeSelectCommand> selectSequence,
 		RobotMode oldRobotMode)
 	{
-		if (gamepad.x && not already selecting)
+		if (gamepad.x && selectSequence.isEmpty())
 		{
-			// SELECT
-			selectSequence.clear();
+			// Start new mode select sequence.
 			selectSequence.add(RobotModeSelectCommand.SELECT);
 		}
 		else if (gamepad.a)
@@ -208,45 +207,41 @@ public class RouterTestTeleOpMode extends OpMode
 		}
 		else if (gamepad.b)
 		{
-			// CANCEL
+			// CANCEL mode select sequence.
 			selectSequence.clear();
 			return oldRobotMode;
 		}
 
-		final ModeCommand dpadCommand =
+		final RobotModeSelectCommand dpadCommand =
 			gamepad.dpad_up ? RobotModeSelectCommand.UP :
 			gamepad.dpad_down ? RobotModeSelectCommand.DOWN :
 			gamepad.dpad_left ? RobotModeSelectCommand.LEFT :
 			gamepad.dpad_right ? RobotModeSelectCommand.RIGHT :
 				RobotModeSelectCommand.NONE;
 
-		if (selectSequence.length() > 1 && selectSequence.last() != dpadCommand)
+		if (selectSequence.size() > 1 && selectSequence.get(selectSequence.size()-1) != dpadCommand)
 			selectSequence.add(dpadCommand);
 
 		// Only add to the select sequence if it has been started (not empty).
-		if (!selectSequence.isEmpty())
+		if (selectSequence.size() == 4)
 		{
-			// Check if we now hold complete a select sequence.
-			if (selectSequence.size() == 4)
-			{
-				RobotMode newRobotMode;
+			RobotMode newRobotMode;
 
-				if (selectSequence.equals(ascentSequence))
-					newRobotMode = RobotMode.ASCENT;
-				else if (selectSequence.equals(basketSequence))
-					newRobotMode = RobotMode.BASKET;
-				else if (selectSequence.equals(specimenSequence))
-					newRobotMode = RobotMode.SPECIMEN;
-				else if (selectSequence.equals(intakeSequence))
-					newRobotMode = RobotMode.INTAKE;
-				else if (selectSequence.equals(compactSequence))
-					newRobotMode = RobotMode.COMPACT;
-				else
-					newRobotMode = oldRobotMode; // Unrecognized sequence.
+			if (selectSequence.equals(ascentSequence))
+				newRobotMode = RobotMode.ASCENT;
+			else if (selectSequence.equals(basketSequence))
+				newRobotMode = RobotMode.BASKET;
+			else if (selectSequence.equals(specimenSequence))
+				newRobotMode = RobotMode.SPECIMEN;
+			else if (selectSequence.equals(intakeSequence))
+				newRobotMode = RobotMode.INTAKE;
+			else if (selectSequence.equals(compactSequence))
+				newRobotMode = RobotMode.COMPACT;
+			else
+				newRobotMode = oldRobotMode; // Unrecognized sequence.
 
-				selectSequence.clear();
-				return newRobotMode;
-			}
+			selectSequence.clear();
+			return newRobotMode;
 		}
 
 		return oldRobotMode;
