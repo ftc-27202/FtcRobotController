@@ -10,19 +10,19 @@ public class TiltRouter
 {
 	public enum Preset
 	{
-		COMPACT,           // Fits inside an 18" cube.
-		DRIVE_CONFIG,      // Close to sample picking config but stable for driving.
-		SAFE_PASS_THROUGH, // Intermediate waypoint that won't collide with slides.
-		PICK_HOVER,        // Hover over sample for a photo op.
-		PICK,              // Claw lowered to pick up a sample off the ground.
-		BASKET_LOW,        // Claw positioned over low basket.
-		BASKET_HIGH,       // Claw positioned over high basket.
-		SPECIMEN_LOW,      // Claw positioned over low specimen bar.
-		SPECIMEN_HIGH,     // Claw positioned over high specimen bar.
+		ASCENT_HIGH_HOVER, // Hook positioned over high ascent bar.
+		ASCENT_HIGH_HANG,  // Hook hanging on high specimen bar.
 		ASCENT_LOW_HOVER,  // Hook positioned over low ascent bar.
 		ASCENT_LOW_HANG,   // Hook hanging on low specimen bar.
-		ASCENT_HIGH_HOVER, // Hook positioned over high ascent bar.
-		ASCENT_HIGH_HANG   // Hook hanging on high specimen bar.
+		BASKET_LOW,        // Claw positioned over low basket.
+		BASKET_HIGH,       // Claw positioned over high basket.
+		COMPACT,           // Fits inside an 18" cube.
+		INTAKE_FLOOR,      // Claw lowered to pick up a sample off the ground.
+		INTAKE_HOVER,      // Hover over sample for a photo op.
+		SAFE_PASS_THROUGH, // Intermediate waypoint that won't collide with slides.
+		SPECIMEN_LOW,      // Claw positioned over low specimen bar.
+		SPECIMEN_HIGH,     // Claw positioned over high specimen bar.
+		TRANSPORT          // Close to sample picking config but stable for driving.
 	}
 
 	private Preset restingPreset;
@@ -35,14 +35,19 @@ public class TiltRouter
 		restingPreset = initialPreset;
 	}
 
+	public TiltRouter.Preset resting()
+	{
+		return routePresets.isEmpty() ? restingPreset : null;
+	}
+
 	public void setTarget(Preset target)
 	{
-		if (routePresets.isEmpty()) // Robot is currently at rest.
+		if (routePresets.isEmpty()) // Robot tilt mechanism is currently at rest.
 		{
 			// Set new routePresets so the next call to updateProgress() will command the motors to start.
 			routePresets = findRoute(restingPreset, target);
 		}
-		else // Robot is moving toward the restingPreset.
+		else // Robot tilt mechanism is moving.
 		{
 			if (target == restingPreset)
 				return; // Nothing to do: Action was already moving toward this restingPreset.
@@ -95,45 +100,33 @@ public class TiltRouter
 		return null;
 	}
 
+	private boolean inFloorZone(Preset preset)
+	{
+		return (preset == Preset.TRANSPORT ||
+				preset == Preset.INTAKE_HOVER ||
+				preset == Preset.INTAKE_FLOOR);
+	}
+
 	// Build a list of routePresets that will safely transition the robot from startPreset to
 	// restingPreset. The resulting list includes startPreset, restingPreset, and any intermediate
 	// poses required for safe travel.
-	public List<Preset> findRoute(Preset startPreset, Preset restingPreset)
+	public List<Preset> findRoute(Preset startPreset, Preset endPreset)
 	{
-		ArrayList<Preset> routePresets = new ArrayList<Preset>();
+		List<Preset> routePresets = new ArrayList<Preset>();
 
 		routePresets.add(startPreset);
 
-		switch (startPreset)
-		{
-			case BASKET_LOW:
-			case BASKET_HIGH:
-				routePresets.add(Preset.SAFE_PASS_THROUGH);
-				break;
+		// The tilt arm can safely move between poses in the "near floor" zone, and also between poses
+		// in the "vertical reach" zone (e.g., baskets and ascent), but moving between zones requires
+		// it to pass between the linear slides. For these cases add an intermediate SAFE_PASS_THROUGH
+		// pose that aligns the tilt arm into a safe orientation.
+		final boolean startIsInFloorZone = inFloorZone(startPreset);
+		final boolean endIsInFloorZone = inFloorZone(endPreset);
 
-			case SPECIMEN_HIGH:
-				// not implemented
-				break;
+		if (startIsInFloorZone != endIsInFloorZone)
+			routePresets.add(Preset.SAFE_PASS_THROUGH);
 
-			case SPECIMEN_LOW:
-				// not implemented
-				break;
-
-			case DRIVE_CONFIG:
-				break;
-
-			case PICK_HOVER:
-				break;
-
-			case PICK:
-				if (restingPreset != Preset.DRIVE_CONFIG)
-				{
-					routePresets.add(Preset.DRIVE_CONFIG);
-				}
-				break;
-		}
-
-		routePresets.add(restingPreset);
+		routePresets.add(endPreset);
 
 		return routePresets;
 	}

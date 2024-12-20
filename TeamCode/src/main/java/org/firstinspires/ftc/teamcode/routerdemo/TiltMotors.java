@@ -18,7 +18,6 @@ public class TiltMotors
 		double armPivotPositionLeft;
 		double armPivotPositionRight;
 		double wristPivotPosition;
-		double wristTwistPosition;
 
 		public Pose(
 				int tiltPosition,
@@ -26,8 +25,7 @@ public class TiltMotors
 				int slidePositionRight,
 				double armPivotPositionLeft,
 				double armPivotPositionRight,
-				double wristPivotPosition,
-				double wristTwistPosition)
+				double wristPivotPosition)
 		{
 			this.tiltPosition = tiltPosition;
 			this.slidePositionLeft = slidePositionLeft;
@@ -35,7 +33,6 @@ public class TiltMotors
 			this.armPivotPositionLeft = armPivotPositionLeft;
 			this.armPivotPositionRight = armPivotPositionRight;
 			this.wristPivotPosition = wristPivotPosition;
-			this.wristTwistPosition = wristTwistPosition;
 		}
 	}
 
@@ -46,7 +43,6 @@ public class TiltMotors
 	private Servo armPivotServoLeft = null;
 	private Servo armPivotServoRight = null;
 	private Servo wristPivotServo = null;
-	private Servo wristTwistServo = null;
 
 	public void init()
 	{
@@ -57,7 +53,6 @@ public class TiltMotors
 		armPivotServoLeft = hardwareMap.get(Servo.class, "ARM_PIVOT_SERVO_L");
 		armPivotServoRight = hardwareMap.get(Servo.class, "ARM_PIVOT_SERVO_R");
 		wristPivotServo = hardwareMap.get(Servo.class, "WRIST_PIVOT_SERVO");
-		wristTwistServo = hardwareMap.get(Servo.class, "WRIST_TWIST_SERVO");
 	}
 
 	public void setTarget(@NonNull Pose target)
@@ -69,7 +64,6 @@ public class TiltMotors
 		armPivotServoLeft.setPosition(target.armPivotPositionLeft);
 		armPivotServoRight.setPosition(target.armPivotPositionRight);
 		wristPivotServo.setPosition(target.wristPivotPosition);
-		wristTwistServo.setPosition(target.wristTwistPosition);
 	}
 
 	public Pose getCurrentPose()
@@ -80,9 +74,7 @@ public class TiltMotors
 				slideMotorRight.getCurrentPosition(),
 				armPivotServoLeft.getPosition(),
 				armPivotServoRight.getPosition(),
-				wristPivotServo.getPosition(),
-				wristTwistServo.getPosition()
-		);
+				wristPivotServo.getPosition());
 	}
 
 	private static boolean areClose(int lhs, int rhs, int maxDelta)
@@ -101,14 +93,12 @@ public class TiltMotors
 		final int maxSlideDelta = 50;
 		final double maxArmPivotDelta = 0.1;
 		final double maxWristPivotDelta = 0.1;
-		final double maxWristTwistDelta = 0.1;
 
 		return areClose(lhs.tiltPosition, rhs.tiltPosition, maxTiltDelta) &&
 				areClose(lhs.slidePositionLeft, rhs.slidePositionLeft, maxSlideDelta) &&
 				areClose(lhs.slidePositionRight, rhs.slidePositionRight, maxSlideDelta) &&
 				areClose(lhs.armPivotPositionLeft, rhs.armPivotPositionLeft, maxArmPivotDelta) &&
 				areClose(lhs.armPivotPositionRight, rhs.armPivotPositionRight, maxArmPivotDelta) &&
-				areClose(lhs.wristPivotPosition, rhs.wristPivotPosition, maxWristPivotDelta) &&
-				areClose(lhs.wristTwistPosition, rhs.wristTwistPosition, maxWristTwistDelta);
+				areClose(lhs.wristPivotPosition, rhs.wristPivotPosition, maxWristPivotDelta);
 	}
 }
