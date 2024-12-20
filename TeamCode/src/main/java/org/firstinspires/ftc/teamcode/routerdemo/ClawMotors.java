@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.Servo;
 
-public class ClawServos
+public class ClawMotors
 {
 	public static class Pose
 	{

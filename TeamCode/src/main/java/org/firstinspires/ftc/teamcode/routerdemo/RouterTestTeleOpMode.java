@@ -11,18 +11,18 @@ import java.util.List;
 
 public class RouterTestTeleOpMode extends OpMode
 {
-	// The robot is always in one mode, based its current objective.
+	// The robot is always in one other these modes based its current objective.
 	private enum RobotMode
 	{ASCENT, BASKET, COMPACT, INTAKE, SPECIMEN, TRANSPORT}
 
-	// These commands (taken from gamepad inputs) are strung together to request a new robot mode.
+	// These commands (issued by dpad) are strung together to request a new robot mode.
 	private enum RobotModeSelectCommand
 	{SELECT, UP, DOWN, LEFT, RIGHT}
 
 	// Variables for interacting with motors and servos.
 	private final DriveMotors driveMotors = new DriveMotors();
 	private final TiltMotors tiltMotors = new TiltMotors();
-	private final ClawServos clawServos = new ClawServos();
+	private final ClawMotors clawMotors = new ClawMotors();
 
 	// Routers for tracking and planning motor/servo targets.
 	private final TiltRouter tiltRouter = new TiltRouter();
@@ -40,7 +40,7 @@ public class RouterTestTeleOpMode extends OpMode
 		// Initialize motors and servos.
 		driveMotors.init();
 		tiltMotors.init();
-		clawServos.init();
+		clawMotors.init();
 
 		// Initialize routers to reflect the robot's starting state.
 		tiltRouter.init(TiltRouter.NamedPose.COMPACT);
@@ -82,7 +82,7 @@ public class RouterTestTeleOpMode extends OpMode
 				case INTAKE:
 					tiltRouter.setTarget(TiltRouter.NamedPose.INTAKE_HOVER);
 					clawRouter.setRestingPose(ClawRouter.NamedPose.CENTERED);
-					clawServos.open();
+					clawMotors.open();
 					break;
 				case SPECIMEN:
 					tiltRouter.setTarget(TiltRouter.NamedPose.SPECIMEN_HIGH);
@@ -138,18 +138,19 @@ public class RouterTestTeleOpMode extends OpMode
 					tiltMotors.setElevation(gamepad2.left_stick_y);
 
 				if (Math.abs(gamepad2.right_stick_x) > gamepad2.joystickDeadzoen) // Right joystick X orients the claw manually.
-					clawServos.setTwist(gamepad2.right_stick_x);
- */
+					clawMotors.setTwist(gamepad2.right_stick_x);
+*/
 			}
 
 			if (gamepad2.left_trigger > 0.1) // Left trigger opens grasp.
-				clawServos.open();
+				clawMotors.open();
 			else if (gamepad2.right_trigger > 0.1) // Right trigger closes grasp.
-				clawServos.close();
+				clawMotors.close();
 		}
 
 		//
-		// Done handling driver inputs. Finally, inform the routers of actual motor positions to see if changes are needed.
+		// Done handling driver inputs. Finally, inform the routers of the current motor positions to
+		// see if it triggers updated targets.
 		//
 
 		final TiltMotors.Pose currentTiltPose = tiltMotors.getCurrentPose();
@@ -157,15 +158,15 @@ public class RouterTestTeleOpMode extends OpMode
 
 		if (newTiltPoseTarget != null)
 		{
-			tiltMotors.setTarget(newTiltPoseTarget); // Issue tilt motor and servo commands.
+			tiltMotors.setTarget(newTiltPoseTarget); // Issue tilt motor commands.
 		}
 
-		final ClawServos.Pose currentClawPose = clawServos.getCurrentPose();
-		final ClawServos.Pose newClawPoseTarget = clawRouter.updateProgress(currentClawPose);
+		final ClawMotors.Pose currentClawPose = clawMotors.getCurrentPose();
+		final ClawMotors.Pose newClawPoseTarget = clawRouter.updateProgress(currentClawPose);
 
 		if (newClawPoseTarget != null)
 		{
-			clawServos.setTarget(newClawPoseTarget); // Issue claw servo commands.
+			clawMotors.setTarget(newClawPoseTarget); // Issue claw motor commands.
 		}
 
 		// Optional: Update LED indicator.
@@ -180,13 +181,13 @@ public class RouterTestTeleOpMode extends OpMode
 	 *   A = RobotMode.TRANSPORT
 	 *   B = Cancel selection
 	 *   X = Select robot mode
-	 *       X up up = RobotMode.ASCENT
-	 *       X up lf = RobotMode.BUCKET
-	 *       X up rt = RobotMode.SPECIMEN
-	 *       X dn rt = RobotMode.INTAKE
-	 *       X dn dn = RobotMode.COMPACT
-	 *       X up B  = Cancel (example)
-	 *       X B     = Cancel (example)
+	 *       [ X, up, up ] = RobotMode.ASCENT
+	 *       [ X, up, lf ] = RobotMode.BUCKET
+	 *       [ X, up, rt ] = RobotMode.SPECIMEN
+	 *       [ X, dn, rt ] = RobotMode.INTAKE
+	 *       [ X, dn, dn ] = RobotMode.COMPACT
+	 *       [ X, up, B  ] = Cancel (example)
+	 *       [ X, B      ] = Cancel (example)
 	 */
 	static private RobotMode checkForCompletedCommandSequence(@NonNull Gamepad gamepad,
 		List<RobotModeSelectCommand> selectSequence, RobotMode oldRobotMode)
