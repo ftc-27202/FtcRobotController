@@ -2,33 +2,33 @@ package org.firstinspires.ftc.teamcode.routerdemo;
 
 import androidx.annotation.NonNull;
 
-//
-// The claw router is responsible for tracking orienting and closing the claw.
-//
+/*
+ * The claw router is responsible for tracking orienting and closing the claw.
+ */
 public class ClawRouter
 {
-	public enum Preset
+	public enum NamedPose
 	{
 		CENTERED, // Claw is centered at 0 degrees.
 		ORIENTED, // Claw has been automatically oriented using the vision pipeline.
 		MANUAL    // Claw has been manually oriented using the gamepad controls.
 	}
 
-	private Preset restingPreset;
+	private NamedPose restingNamedPose;
 
-	public Preset resting()
+	public NamedPose resting()
 	{
-		return restingPreset;
+		return restingNamedPose;
 	}
 
-	public void setRestingPreset(@NonNull Preset restingPreset)
+	public void setRestingPose(@NonNull NamedPose pose)
 	{
-		this.restingPreset = restingPreset;
+		this.restingNamedPose = pose;
 	}
 
-	public void init(@NonNull Preset target)
+	public void init(@NonNull NamedPose target)
 	{
-		this.restingPreset = target;
+		this.restingNamedPose = target;
 	}
 
 	// Update the Action motion progress against the measured encoder values. If the next waypoint
