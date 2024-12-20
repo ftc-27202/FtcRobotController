@@ -85,9 +85,9 @@ public class RobotGeometry
 
 	@NonNull
 	@Contract("_ -> new")
-	public static TiltMotors.Pose toPose(@NonNull TiltRouter.Preset preset)
+	public static TiltMotors.Pose toPose(@NonNull TiltRouter.NamedPose namedPose)
 	{
-		switch (preset)
+		switch (namedPose)
 		{
 			case COMPACT:
 				return new TiltMotors.Pose(
