@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.routerdemo;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import androidx.annotation.NonNull;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class TiltMotors
@@ -44,9 +42,10 @@ public class TiltMotors
 	private Servo armPivotServoRight = null;
 	private Servo wristPivotServo = null;
 
-	public void init()
+	public void init(HardwareMap hardwareMap)
 	{
-		tiltMotor = hardwareMap.get(DcMotor.class, "TILT_MOTOR");
+		tiltMotor = hardwareMap.get(DcMotor.class, "slideTilt");
+/*
 		slideMotorLeft = hardwareMap.get(DcMotor.class, "SLIDE_MOTOR_L");
 		slideMotorRight = hardwareMap.get(DcMotor.class, "SLIDE_MOTOR_R");
 
@@ -56,44 +55,44 @@ public class TiltMotors
 
 		slideMotorLeft.setDirection(DcMotor.Direction.FORWARD);
 		slideMotorRight.setDirection(DcMotor.Direction.REVERSE);
-
+*/
 		tiltMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		slideMotorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		slideMotorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
 		tiltMotor.setTargetPosition(0);
-		slideMotorLeft.setTargetPosition(0);
-		slideMotorRight.setTargetPosition(0);
-
 		tiltMotor.setPower(0.5);
-		slideMotorLeft.setPower(0.5);
-		slideMotorRight.setPower(0.5);
-
 		tiltMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+/*
+		slideMotorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		slideMotorLeft.setTargetPosition(0);
+		slideMotorLeft.setPower(0.5);
 		slideMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+		slideMotorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		slideMotorRight.setTargetPosition(0);
+		slideMotorRight.setPower(0.5);
 		slideMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+*/
 	}
 
 	public void setTarget(@NonNull Pose target)
 	{
 		tiltMotor.setTargetPosition(target.tiltPosition);
-		slideMotorLeft.setTargetPosition(target.slidePositionLeft);
-		slideMotorRight.setTargetPosition(target.slidePositionRight);
+		//slideMotorLeft.setTargetPosition(target.slidePositionLeft);
+		//slideMotorRight.setTargetPosition(target.slidePositionRight);
 
-		armPivotServoLeft.setPosition(target.armPivotPositionLeft);
-		armPivotServoRight.setPosition(target.armPivotPositionRight);
-		wristPivotServo.setPosition(target.wristPivotPosition);
+		//armPivotServoLeft.setPosition(target.armPivotPositionLeft);
+		//armPivotServoRight.setPosition(target.armPivotPositionRight);
+		//wristPivotServo.setPosition(target.wristPivotPosition);
 	}
 
 	public Pose getCurrentPose()
 	{
 		return new Pose(
 				tiltMotor.getCurrentPosition(),
-				slideMotorLeft.getCurrentPosition(),
-				slideMotorRight.getCurrentPosition(),
-				armPivotServoLeft.getPosition(),
-				armPivotServoRight.getPosition(),
-				wristPivotServo.getPosition());
+				0, // slideMotorLeft.getCurrentPosition(),
+				0, // slideMotorRight.getCurrentPosition(),
+				0.0, // armPivotServoLeft.getPosition(),
+				0.0, // armPivotServoRight.getPosition(),
+				0.0); // wristPivotServo.getPosition());
 	}
 
 	private static boolean areClose(int lhs, int rhs, int maxDelta)
@@ -113,11 +112,13 @@ public class TiltMotors
 		final double maxArmPivotDelta = 0.1;
 		final double maxWristPivotDelta = 0.1;
 
-		return areClose(lhs.tiltPosition, rhs.tiltPosition, maxTiltDelta) &&
+		return areClose(lhs.tiltPosition, rhs.tiltPosition, maxTiltDelta); // &&
+/*
 				areClose(lhs.slidePositionLeft, rhs.slidePositionLeft, maxSlideDelta) &&
 				areClose(lhs.slidePositionRight, rhs.slidePositionRight, maxSlideDelta) &&
 				areClose(lhs.armPivotPositionLeft, rhs.armPivotPositionLeft, maxArmPivotDelta) &&
 				areClose(lhs.armPivotPositionRight, rhs.armPivotPositionRight, maxArmPivotDelta) &&
 				areClose(lhs.wristPivotPosition, rhs.wristPivotPosition, maxWristPivotDelta);
+*/
 	}
 }

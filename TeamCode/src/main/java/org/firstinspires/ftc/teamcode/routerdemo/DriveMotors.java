@@ -1,11 +1,8 @@
 package org.firstinspires.ftc.teamcode.routerdemo;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import androidx.annotation.NonNull;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class DriveMotors
 {
@@ -36,7 +33,7 @@ public class DriveMotors
 	public DcMotor backLeftMotor = null;
 	public DcMotor backRightMotor = null;
 
-	public void init()
+	public void init(HardwareMap hardwareMap)
 	{
 		frontLeftMotor = hardwareMap.get(DcMotor.class, "leftFront");
 		frontRightMotor = hardwareMap.get(DcMotor.class, "rightFront");

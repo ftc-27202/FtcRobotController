@@ -3,11 +3,14 @@ package org.firstinspires.ftc.teamcode.routerdemo;
 import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+@TeleOp(name = "Router Test TeleOp", group = "Robot")
 
 public class RouterTestTeleOpMode extends OpMode
 {
@@ -38,9 +41,9 @@ public class RouterTestTeleOpMode extends OpMode
 	public void init()
 	{
 		// Initialize motors and servos.
-		driveMotors.init();
-		tiltMotors.init();
-		clawMotors.init();
+		driveMotors.init(hardwareMap);
+		tiltMotors.init(hardwareMap);
+		clawMotors.init(hardwareMap);
 
 		// Initialize routers to reflect the robot's starting state.
 		tiltRouter.init(TiltRouter.NamedPose.COMPACT);
