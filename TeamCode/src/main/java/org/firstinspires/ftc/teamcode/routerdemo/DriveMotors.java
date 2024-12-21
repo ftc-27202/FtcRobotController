@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode.routerdemo;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import androidx.annotation.NonNull;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class DriveMotors
 {
@@ -36,12 +34,17 @@ public class DriveMotors
 	public DcMotor backLeftMotor = null;
 	public DcMotor backRightMotor = null;
 
-	public void init()
+	public void init(HardwareMap hardwareMap)
 	{
-		frontLeftMotor = hardwareMap.get(DcMotor.class, "DRIVE_MOTOR_FL");
-		frontRightMotor = hardwareMap.get(DcMotor.class, "DRIVE_MOTOR_FR");
-		backLeftMotor = hardwareMap.get(DcMotor.class, "DRIVE_MOTOR_BL");
-		backRightMotor = hardwareMap.get(DcMotor.class, "DRIVE_MOTOR_BR");
+		frontLeftMotor = hardwareMap.get(DcMotor.class, "leftFront");
+		frontRightMotor = hardwareMap.get(DcMotor.class, "rightFront");
+		backLeftMotor = hardwareMap.get(DcMotor.class, "leftRear");
+		backRightMotor = hardwareMap.get(DcMotor.class, "rightRear");
+
+		frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+		frontRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+		backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+		backRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 	}
 
 	public void setPowerLevels(@NonNull PowerLevels levels)
