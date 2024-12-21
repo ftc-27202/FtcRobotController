@@ -20,7 +20,7 @@ public class RobotGeometry
 	public static final int SLIDE_ASCENT_HIGH_HANG = 2000;  //
 	public static final int SLIDE_EXTENDED_MAX = 2500;      // Maximum allowable extension (check value)
 
-	public static final int TILT_COMPACT = 100;             //
+	public static final int TILT_COMPACT = 0;               //
 	public static final int TILT_BASKET = 0;                //
 	public static final int TILT_VERTICAL = 300;            //
 	public static final int TILT_FLOOR_HOVER = 500;         //
@@ -113,56 +113,56 @@ public class RobotGeometry
 
 			case BASKET_LOW:
 				return new TiltMotors.Pose(
-						TILT_FLOOR_HOVER,
+						TILT_BASKET,
 						SLIDE_BASKET_LOW, SLIDE_BASKET_LOW,
 						0.0, 0.0,
 						0.0);
 
 			case BASKET_HIGH:
 				return new TiltMotors.Pose(
-						TILT_FLOOR_HOVER,
+						TILT_BASKET,
 						SLIDE_BASKET_HIGH, SLIDE_BASKET_HIGH,
 						0.0, 0.0,
 						0.0);
 
 			case SPECIMEN_LOW:
 				return new TiltMotors.Pose(
-						TILT_FLOOR_HOVER,
+						TILT_BASKET,
 						SLIDE_SPECIMEN_LOW, SLIDE_SPECIMEN_LOW,
 						0.0, 0.0,
 						0.0);
 
 			case SPECIMEN_HIGH:
 				return new TiltMotors.Pose(
-						TILT_FLOOR_HOVER,
+						TILT_BASKET,
 						SLIDE_SPECIMEN_HIGH, SLIDE_SPECIMEN_HIGH,
 						0.0, 0.0,
 						0.0);
 
 			case ASCENT_LOW_HOVER:
 				return new TiltMotors.Pose(
-						TILT_FLOOR_HOVER,
+						TILT_VERTICAL,
 						SLIDE_ASCENT_LOW_HOVER, SLIDE_ASCENT_LOW_HOVER,
 						0.0, 0.0,
 						0.0);
 
 			case ASCENT_LOW_HANG:
 				return new TiltMotors.Pose(
-						TILT_FLOOR_HOVER,
+						TILT_VERTICAL,
 						SLIDE_ASCENT_LOW_HANG, SLIDE_ASCENT_LOW_HANG,
 						0.0, 0.0,
 						0.0);
 
 			case ASCENT_HIGH_HOVER:
 				return new TiltMotors.Pose(
-						TILT_FLOOR_HOVER,
+						TILT_VERTICAL,
 						SLIDE_ASCENT_HIGH_HOVER, SLIDE_ASCENT_HIGH_HOVER,
 						0.0, 0.0,
 						0.0);
 
 			case ASCENT_HIGH_HANG:
 				return new TiltMotors.Pose(
-						TILT_FLOOR_HOVER,
+						TILT_VERTICAL,
 						SLIDE_COLLAPSED, SLIDE_COLLAPSED,
 						0.1, 0.0,
 						0.0);
@@ -170,7 +170,7 @@ public class RobotGeometry
 			case SAFE_PASS_THROUGH:
 			default:
 				return new TiltMotors.Pose(
-						TILT_FLOOR_HOVER,
+						TILT_VERTICAL,
 						SLIDE_SAFE_PASS_THROUGH, SLIDE_SAFE_PASS_THROUGH,
 						0.0, 0.0,
 						0.0);
