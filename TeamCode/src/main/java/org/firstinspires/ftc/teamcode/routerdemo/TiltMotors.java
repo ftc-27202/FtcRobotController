@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 public class TiltMotors
 {
 	// Structure to hold all tilt-related motor positions in one place.
@@ -73,8 +75,9 @@ public class TiltMotors
 */
 	}
 
-	public void setTarget(@NonNull Pose target)
+	public void setTarget(@NonNull Pose target, Telemetry telemetry)
 	{
+		telemetry.addData("tilt motor command", "%d", target.tiltPosition);
 		tiltMotor.setTargetPosition(target.tiltPosition);
 		//slideMotorLeft.setTargetPosition(target.slidePositionLeft);
 		//slideMotorRight.setTargetPosition(target.slidePositionRight);

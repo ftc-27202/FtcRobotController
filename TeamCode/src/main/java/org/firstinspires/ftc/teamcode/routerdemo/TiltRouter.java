@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.routerdemo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,13 +72,19 @@ public class TiltRouter
 
 	// Update the tile route progress using the measured encoder values. If the current waypoint
 	// has been reached then instruct the motors to advance to next one.
-	public TiltMotors.Pose updateProgress(TiltMotors.Pose currentPose)
+	public TiltMotors.Pose updateProgress(TiltMotors.Pose currentPose, Telemetry telemetry)
 	{
 		if (namedPoseRoute.isEmpty())
 			return null; // Nothing to do: The action has reached its restingNamedPose.
 
 		final NamedPose nextNamedPose = namedPoseRoute.get(0);
 		final TiltMotors.Pose nextPose = RobotGeometry.toPose(nextNamedPose);
+
+		telemetry.addData("tilt", "%s %d %d %s",
+				nextNamedPose.toString(),
+				currentPose.tiltPosition,
+				nextPose.tiltPosition,
+				TiltMotors.areClose(currentPose, nextPose) ? "CLOSE" : "NOT CLOSE");
 
 		if (TiltMotors.areClose(currentPose, nextPose))
 		{

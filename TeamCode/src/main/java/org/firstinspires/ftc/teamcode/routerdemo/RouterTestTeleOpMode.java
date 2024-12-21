@@ -67,6 +67,8 @@ public class RouterTestTeleOpMode extends OpMode
 		final RobotMode newRobotMode = updateModeSelectSequence(gamepad2, commandSequence, robotMode);
 		if (newRobotMode != robotMode)
 		{
+			telemetry.addData("New mode", "%s", newRobotMode.toString());
+
 			// Robot mode change has been requested.
 			robotMode = newRobotMode;
 
@@ -128,11 +130,15 @@ public class RouterTestTeleOpMode extends OpMode
 			}
 			else if (gamepad2.dpad_down) // Lower claw to floor with current claw state.
 			{
-				tiltRouter.setTarget(TiltRouter.NamedPose.INTAKE_FLOOR);
+				final TiltRouter.NamedPose target = TiltRouter.NamedPose.INTAKE_FLOOR;
+				tiltRouter.setTarget(target);
+				tiltMotors.setTarget(RobotGeometry.toPose(target), telemetry);
 			}
 			else if (gamepad2.dpad_up) // Raise claw to hover with current claw state.
 			{
-				tiltRouter.setTarget(TiltRouter.NamedPose.INTAKE_HOVER);
+				final TiltRouter.NamedPose target = TiltRouter.NamedPose.INTAKE_HOVER;
+				tiltRouter.setTarget(target);
+				tiltMotors.setTarget(RobotGeometry.toPose(target), telemetry);
 			}
 			else // Handle manual joystick inputs.
 			{
@@ -157,11 +163,11 @@ public class RouterTestTeleOpMode extends OpMode
 		//
 
 		final TiltMotors.Pose currentTiltPose = tiltMotors.getCurrentPose();
-		final TiltMotors.Pose newTiltPoseTarget = tiltRouter.updateProgress(currentTiltPose);
+		final TiltMotors.Pose newTiltPoseTarget = tiltRouter.updateProgress(currentTiltPose, telemetry);
 
 		if (newTiltPoseTarget != null)
 		{
-			tiltMotors.setTarget(newTiltPoseTarget); // Issue tilt motor commands.
+			tiltMotors.setTarget(newTiltPoseTarget, telemetry); // Issue tilt motor commands.
 		}
 
 		final ClawMotors.Pose currentClawPose = clawMotors.getCurrentPose();
@@ -192,28 +198,35 @@ public class RouterTestTeleOpMode extends OpMode
 	 *       [ SELECT, UP,   NONE, CANCEL  ] = Cancel (example)
 	 *       [ SELECT, CANCEL              ] = Cancel (example)
 	 */
-	static private RobotMode updateModeSelectSequence(
-		@NonNull Gamepad gamepad,
-		List<RobotModeSelectCommand> selectSequence,
-		RobotMode oldRobotMode)
+	private RobotMode updateModeSelectSequence(
+            @NonNull Gamepad gamepad,
+            List<RobotModeSelectCommand> selectSequence,
+            RobotMode oldRobotMode)
 	{
 		if (gamepad.x && selectSequence.isEmpty())
 		{
 			// Start new mode select sequence.
 			selectSequence.add(RobotModeSelectCommand.SELECT);
+			telemetry.addData("command", "SELECT");
 		}
 		else if (gamepad.a)
 		{
 			// Slam into TRANSPORT mode.
 			selectSequence.clear();
+			telemetry.addData("command", "SLAM (TRANSPORT)");
 			return RobotMode.TRANSPORT;
 		}
 		else if (gamepad.b)
 		{
 			// CANCEL mode select sequence.
 			selectSequence.clear();
+			telemetry.addData("command", "CANCEL");
 			return oldRobotMode;
 		}
+
+		// If we're not currently in select mode then ignore dpad inputs.
+		if (selectSequence.isEmpty())
+			return oldRobotMode;
 
 		final RobotModeSelectCommand dpadCommand =
 			gamepad.dpad_up ? RobotModeSelectCommand.UP :
@@ -222,8 +235,15 @@ public class RouterTestTeleOpMode extends OpMode
 			gamepad.dpad_right ? RobotModeSelectCommand.RIGHT :
 				RobotModeSelectCommand.NONE;
 
-		if (selectSequence.size() > 1 && selectSequence.get(selectSequence.size()-1) != dpadCommand)
+		final RobotModeSelectCommand previousDpadCommand = (selectSequence.size() < 2)
+			? RobotModeSelectCommand.NONE
+			: selectSequence.get(selectSequence.size()-1);
+
+		if (dpadCommand != previousDpadCommand)
+		{
 			selectSequence.add(dpadCommand);
+			telemetry.addData("command", "%s (%d)", dpadCommand.toString(), selectSequence.size());
+		}
 
 		// Only add to the select sequence if it has been started (not empty).
 		if (selectSequence.size() == 4)
@@ -255,17 +275,32 @@ public class RouterTestTeleOpMode extends OpMode
 	//
 
 	private static final List<RobotModeSelectCommand> ascentSequence = Arrays.asList(
-			RobotModeSelectCommand.SELECT, RobotModeSelectCommand.UP, RobotModeSelectCommand.UP);
+			RobotModeSelectCommand.SELECT,
+			RobotModeSelectCommand.UP,
+			RobotModeSelectCommand.NONE,
+			RobotModeSelectCommand.UP);
 
 	private static final List<RobotModeSelectCommand> basketSequence = Arrays.asList(
-			RobotModeSelectCommand.SELECT, RobotModeSelectCommand.UP, RobotModeSelectCommand.LEFT);
+			RobotModeSelectCommand.SELECT,
+			RobotModeSelectCommand.UP,
+			RobotModeSelectCommand.NONE,
+			RobotModeSelectCommand.LEFT);
 
 	private static final List<RobotModeSelectCommand> specimenSequence = Arrays.asList(
-			RobotModeSelectCommand.SELECT, RobotModeSelectCommand.UP, RobotModeSelectCommand.RIGHT);
+			RobotModeSelectCommand.SELECT,
+			RobotModeSelectCommand.UP,
+			RobotModeSelectCommand.NONE,
+			RobotModeSelectCommand.RIGHT);
 
 	private static final List<RobotModeSelectCommand> intakeSequence = Arrays.asList(
-			RobotModeSelectCommand.SELECT, RobotModeSelectCommand.DOWN, RobotModeSelectCommand.RIGHT);
+			RobotModeSelectCommand.SELECT,
+			RobotModeSelectCommand.DOWN,
+			RobotModeSelectCommand.NONE,
+			RobotModeSelectCommand.RIGHT);
 
 	private static final List<RobotModeSelectCommand> compactSequence = Arrays.asList(
-			RobotModeSelectCommand.SELECT, RobotModeSelectCommand.DOWN, RobotModeSelectCommand.RIGHT);
+			RobotModeSelectCommand.SELECT,
+			RobotModeSelectCommand.DOWN,
+			RobotModeSelectCommand.NONE,
+			RobotModeSelectCommand.RIGHT);
 }
