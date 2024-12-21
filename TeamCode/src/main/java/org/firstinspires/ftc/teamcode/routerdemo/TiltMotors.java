@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.routerdemo;
 
 import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -47,31 +48,32 @@ public class TiltMotors
 	public void init(HardwareMap hardwareMap)
 	{
 		tiltMotor = hardwareMap.get(DcMotor.class, "slideTilt");
-/*
-		slideMotorLeft = hardwareMap.get(DcMotor.class, "SLIDE_MOTOR_L");
-		slideMotorRight = hardwareMap.get(DcMotor.class, "SLIDE_MOTOR_R");
+		slideMotorLeft = hardwareMap.get(DcMotor.class, "slideMotorLeft");
+		slideMotorRight = hardwareMap.get(DcMotor.class, "slideMotorRight");
 
+		tiltMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+		slideMotorLeft.setDirection(DcMotor.Direction.REVERSE);
+		slideMotorRight.setDirection(DcMotor.Direction.REVERSE);
+
+		tiltMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		slideMotorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		slideMotorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+		tiltMotor.setTargetPosition(0);
+		slideMotorLeft.setTargetPosition(0);
+		slideMotorRight.setTargetPosition(0);
+
+		tiltMotor.setPower(0.5);
+		slideMotorLeft.setPower(0.5);
+		slideMotorRight.setPower(0.5);
+
+		tiltMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		slideMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		slideMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+/*
 		armPivotServoLeft = hardwareMap.get(Servo.class, "ARM_PIVOT_SERVO_L");
 		armPivotServoRight = hardwareMap.get(Servo.class, "ARM_PIVOT_SERVO_R");
 		wristPivotServo = hardwareMap.get(Servo.class, "WRIST_PIVOT_SERVO");
-
-		slideMotorLeft.setDirection(DcMotor.Direction.FORWARD);
-		slideMotorRight.setDirection(DcMotor.Direction.REVERSE);
-*/
-		tiltMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		tiltMotor.setTargetPosition(0);
-		tiltMotor.setPower(0.5);
-		tiltMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-/*
-		slideMotorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		slideMotorLeft.setTargetPosition(0);
-		slideMotorLeft.setPower(0.5);
-		slideMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-		slideMotorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-		slideMotorRight.setTargetPosition(0);
-		slideMotorRight.setPower(0.5);
-		slideMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 */
 	}
 
@@ -79,20 +81,21 @@ public class TiltMotors
 	{
 		telemetry.addData("tilt motor command", "%d", target.tiltPosition);
 		tiltMotor.setTargetPosition(target.tiltPosition);
-		//slideMotorLeft.setTargetPosition(target.slidePositionLeft);
-		//slideMotorRight.setTargetPosition(target.slidePositionRight);
-
-		//armPivotServoLeft.setPosition(target.armPivotPositionLeft);
-		//armPivotServoRight.setPosition(target.armPivotPositionRight);
-		//wristPivotServo.setPosition(target.wristPivotPosition);
+		slideMotorLeft.setTargetPosition(target.slidePositionLeft);
+		slideMotorRight.setTargetPosition(target.slidePositionRight);
+/*
+		armPivotServoLeft.setPosition(target.armPivotPositionLeft);
+		armPivotServoRight.setPosition(target.armPivotPositionRight);
+		wristPivotServo.setPosition(target.wristPivotPosition);
+*/
 	}
 
 	public Pose getCurrentPose()
 	{
 		return new Pose(
 				tiltMotor.getCurrentPosition(),
-				0, // slideMotorLeft.getCurrentPosition(),
-				0, // slideMotorRight.getCurrentPosition(),
+				 slideMotorLeft.getCurrentPosition(),
+				 slideMotorRight.getCurrentPosition(),
 				0.0, // armPivotServoLeft.getPosition(),
 				0.0, // armPivotServoRight.getPosition(),
 				0.0); // wristPivotServo.getPosition());
@@ -115,10 +118,10 @@ public class TiltMotors
 		final double maxArmPivotDelta = 0.1;
 		final double maxWristPivotDelta = 0.1;
 
-		return areClose(lhs.tiltPosition, rhs.tiltPosition, maxTiltDelta); // &&
-/*
+		return areClose(lhs.tiltPosition, rhs.tiltPosition, maxTiltDelta) &&
 				areClose(lhs.slidePositionLeft, rhs.slidePositionLeft, maxSlideDelta) &&
-				areClose(lhs.slidePositionRight, rhs.slidePositionRight, maxSlideDelta) &&
+				areClose(lhs.slidePositionRight, rhs.slidePositionRight, maxSlideDelta);
+/*
 				areClose(lhs.armPivotPositionLeft, rhs.armPivotPositionLeft, maxArmPivotDelta) &&
 				areClose(lhs.armPivotPositionRight, rhs.armPivotPositionRight, maxArmPivotDelta) &&
 				areClose(lhs.wristPivotPosition, rhs.wristPivotPosition, maxWristPivotDelta);
