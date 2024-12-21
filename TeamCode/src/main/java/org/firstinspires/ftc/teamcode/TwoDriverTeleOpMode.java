@@ -37,41 +37,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 public class TwoDriverTeleOpMode extends BaseTeleOpMode {
 
     public void loop () {
-        //if left_trigger: speed = 0.6; else speed = 1.0
-        double speed = gamepad1.right_trigger > 0 ? 0.6 : 1.0;
-        double turn_speed = gamepad1.right_trigger > 0 ?  0.2 : 1.0;
-        double max;
+        double straightSpeed = gamepad1.left_bumper ? 0.4 : (1 - gamepad1.left_trigger);
+        double strafeSpeed = gamepad1.left_bumper ? 0.4 : (1 - gamepad1.left_trigger);
+        double turnSpeed = gamepad1.right_bumper ? 0.2 : (1 - gamepad1.right_trigger);
 
-        // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
         double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
         double lateral = gamepad1.left_stick_x;
-        double yaw = gamepad1.right_stick_x * turn_speed;
+        double yaw = gamepad1.right_stick_x;
 
-        // Combine the joystick requests for each axis-motion to determine each wheel's power.
-        // Set up a variable for each drive wheel to save the power level for telemetry.
-        double leftFrontPower = axial + lateral + yaw;
-        double rightFrontPower = axial - lateral - yaw;
-        double leftBackPower = axial - lateral + yaw;
-        double rightBackPower = axial + lateral - yaw;
-
-        // Normalize the values so no wheel power exceeds 100%
-        // This ensures that the robot maintains the desired motion.
-        max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-        max = Math.max(max, Math.abs(leftBackPower));
-        max = Math.max(max, Math.abs(rightBackPower));
-
-        if (max > 1.0) {
-            leftFrontPower /= max;
-            rightFrontPower /= max;
-            leftBackPower /= max;
-            rightBackPower /= max;
-        }
-
-        // Send calculated power to wheels
-        leftFrontDrive.setPower(leftFrontPower * speed);
-        rightFrontDrive.setPower(rightFrontPower * speed);
-        leftBackDrive.setPower(leftBackPower * speed);
-        rightBackDrive.setPower(rightBackPower * speed);
+        moveBase(axial, lateral, yaw, straightSpeed, strafeSpeed, turnSpeed);
 
         /*
         if (gamepad1.a) {
@@ -81,6 +55,9 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
         } else if (gamepad1.b) {
             intake.setPower(INTAKE_DEPOSIT);
         }*/
+
+        telemetry.addData("Left Trigger", gamepad1.left_trigger);
+        telemetry.addData("Right Trigger", gamepad1.right_trigger);
 
         super.loop();
     }
