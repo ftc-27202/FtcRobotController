@@ -3,59 +3,68 @@ package org.firstinspires.ftc.teamcode.routerdemo;
 import java.util.ArrayList;
 import java.util.List;
 
-//
-// The tilt router is responsible for safely moving the claw between preset waypoint poses.
-//
+/*
+ * The tilt router is responsible for safely moving the claw between named poses.
+ */
 public class TiltRouter
 {
-	public enum Preset
+	public enum NamedPose
 	{
-		COMPACT,           // Fits inside an 18" cube.
-		DRIVE_CONFIG,      // Close to sample picking config but stable for driving.
-		SAFE_PASS_THROUGH, // Intermediate waypoint that won't collide with slides.
-		PICK_HOVER,        // Hover over sample for a photo op.
-		PICK,              // Claw lowered to pick up a sample off the ground.
-		BASKET_LOW,        // Claw positioned over low basket.
-		BASKET_HIGH,       // Claw positioned over high basket.
-		SPECIMEN_LOW,      // Claw positioned over low specimen bar.
-		SPECIMEN_HIGH,     // Claw positioned over high specimen bar.
+		ASCENT_HIGH_HOVER, // Hook positioned over high ascent bar.
+		ASCENT_HIGH_HANG,  // Hook hanging on high specimen bar.
 		ASCENT_LOW_HOVER,  // Hook positioned over low ascent bar.
 		ASCENT_LOW_HANG,   // Hook hanging on low specimen bar.
-		ASCENT_HIGH_HOVER, // Hook positioned over high ascent bar.
-		ASCENT_HIGH_HANG   // Hook hanging on high specimen bar.
+		BASKET_LOW,        // Claw positioned over low basket.
+		BASKET_HIGH,       // Claw positioned over high basket.
+		COMPACT,           // Fits inside an 18" cube.
+		INTAKE_FLOOR,      // Claw lowered to pick up a sample off the ground.
+		INTAKE_HOVER,      // Hover over sample for a photo op.
+		SAFE_PASS_THROUGH, // Intermediate waypoint that won't collide with slides.
+		SPECIMEN_LOW,      // Claw positioned over low specimen bar.
+		SPECIMEN_HIGH,     // Claw positioned over high specimen bar.
+		TRANSPORT          // Close to sample picking config but stable for driving.
 	}
 
-	private Preset restingPreset;
-	private List<Preset> routePresets = new ArrayList<>();
+	// Pose that the robot is either currently resting at, or will rest at after completing the current route.
+	private NamedPose restingNamedPose;
+
+	// Sequence of poses that the robot is currently traversing on its way to restingNamedPose. If the tilt mechanism
+	// is at rest then this list will be empty. Otherwise the last item in namedPoseRoute will match restingNamedPose.
+	private List<NamedPose> namedPoseRoute = new ArrayList<>();
 
 	private long lastTargetChangeTimeMillis;
 
-	public void init(Preset initialPreset)
+	public void init(NamedPose initialNamedPose)
 	{
-		restingPreset = initialPreset;
+		restingNamedPose = initialNamedPose;
 	}
 
-	public void setTarget(Preset target)
+	public TiltRouter.NamedPose resting()
 	{
-		if (routePresets.isEmpty()) // Robot is currently at rest.
-		{
-			// Set new routePresets so the next call to updateProgress() will command the motors to start.
-			routePresets = findRoute(restingPreset, target);
-		}
-		else // Robot is moving toward the restingPreset.
-		{
-			if (target == restingPreset)
-				return; // Nothing to do: Action was already moving toward this restingPreset.
+		return namedPoseRoute.isEmpty() ? restingNamedPose : null;
+	}
 
-			// Switch to the new restingPreset by replacing the existing routePresets, but allow the current leg
-			// to finish before starting toward the new restingPreset. Routes ensure safe motion between known
-			// routePresets but changing the path between arbitrary routePresets could cause a collision.
-			final Preset nextPreset = routePresets.get(0);
-			routePresets.clear(); // Abandon old unreached routePresets.
-			routePresets = findRoute(nextPreset, target); // Re-route to new restingPreset, keeping next preset.
+	public void setTarget(NamedPose target)
+	{
+		if (namedPoseRoute.isEmpty()) // Robot tilt mechanism is currently at rest.
+		{
+			// Set new namedPoseRoute so the next call to updateProgress() will command the motors to start.
+			namedPoseRoute = findRoute(restingNamedPose, target);
+		}
+		else // Robot tilt mechanism is moving.
+		{
+			if (target == restingNamedPose)
+				return; // Nothing to do: Action was already moving toward this restingNamedPose.
+
+			// Switch to the new restingNamedPose by replacing the existing namedPoseRoute, but allow the current leg
+			// to finish before starting toward the new restingNamedPose. Routes ensure safe motion between known
+			// namedPoseRoute but changing the path between arbitrary namedPoseRoute could cause a collision.
+			final NamedPose nextNamedPose = namedPoseRoute.get(0);
+			namedPoseRoute.clear(); // Abandon old unreached namedPoseRoute.
+			namedPoseRoute = findRoute(nextNamedPose, target); // Re-route to new restingNamedPose, keeping next pose.
 		}
 
-		restingPreset = target;
+		restingNamedPose = target;
 		lastTargetChangeTimeMillis = System.currentTimeMillis();
 	}
 
@@ -63,27 +72,27 @@ public class TiltRouter
 	// has been reached then instruct the motors to advance to next one.
 	public TiltMotors.Pose updateProgress(TiltMotors.Pose currentPose)
 	{
-		if (routePresets.isEmpty())
-			return null; // Nothing to do: The action has reached its restingPreset.
+		if (namedPoseRoute.isEmpty())
+			return null; // Nothing to do: The action has reached its restingNamedPose.
 
-		final Preset nextPreset = routePresets.get(0);
-		final TiltMotors.Pose nextPose = RobotGeometry.toPose(nextPreset);
+		final NamedPose nextNamedPose = namedPoseRoute.get(0);
+		final TiltMotors.Pose nextPose = RobotGeometry.toPose(nextNamedPose);
 
 		if (TiltMotors.areClose(currentPose, nextPose))
 		{
 			// Reached the next waypoint. Pop it off and determine what's next.
-			routePresets.remove(0);
+			namedPoseRoute.remove(0);
 
-			if (routePresets.isEmpty()) // Tilt has reached its destination.
+			if (namedPoseRoute.isEmpty()) // Tilt has reached its destination.
 			{
-				if (restingPreset == Preset.COMPACT)
+				if (restingNamedPose == NamedPose.COMPACT)
 					; // Turn off motor power at a resting position?
 
 				// Should we kill power? (and where do we start it up again?)
 			}
 			else
 			{
-				return RobotGeometry.toPose(routePresets.get(0));
+				return RobotGeometry.toPose(namedPoseRoute.get(0));
 			}
 		}
 		else // Not there yet.
@@ -95,46 +104,33 @@ public class TiltRouter
 		return null;
 	}
 
-	// Build a list of routePresets that will safely transition the robot from startPreset to
-	// restingPreset. The resulting list includes startPreset, restingPreset, and any intermediate
-	// poses required for safe travel.
-	public List<Preset> findRoute(Preset startPreset, Preset restingPreset)
+	private boolean inFloorZone(NamedPose namedPose)
 	{
-		ArrayList<Preset> routePresets = new ArrayList<Preset>();
+		return namedPose == NamedPose.TRANSPORT ||
+			namedPose == NamedPose.INTAKE_HOVER ||
+			namedPose == NamedPose.INTAKE_FLOOR;
+	}
 
-		routePresets.add(startPreset);
+	// Build a list of poses that will safely transition the robot from startPose to endPose. The resulting
+	// list will includes startPose, endPose, and any intermediate poses that are required for safe travel.
+	public List<NamedPose> findRoute(NamedPose startPose, NamedPose endPose)
+	{
+		List<NamedPose> namedPoseRoute = new ArrayList<NamedPose>();
 
-		switch (startPreset)
-		{
-			case BASKET_LOW:
-			case BASKET_HIGH:
-				routePresets.add(Preset.SAFE_PASS_THROUGH);
-				break;
+		namedPoseRoute.add(startPose);
 
-			case SPECIMEN_HIGH:
-				// not implemented
-				break;
+		// The tilt arm can safely move between poses in the "near floor" zone, and also between poses
+		// in the "vertical reach" zone (e.g., baskets and ascent), but moving between zones requires
+		// it to pass between the linear slides. For these cases add an intermediate SAFE_PASS_THROUGH
+		// pose that aligns the tilt arm into a safe orientation.
+		final boolean startIsInFloorZone = inFloorZone(startPose);
+		final boolean endIsInFloorZone = inFloorZone(endPose);
 
-			case SPECIMEN_LOW:
-				// not implemented
-				break;
+		if (startIsInFloorZone != endIsInFloorZone)
+			namedPoseRoute.add(NamedPose.SAFE_PASS_THROUGH);
 
-			case DRIVE_CONFIG:
-				break;
+		namedPoseRoute.add(endPose);
 
-			case PICK_HOVER:
-				break;
-
-			case PICK:
-				if (restingPreset != Preset.DRIVE_CONFIG)
-				{
-					routePresets.add(Preset.DRIVE_CONFIG);
-				}
-				break;
-		}
-
-		routePresets.add(restingPreset);
-
-		return routePresets;
+		return namedPoseRoute;
 	}
 }
