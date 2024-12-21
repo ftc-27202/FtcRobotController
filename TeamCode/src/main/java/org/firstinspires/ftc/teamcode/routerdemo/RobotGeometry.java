@@ -18,7 +18,7 @@ public class RobotGeometry
 	public static final int SLIDE_ASCENT_LOW_HANG = 2000;   //
 	public static final int SLIDE_ASCENT_HIGH_HOVER = 2000; //
 	public static final int SLIDE_ASCENT_HIGH_HANG = 2000;  //
-	public static final int SLIDE_EXTENDED_MAX = 2500;      // Maximum allowable extension (check value)
+	public static final int SLIDE_EXTENDED_MAX = 3300;      // Maximum allowable extension (check value)
 
 	public static final int TILT_COMPACT = 0;               //
 	public static final int TILT_BASKET = 0;                //
