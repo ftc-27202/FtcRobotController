@@ -255,6 +255,8 @@ public class RouterTestTeleOpMode extends OpMode
 
 		if (selectSequence.size() > 1 && selectSequence.get(selectSequence.size()-1) != dpadCommand)
 			selectSequence.add(dpadCommand);
+			telemetry.addData("command", "%s (%d)", dpadCommand.toString(), selectSequence.size());
+		}
 
 		// Only add to the select sequence if it has been started (not empty).
 		if (selectSequence.size() == 4)
