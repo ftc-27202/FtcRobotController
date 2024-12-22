@@ -14,7 +14,7 @@ import java.util.List;
 
 public class RouterTestTeleOpMode extends OpMode
 {
-	// The robot is always in one other these modes based its current objective.
+	// The robot is always in one of these modes based its current objective.
 	private enum RobotMode
 	{ASCENT, BASKET, COMPACT, INTAKE, SPECIMEN, TRANSPORT}
 
@@ -67,10 +67,9 @@ public class RouterTestTeleOpMode extends OpMode
 		final RobotMode newRobotMode = updateModeSelectSequence(gamepad2, commandSequence, robotMode);
 		if (newRobotMode != robotMode)
 		{
-			telemetry.addData("New mode", "%s", newRobotMode.toString());
-
 			// Robot mode change has been requested.
 			robotMode = newRobotMode;
+			telemetry.addData("Mode", "%s", newRobotMode.toString());
 
 			// Check if the new mode requires a new pose.
 			switch (newRobotMode)
@@ -206,21 +205,21 @@ public class RouterTestTeleOpMode extends OpMode
 		if (gamepad.x && selectSequence.isEmpty())
 		{
 			// Start new mode select sequence.
+			telemetry.addData("Sequence", "SELECT");
 			selectSequence.add(RobotModeSelectCommand.SELECT);
-			telemetry.addData("command", "SELECT");
 		}
 		else if (gamepad.a)
 		{
 			// Slam into TRANSPORT mode.
+			telemetry.addData("Sequence", "SLAM");
 			selectSequence.clear();
-			telemetry.addData("command", "SLAM (TRANSPORT)");
 			return RobotMode.TRANSPORT;
 		}
 		else if (gamepad.b)
 		{
 			// CANCEL mode select sequence.
+			telemetry.addData("Sequence", "CANCEL");
 			selectSequence.clear();
-			telemetry.addData("command", "CANCEL");
 			return oldRobotMode;
 		}
 
@@ -242,7 +241,7 @@ public class RouterTestTeleOpMode extends OpMode
 		if (dpadCommand != previousDpadCommand)
 		{
 			selectSequence.add(dpadCommand);
-			telemetry.addData("command", "%s (%d)", dpadCommand.toString(), selectSequence.size());
+			telemetry.addData("Sequence", "%s (%d)", dpadCommand.toString(), selectSequence.size());
 		}
 
 		// Only add to the select sequence if it has been started (not empty).
