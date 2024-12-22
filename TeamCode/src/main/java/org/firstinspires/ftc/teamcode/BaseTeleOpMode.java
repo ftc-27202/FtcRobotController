@@ -21,14 +21,28 @@ public class BaseTeleOpMode extends OpMode {
     public DcMotor rightBackDrive;
     public DcMotor slideTilt;
 
-    final double SLIDES_UP = 0;
-    final double SLIDES_DOWN = 0;
+    public DcMotor slideMotorLeft;
+    public DcMotor slideMotorRight;
+
+    final int SLIDES_UP = 3300;
+    final int SLIDES_DOWN = 0;
 
     public void init() {
         leftFrontDrive = hardwareMap.get(DcMotor.class, "leftFront");
         leftBackDrive = hardwareMap.get(DcMotor.class, "leftRear");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightRear");
+
+
+        slideMotorLeft = hardwareMap.get(DcMotor.class, "slideMotorLeft");
+        slideMotorRight = hardwareMap.get(DcMotor.class, "slideMotorRight");
+
+        slideMotorLeft.setDirection(DcMotor.Direction.REVERSE);
+        slideMotorRight.setDirection(DcMotor.Direction.FORWARD);
+
+        slideMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slideMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);

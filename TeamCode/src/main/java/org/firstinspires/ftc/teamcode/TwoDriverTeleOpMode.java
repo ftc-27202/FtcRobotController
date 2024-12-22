@@ -47,17 +47,41 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
 
         moveBase(axial, lateral, yaw, straightSpeed, strafeSpeed, turnSpeed);
 
-        /*
-        if (gamepad1.a) {
-            intake.setPower(INTAKE_COLLECT);
-        } else if (gamepad1.x) {
-            intake.setPower(INTAKE_OFF);
+
+        if (gamepad1.x) {
+            slideTilt.setPower(-1);
+        } else if (gamepad1.y) {
+            slideTilt.setPower(0);
         } else if (gamepad1.b) {
-            intake.setPower(INTAKE_DEPOSIT);
-        }*/
+            slideTilt.setPower(1);
+        }
 
         telemetry.addData("Left Trigger", gamepad1.left_trigger);
         telemetry.addData("Right Trigger", gamepad1.right_trigger);
+
+        slideMotorLeft.setPower(-gamepad2.left_stick_y);
+        slideMotorRight.setPower(-gamepad2.right_stick_y);
+
+        if (gamepad2.dpad_up) {
+            slideMotorLeft.setTargetPosition(SLIDES_UP);
+            slideMotorLeft.setPower(1.0);
+            slideMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            slideMotorRight.setTargetPosition(SLIDES_UP);
+            slideMotorRight.setPower(1.0);
+            slideMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        } else if (gamepad2.dpad_down) {
+            slideMotorLeft.setTargetPosition(SLIDES_DOWN);
+            slideMotorLeft.setPower(1.0);
+            slideMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            slideMotorRight.setTargetPosition(SLIDES_DOWN);
+            slideMotorRight.setPower(1.0);
+            slideMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+
+        telemetry.addData("slideMotorLeft", slideMotorLeft.getCurrentPosition());
+        telemetry.addData("slideMotorRight", slideMotorRight.getCurrentPosition());
 
         super.loop();
     }
