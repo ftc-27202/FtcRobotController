@@ -46,11 +46,10 @@ public class TiltRouter
 		return namedPoseRoute.isEmpty() ? restingNamedPose : null;
 	}
 
-	public void setTarget(NamedPose target)
+	public void setTarget(NamedPose target, TiltMotors tiltMotors)
 	{
 		if (namedPoseRoute.isEmpty()) // Robot tilt mechanism is currently at rest.
 		{
-			// Set new namedPoseRoute so the next call to updateProgress() will command the motors to start.
 			namedPoseRoute = findRoute(restingNamedPose, target);
 		}
 		else // Robot tilt mechanism is moving.
@@ -67,18 +66,26 @@ public class TiltRouter
 		}
 
 		restingNamedPose = target;
-		lastTargetChangeTimeMillis = System.currentTimeMillis();
+
+		if (!namedPoseRoute.isEmpty())
+		{
+			final TiltRouter.NamedPose nextNamedPose = namedPoseRoute.get(0);
+			tiltMotors.setTarget(RobotGeometry.toPose(nextNamedPose));
+			lastTargetChangeTimeMillis = System.currentTimeMillis();
+		}
 	}
 
 	// Update the tile route progress using the measured encoder values. If the current waypoint
 	// has been reached then instruct the motors to advance to next one.
-	public TiltMotors.Pose updateProgress(TiltMotors.Pose currentPose, Telemetry telemetry)
+	//public TiltMotors.Pose updateProgress(TiltMotors.Pose currentPose, Telemetry telemetry)
+	public TiltMotors.Pose updateProgress(TiltMotors tiltMotors, Telemetry telemetry)
 	{
 		if (namedPoseRoute.isEmpty())
 			return null; // Nothing to do: The action has reached its restingNamedPose.
 
 		final NamedPose nextNamedPose = namedPoseRoute.get(0);
 		final TiltMotors.Pose nextPose = RobotGeometry.toPose(nextNamedPose);
+		final TiltMotors.Pose currentPose = tiltMotors.getCurrentPose();
 
 		telemetry.addData("tilt", "%s %d %d %s",
 				nextNamedPose.toString(),
@@ -100,7 +107,9 @@ public class TiltRouter
 			}
 			else
 			{
-				return RobotGeometry.toPose(namedPoseRoute.get(0));
+				tiltMotors.setTarget(nextPose);
+				return nextPose; // TODO: make void return later
+				//return RobotGeometry.toPose(namedPoseRoute.get(0));
 			}
 		}
 		else // Not there yet.

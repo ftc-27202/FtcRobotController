@@ -77,9 +77,8 @@ public class TiltMotors
 */
 	}
 
-	public void setTarget(@NonNull Pose target, Telemetry telemetry)
+	public void setTarget(@NonNull Pose target)
 	{
-		telemetry.addData("tilt motor command", "%d", target.tiltPosition);
 		tiltMotor.setTargetPosition(target.tiltPosition);
 		slideMotorLeft.setTargetPosition(target.slidePositionLeft);
 		slideMotorRight.setTargetPosition(target.slidePositionRight);

@@ -75,24 +75,24 @@ public class RouterTestTeleOpMode extends OpMode
 			switch (newRobotMode)
 			{
 				case ASCENT:
-					tiltRouter.setTarget(TiltRouter.NamedPose.ASCENT_LOW_HOVER);
+					tiltRouter.setTarget(TiltRouter.NamedPose.ASCENT_LOW_HOVER, tiltMotors);
 					break;
 				case BASKET:
-					tiltRouter.setTarget(TiltRouter.NamedPose.BASKET_HIGH);
+					tiltRouter.setTarget(TiltRouter.NamedPose.BASKET_HIGH, tiltMotors);
 					break;
 				case COMPACT:
-					tiltRouter.setTarget(TiltRouter.NamedPose.COMPACT);
+					tiltRouter.setTarget(TiltRouter.NamedPose.COMPACT, tiltMotors);
 					break;
 				case INTAKE:
-					tiltRouter.setTarget(TiltRouter.NamedPose.INTAKE_HOVER);
+					tiltRouter.setTarget(TiltRouter.NamedPose.INTAKE_HOVER, tiltMotors);
 					clawRouter.setRestingPose(ClawRouter.NamedPose.CENTERED);
 					clawMotors.open();
 					break;
 				case SPECIMEN:
-					tiltRouter.setTarget(TiltRouter.NamedPose.SPECIMEN_HIGH);
+					tiltRouter.setTarget(TiltRouter.NamedPose.SPECIMEN_HIGH, tiltMotors);
 					break;
 				case TRANSPORT:
-					tiltRouter.setTarget(TiltRouter.NamedPose.INTAKE_HOVER);
+					tiltRouter.setTarget(TiltRouter.NamedPose.INTAKE_HOVER, tiltMotors);
 					break;
 				default:
 					break;
@@ -129,15 +129,11 @@ public class RouterTestTeleOpMode extends OpMode
 			}
 			else if (gamepad2.dpad_down) // Lower claw to floor with current claw state.
 			{
-				final TiltRouter.NamedPose target = TiltRouter.NamedPose.INTAKE_FLOOR;
-				tiltRouter.setTarget(target);
-				tiltMotors.setTarget(RobotGeometry.toPose(target), telemetry);
+				tiltRouter.setTarget(TiltRouter.NamedPose.INTAKE_FLOOR, tiltMotors);
 			}
 			else if (gamepad2.dpad_up) // Raise claw to hover with current claw state.
 			{
-				final TiltRouter.NamedPose target = TiltRouter.NamedPose.INTAKE_HOVER;
-				tiltRouter.setTarget(target);
-				tiltMotors.setTarget(RobotGeometry.toPose(target), telemetry);
+				tiltRouter.setTarget(TiltRouter.NamedPose.INTAKE_HOVER, tiltMotors);
 			}
 			else // Handle manual joystick inputs.
 			{
@@ -158,16 +154,10 @@ public class RouterTestTeleOpMode extends OpMode
 
 		//
 		// Done handling driver inputs. Finally, inform the routers of the current motor positions to
-		// see if it triggers updated targets.
+		// update progress.
 		//
 
-		final TiltMotors.Pose currentTiltPose = tiltMotors.getCurrentPose();
-		final TiltMotors.Pose newTiltPoseTarget = tiltRouter.updateProgress(currentTiltPose, telemetry);
-
-		if (newTiltPoseTarget != null)
-		{
-			tiltMotors.setTarget(newTiltPoseTarget, telemetry); // Issue tilt motor commands.
-		}
+		tiltRouter.updateProgress(tiltMotors, telemetry);
 
 		final ClawMotors.Pose currentClawPose = clawMotors.getCurrentPose();
 		final ClawMotors.Pose newClawPoseTarget = clawRouter.updateProgress(currentClawPose);
