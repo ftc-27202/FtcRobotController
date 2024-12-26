@@ -102,17 +102,17 @@ public class RouterTestTeleOpMode extends OpMode
 		}
 
 		//
-		// Update router targets based on gamepad2 inputs (if any). The inputs are interpretted
-		// differently depending on which mode the robot is in.
+		// Handle gamepad2 inputs (if any). They are interpretted differently depending on which
+		// mode the robot is in.
 		//
 
 		if (robotMode == RobotMode.ASCENT)
 		{
-			; // NOT IMPLEMENTED YET
+			; // NOT IMPLEMENTED
 		}
 		else if (robotMode == RobotMode.BASKET)
 		{
-			; // NOT IMPLEMENTED YET
+			; // NOT IMPLEMENTED
 		}
 		else if (robotMode == RobotMode.INTAKE)
 		{
@@ -153,19 +153,12 @@ public class RouterTestTeleOpMode extends OpMode
 		}
 
 		//
-		// Done handling driver inputs. Finally, inform the routers of the current motor positions to
-		// update progress.
+		// Done handling driver inputs. Now inform the routers of the current motor positions so
+		// they can update their progress.
 		//
 
 		tiltRouter.updateProgress(tiltMotors, telemetry);
-
-		final ClawMotors.Pose currentClawPose = clawMotors.getCurrentPose();
-		final ClawMotors.Pose newClawPoseTarget = clawRouter.updateProgress(currentClawPose);
-
-		if (newClawPoseTarget != null)
-		{
-			clawMotors.setTarget(newClawPoseTarget); // Issue claw motor commands.
-		}
+		clawRouter.updateProgress(clawMotors, telemetry);
 
 		// Optional: Update LED indicator.
 	}
@@ -187,6 +180,7 @@ public class RouterTestTeleOpMode extends OpMode
 	 *       [ SELECT, UP,   NONE, CANCEL  ] = Cancel (example)
 	 *       [ SELECT, CANCEL              ] = Cancel (example)
 	 */
+	// TODO can this be static if telemetry is passed in?
 	private RobotMode updateModeSelectSequence(
             @NonNull Gamepad gamepad,
             List<RobotModeSelectCommand> selectSequence,
@@ -228,13 +222,14 @@ public class RouterTestTeleOpMode extends OpMode
 			? RobotModeSelectCommand.NONE
 			: selectSequence.get(selectSequence.size()-1);
 
+		// Only add to the select sequence if it has been started and isn't a repeat.
 		if (dpadCommand != previousDpadCommand)
 		{
 			selectSequence.add(dpadCommand);
 			telemetry.addData("Sequence", "%s (%d)", dpadCommand.toString(), selectSequence.size());
 		}
 
-		// Only add to the select sequence if it has been started (not empty).
+		// Check to see if we now have a complete sequence.
 		if (selectSequence.size() == 4)
 		{
 			RobotMode newRobotMode;

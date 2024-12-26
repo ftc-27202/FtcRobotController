@@ -33,8 +33,14 @@ public class ClawRouter
 
 	// Update the Action motion progress against the measured encoder values. If the next waypoint
 	// has been reached then instruct the motors to advance to next waypoint.
-	public ClawMotors.Pose updateProgress(ClawMotors.Pose currentPose)
+	public ClawMotors.Pose updateProgress(ClawMotors clawMotors, Telemetry telemetry)
 	{
+		final ClawMotors.Pose currentPose = clawMotors.getCurrentPose();
+
+		telemetry.addData("claw", "%s %g",
+            restingNamedPose.toString(),
+				currentPose.twistPosition);
+
 		return currentPose; // incomplete
 	}
 }
