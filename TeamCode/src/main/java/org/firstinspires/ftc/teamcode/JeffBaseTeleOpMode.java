@@ -100,7 +100,13 @@ public class JeffBaseTeleOpMode extends OpMode {
         leftBackDrive = hardwareMap.get(DcMotor.class, "leftRear");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightRear");
+
         odo = hardwareMap.get(GoBildaPinpointDriver.class,"pinpointComputer");
+        odo.resetPosAndIMU();
+        odo.recalibrateIMU();
+        odo.setEncoderResolution(13.26291192);
+        odo.setOffsets(-75,201.5);
+
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
