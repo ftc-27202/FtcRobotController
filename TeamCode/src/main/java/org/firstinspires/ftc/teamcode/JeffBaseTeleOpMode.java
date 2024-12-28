@@ -103,9 +103,8 @@ public class JeffBaseTeleOpMode extends OpMode {
 
         odo = hardwareMap.get(GoBildaPinpointDriver.class,"pinpointComputer");
         odo.resetPosAndIMU();
-        odo.recalibrateIMU();
-        odo.setEncoderResolution(13.26291192);
-        odo.setOffsets(-75,201);
+        odo.setEncoderResolution(19.89436789);
+        odo.setOffsets(-75,20);
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
