@@ -223,8 +223,10 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
         }
         // bludo IM GONNA NOSFERATUj
         odo.update();
-        telemetry.addData("Pos X","%f", odo.getPosY());
-        telemetry.addData("Pos Y","%f", odo.getPosX());
+        telemetry.addData("Pos X raw","%01d", odo.getEncoderX());
+        telemetry.addData("Pos Y raw","%01d", odo.getEncoderY());
+        telemetry.addData("Pos X","%f", odo.getPosX()/25.4);
+        telemetry.addData("Pos Y","%f", odo.getPosY()/25.4);
         telemetry.addData("Heading","%f", odo.getHeading());
         //prevents extensions being 42 inches or more
         if (armMotor.getTargetPosition() > ARM_SCORE_SPECIMEN && (leftSlide.getTargetPosition() > SLIDE_HALF || rightSlide.getTargetPosition() > SLIDE_HALF)) {
