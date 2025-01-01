@@ -23,10 +23,15 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+
 
 @Config
 @Autonomous(name = "AA_Auto (Basket Side)", group = "Autonomous")
 public class JeffAutoBasketSide extends LinearOpMode {
+
     public class Slide {
         private DcMotorEx leftSlide;
         private DcMotorEx rightSlide;
@@ -428,6 +433,14 @@ public class JeffAutoBasketSide extends LinearOpMode {
         Wrist wrist = new Wrist(hardwareMap);
         Intake intake = new Intake(hardwareMap);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        GoBildaPinpointDriver odo;
+        Pose2D startingPos = new Pose2D(DistanceUnit.INCH, -41, -60, AngleUnit.RADIANS, 0 );
+        odo = hardwareMap.get(GoBildaPinpointDriver.class,"pinpointComputer");
+//        odo.resetPosAndIMU();
+        odo.setEncoderResolution(19.89436789);
+        odo.setOffsets(-75,20);
+        odo.setPosition(startingPos);
+        odo.recalibrateIMU();
 
         TrajectoryActionBuilder trajDriveToHighBasket = drive.actionBuilder(initialPose)
                 .strafeTo(new Vector2d(-43, -60));
@@ -637,6 +650,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
                 )
             )
         );
+
 
         telemetry.addData("Duration", this.getRuntime());
         telemetry.update();

@@ -45,6 +45,7 @@ import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumLocalizerInputsMessage;
 import org.firstinspires.ftc.teamcode.messages.PoseMessage;
+import org.firstinspires.ftc.teamcode.samples.TwoDeadWheelLocalizer;
 
 import java.lang.Math;
 import java.util.Arrays;
@@ -63,14 +64,15 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
         // drive model parameters
-        public double inPerTick = 0.0201572263656521;
-        public double lateralInPerTick = 0.0224719101123596;
-        public double trackWidthTicks = 735;
+        public double inPerTick = .002;
+        //public double inPerTick = 0.0201572263656521;
+        public double lateralInPerTick = 0.001391645743490362;
+        public double trackWidthTicks = 6819.385285951581;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.1053897506681833;
-        public double kV = 0.004217905034212203;
-        public double kA = 0.0001;
+        public double kS = 1.1484920642660024;
+        public double kV = 0.00035891573661792374;
+        public double kA = 0.000115;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
@@ -241,7 +243,7 @@ public final class MecanumDrive {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        localizer = new DriveLocalizer();
+        localizer = new TwoDeadWheelLocalizer(hardwareMap, lazyImu.get(), PARAMS.inPerTick);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
