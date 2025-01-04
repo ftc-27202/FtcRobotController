@@ -145,8 +145,13 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             limelight.pipelineSwitch(0);
         } else if (gamepad2.b) {
             limelight.pipelineSwitch(1);
-        } else if (gamepad2.x){
+        } else if (gamepad2.x) {
             limelight.pipelineSwitch(2);
+        }
+
+        if (gamepad2.a) {
+            leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
 
         if (gamepad2.left_trigger > 0 && gamepad2.right_trigger > 0) {
