@@ -19,7 +19,8 @@ public class BaseTeleOpMode extends OpMode {
     public DcMotor leftBackDrive;
     public DcMotor rightFrontDrive;
     public DcMotor rightBackDrive;
-    public DcMotor slideTilt;
+    public DcMotor slideTiltLeft;
+    public DcMotor slideTiltRight;
 
     public DcMotor slideMotorLeft;
     public DcMotor slideMotorRight;
@@ -49,8 +50,13 @@ public class BaseTeleOpMode extends OpMode {
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
-        slideTilt = hardwareMap.get(DcMotor.class, "slideTilt");
-        slideTilt.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slideTiltLeft = hardwareMap.get(DcMotor.class, "slideTiltLeft");
+        slideTiltLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slideTiltLeft.setDirection(DcMotor.Direction.REVERSE);
+
+        slideTiltRight = hardwareMap.get(DcMotor.class, "slideTiltRight");
+        slideTiltRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slideTiltRight.setDirection(DcMotor.Direction.FORWARD);
 
         leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -89,7 +95,8 @@ public class BaseTeleOpMode extends OpMode {
     @Override
     public void loop() {
         /* send telemetry to the driver of the arm's current position and target position */
-        telemetry.addData("Slide Tilt", "%d", slideTilt.getCurrentPosition());
+        telemetry.addData("Slide Tilt Left", "%d", slideTiltLeft.getCurrentPosition());
+        telemetry.addData("Slide Tilt Right", "%d", slideTiltRight.getCurrentPosition());
         telemetry.addData("Run Time", getRuntime());
         telemetry.update();
     }
