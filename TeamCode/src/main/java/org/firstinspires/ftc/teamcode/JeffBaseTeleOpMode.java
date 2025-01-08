@@ -14,11 +14,7 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
-import java.util.Locale;
 @TeleOp(name = "Jeff Base Two Driver TeleOp", group = "Robot")
 @Disabled
 public class JeffBaseTeleOpMode extends OpMode {
@@ -33,7 +29,7 @@ public class JeffBaseTeleOpMode extends OpMode {
     public CRServo intake;
     public Servo wrist;
     public Servo bucket;
-    public GoBildaPinpointDriver odo;
+
     final double ARM_TICKS_PER_DEGREE =
             28 // number of encoder ticks per rotation of the bare motor
                     * 250047.0 / 4913.0 // This is the exact gear ratio of the 50.9:1 Yellow Jacket gearbox
@@ -100,7 +96,7 @@ public class JeffBaseTeleOpMode extends OpMode {
         leftBackDrive = hardwareMap.get(DcMotor.class, "leftRear");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightRear");
-        odo = hardwareMap.get(GoBildaPinpointDriver.class,"pinpointComputer");
+
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);

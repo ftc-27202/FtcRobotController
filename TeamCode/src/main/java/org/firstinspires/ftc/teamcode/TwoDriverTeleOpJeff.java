@@ -31,7 +31,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 @TeleOp(name = "Jeff Two Driver TeleOp", group = "Robot")
@@ -226,9 +225,7 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
                return;
            }
         }
-        // Odometry telemetry
-        telemetry.addData("Pos X","%f", odo.getPosX());
-        telemetry.addData("Pos X","%f", odo.getPosY());
+
         //prevents extensions being 42 inches or more
         if (armMotor.getTargetPosition() > ARM_SCORE_SPECIMEN && (leftSlide.getTargetPosition() > SLIDE_HALF || rightSlide.getTargetPosition() > SLIDE_HALF)) {
             slideTargetPosition = SLIDE_HALF;
