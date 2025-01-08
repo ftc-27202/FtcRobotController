@@ -6,13 +6,19 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
+import java.util.Locale;
 @TeleOp(name = "Jeff Base Two Driver TeleOp", group = "Robot")
 @Disabled
 public class JeffBaseTeleOpMode extends OpMode {
@@ -60,11 +66,9 @@ public class JeffBaseTeleOpMode extends OpMode {
     final double WRIST_SPECIMEN = 0.3;
 //    final double WRIST_FOLDED_OUT = 1.0;
     final double WRIST_FOLDED_OUT = 0.69;
-    final double startingRotation = 90;
-    final double startingX = -300;
-    final double startingY = -500;
+
     final double FUDGE_FACTOR = 15 * ARM_TICKS_PER_DEGREE;
-    public Pose2D startingPos = new Pose2D(DistanceUnit.INCH, -41, -60, AngleUnit.RADIANS, 0 );
+
     final double BUCKET_CATCH = 0.5;
     final double BUCKET_DUMP = 0;
 
@@ -87,6 +91,7 @@ public class JeffBaseTeleOpMode extends OpMode {
         leftSlide = hardwareMap.get(DcMotor.class, "leftSlide");
         leftSlide.setDirection(DcMotor.Direction.FORWARD);
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         rightSlide = hardwareMap.get(DcMotor.class, "rightSlide");
         rightSlide.setDirection(DcMotor.Direction.REVERSE);
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -97,11 +102,10 @@ public class JeffBaseTeleOpMode extends OpMode {
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightRear");
 
         odo = hardwareMap.get(GoBildaPinpointDriver.class,"pinpointComputer");
-//        odo.resetPosAndIMU();
+        odo.resetPosAndIMU();
         odo.setEncoderResolution(19.89436789);
         odo.setOffsets(-75,20);
-        odo.setPosition(startingPos);
-        odo.recalibrateIMU();
+
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
