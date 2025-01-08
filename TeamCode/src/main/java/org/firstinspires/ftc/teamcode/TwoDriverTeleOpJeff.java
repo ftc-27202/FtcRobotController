@@ -226,11 +226,11 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
                return;
            }
         }
-        // bludo IM GONNA NOSFERATU
+        // Odometry telemetry
         odo.update();
         telemetry.addData("Pos X","%f", odo.getPosY());
         telemetry.addData("Pos Y","%f", odo.getPosX());
-        telemetry.addData("Heading","%f", odo.getHeading());
+        telemetry.addData("Position","%f", odo.getPosition());
         //prevents extensions being 42 inches or more
         if (armMotor.getTargetPosition() > ARM_SCORE_SPECIMEN && (leftSlide.getTargetPosition() > SLIDE_HALF || rightSlide.getTargetPosition() > SLIDE_HALF)) {
             slideTargetPosition = SLIDE_HALF;
