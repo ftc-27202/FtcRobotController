@@ -226,7 +226,7 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
                return;
            }
         }
-        // bludo IM GONNA NOSFERATUj
+        // bludo IM GONNA NOSFERATU
         odo.update();
         telemetry.addData("Pos X","%f", odo.getPosY());
         telemetry.addData("Pos Y","%f", odo.getPosX());
