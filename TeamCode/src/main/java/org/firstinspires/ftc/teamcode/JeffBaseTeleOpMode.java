@@ -105,7 +105,7 @@ public class JeffBaseTeleOpMode extends OpMode {
         odo.resetPosAndIMU();
         odo.recalibrateIMU();
         odo.setEncoderResolution(13.26291192);
-        odo.setOffsets(-75,201);
+        odo.setOffsets(-75,201.5);
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
