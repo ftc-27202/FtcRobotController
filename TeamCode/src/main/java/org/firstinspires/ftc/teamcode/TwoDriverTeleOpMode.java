@@ -47,12 +47,12 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
 
         moveBase(axial, lateral, yaw, straightSpeed, strafeSpeed, turnSpeed);
 
-        if (gamepad1.right_stick_y != 0) {
-            slideTiltLeft.setTargetPosition((int) (gamepad1.right_stick_y * -30));
+        if (gamepad2.right_stick_y != 0) {
+            slideTiltLeft.setTargetPosition((int) (slideTiltLeft.getTargetPosition() + gamepad1.right_stick_y * -30));
             slideTiltLeft.setPower(0.2);
             slideTiltLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            slideTiltRight.setTargetPosition((int) (gamepad1.right_stick_y * -30));
+            slideTiltRight.setTargetPosition((int) (slideTiltRight.getTargetPosition() + gamepad1.right_stick_y * -30));
             slideTiltRight.setPower(0.2);
             slideTiltRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             return;
@@ -88,7 +88,7 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
         telemetry.addData("Right Trigger", gamepad1.right_trigger);
 
         slideMotorLeft.setPower(-gamepad2.left_stick_y);
-        slideMotorRight.setPower(-gamepad2.right_stick_y);
+        slideMotorRight.setPower(-gamepad2.left_stick_y);
 
         if (gamepad2.dpad_up) {
             slideMotorLeft.setTargetPosition(SLIDES_UP);
