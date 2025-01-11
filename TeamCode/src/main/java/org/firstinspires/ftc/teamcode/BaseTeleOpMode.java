@@ -21,6 +21,10 @@ public class BaseTeleOpMode extends OpMode {
     public DcMotor rightBackDrive;
     public DcMotor slideTiltLeft;
     public DcMotor slideTiltRight;
+    public Servo armPivotLeft;
+    public Servo armPivotRight;
+    public Servo wristPivot;
+
 
     public DcMotor slideMotorLeft;
     public DcMotor slideMotorRight;
@@ -28,11 +32,37 @@ public class BaseTeleOpMode extends OpMode {
     final int SLIDES_UP = 3300;
     final int SLIDES_DOWN = 0;
 
+    final double ARM_TICKS_PER_DEGREE =
+            28
+                * 5800 / 312
+                * 100 / 30
+                * 1/360;
+
+
     public void init() {
         leftFrontDrive = hardwareMap.get(DcMotor.class, "leftFront");
         leftBackDrive = hardwareMap.get(DcMotor.class, "leftRear");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
         rightBackDrive = hardwareMap.get(DcMotor.class, "rightRear");
+
+        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+
+
+        slideTiltLeft = hardwareMap.get(DcMotor.class, "slideTiltLeft");
+        slideTiltLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slideTiltLeft.setDirection(DcMotor.Direction.FORWARD);
+
+        slideTiltRight = hardwareMap.get(DcMotor.class, "slideTiltRight");
+        slideTiltRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slideTiltRight.setDirection(DcMotor.Direction.REVERSE);
 
 
         slideMotorLeft = hardwareMap.get(DcMotor.class, "slideMotorLeft");
@@ -45,23 +75,14 @@ public class BaseTeleOpMode extends OpMode {
         slideMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        armPivotLeft = hardwareMap.get(Servo.class, "armPivotLeft");
+        armPivotLeft.setDirection(Servo.Direction.FORWARD);
 
-        slideTiltLeft = hardwareMap.get(DcMotor.class, "slideTiltLeft");
-        slideTiltLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slideTiltLeft.setDirection(DcMotor.Direction.REVERSE);
+        armPivotRight = hardwareMap.get(Servo.class, "armPivotRight");
+        armPivotLeft.setDirection(Servo.Direction.REVERSE);
 
-        slideTiltRight = hardwareMap.get(DcMotor.class, "slideTiltRight");
-        slideTiltRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slideTiltRight.setDirection(DcMotor.Direction.FORWARD);
 
-        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        wristPivot = hardwareMap.get(Servo.class, "wristPivot");
     }
 
     public void moveBase(double axial, double lateral, double yaw, double straightSpeed, double strafeSpeed, double turnSpeed) {
@@ -95,8 +116,10 @@ public class BaseTeleOpMode extends OpMode {
     @Override
     public void loop() {
         /* send telemetry to the driver of the arm's current position and target position */
-        telemetry.addData("Slide Tilt Left", "%d", slideTiltLeft.getCurrentPosition());
-        telemetry.addData("Slide Tilt Right", "%d", slideTiltRight.getCurrentPosition());
+        telemetry.addData("Slide Tilt Left Degrees", "%f",  (slideTiltLeft.getCurrentPosition() / ARM_TICKS_PER_DEGREE));
+        telemetry.addData("Slide Tilt Right Degrees", "%f", (slideTiltRight.getCurrentPosition() / ARM_TICKS_PER_DEGREE));
+        telemetry.addData("Arm Pivot Left", "%f", armPivotLeft.getPosition());
+        telemetry.addData("Arm Pivot Right", "%f", armPivotRight.getPosition());
         telemetry.addData("Run Time", getRuntime());
         telemetry.update();
     }
