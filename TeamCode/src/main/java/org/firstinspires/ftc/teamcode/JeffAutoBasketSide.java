@@ -298,7 +298,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
         private Servo bucket;
 
         final double BUCKET_CATCH = 0.5;
-        final double BUCKET_DUMP = 0.0;
+        final double BUCKET_DUMP = 0.1;
 
         public Bucket(HardwareMap hardwareMap) {
             bucket = hardwareMap.get(Servo.class, "bucket");
@@ -337,7 +337,7 @@ public class JeffAutoBasketSide extends LinearOpMode {
         /* Variables to store the positions that the wrist should be set to when folding in, or folding out. */
         final double WRIST_FOLDED_IN = 0.0;
         final double WRIST_SPECIMEN = 0.3;
-        final double WRIST_FOLDED_OUT = 0.69;
+        final double WRIST_FOLDED_OUT = 0.67;
 //        final double WRIST_FOLDED_OUT = 1.0;
 
         public Wrist(HardwareMap hardwareMap) {
@@ -430,7 +430,8 @@ public class JeffAutoBasketSide extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         TrajectoryActionBuilder trajDriveToHighBasket = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(-43, -60));
+                .strafeTo(new Vector2d(-44, -60));
+//                .strafeTo(new Vector2d(-44.75, -60));
 
         TrajectoryActionBuilder trajDriveToCollectSamplePosition1 = trajDriveToHighBasket.endTrajectory().fresh()
                 .strafeToSplineHeading(new Vector2d(-30, -33), Math.toRadians(160));

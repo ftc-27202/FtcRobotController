@@ -61,12 +61,12 @@ public class JeffBaseTeleOpMode extends OpMode {
 //    final double WRIST_SPECIMEN = 0.4;
     final double WRIST_SPECIMEN = 0.3;
 //    final double WRIST_FOLDED_OUT = 1.0;
-    final double WRIST_FOLDED_OUT = 0.69;
+    final double WRIST_FOLDED_OUT = 0.67;
 
     final double FUDGE_FACTOR = 15 * ARM_TICKS_PER_DEGREE;
 
     final double BUCKET_CATCH = 0.5;
-    final double BUCKET_DUMP = 0;
+    final double BUCKET_DUMP = 0.10;
 
 //    final double BUCKET_CATCH = 0.80;
 //    final double BUCKET_DUMP = 0.3;
