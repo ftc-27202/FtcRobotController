@@ -148,7 +148,8 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             limelight.pipelineSwitch(2);
         }
 
-        if (gamepad2.a) {
+        // Changed to wait for both triggers
+        if (gamepad2.a && gamepad2.left_trigger > 0 && gamepad2.right_trigger > 0) {
             leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
@@ -157,6 +158,19 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             telemetry.addData("Target Position", leftSlide.getTargetPosition());
             telemetry.addData("Actual Position", leftSlide.getCurrentPosition());
             slideTargetPosition -= (int) (gamepad2.right_stick_y * 30.0);
+        }
+
+        // Added arm reset for league qualifier
+        if (gamepad2.b && gamepad2.left_trigger > 0 && gamepad2.right_trigger > 0) {
+            armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            armPosition = ARM_COLLAPSED_INTO_ROBOT;
+        }
+
+        // Added arm reset for league qualifier
+        if (gamepad2.left_trigger > 0 && gamepad2.right_trigger > 0) {
+            telemetry.addData("Arm Target Position", armMotor.getTargetPosition());
+            telemetry.addData("Arm Current Position", armMotor.getCurrentPosition());
+            armPosition -= gamepad2.left_stick_y * ARM_TICKS_PER_DEGREE * 5.0;
         }
 
         //Limelight stuff starts here
