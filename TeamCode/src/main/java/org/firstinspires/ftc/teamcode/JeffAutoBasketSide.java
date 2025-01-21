@@ -123,8 +123,8 @@ public class JeffAutoBasketSide extends LinearOpMode {
                         * 100.0 / 20.0 // This is the external gear reduction, a 20T pinion gear that drives a 100T hub-mount gear
                         * 1 / 360.0; // Ticks per degree, not per rotation
         final double ARM_COLLAPSED_INTO_ROBOT = 0;
-        final double ARM_COLLECT_SAMPLE3 = 224 * ARM_TICKS_PER_DEGREE;
-        final double ARM_COLLECT = 224 * ARM_TICKS_PER_DEGREE;
+        final double ARM_COLLECT_SAMPLE3 = 223.5 * ARM_TICKS_PER_DEGREE;
+        final double ARM_COLLECT = 223.5 * ARM_TICKS_PER_DEGREE;
 //        final double ARM_COLLECT = 225 * ARM_TICKS_PER_DEGREE;
         final double ARM_CLEAR_BARRIER = 200 * ARM_TICKS_PER_DEGREE;
         final double ARM_SCORE_SPECIMEN = 160 * ARM_TICKS_PER_DEGREE;
@@ -443,7 +443,8 @@ public class JeffAutoBasketSide extends LinearOpMode {
 //                .strafeToSplineHeading(new Vector2d(-30, -33), Math.toRadians(160));
 
         TrajectoryActionBuilder trajDriveForwardToCollectSample1 = trajDriveToCollectSamplePosition1.endTrajectory().fresh()
-                .strafeTo(new Vector2d(-34, -29));
+                .strafeTo(new Vector2d(-35.5, -26));
+        //           .strafeTo(new Vector2d(-34, -29));
 //              Meet 2
 //                .strafeTo(new Vector2d(-34, -29), new TranslationalVelConstraint(10));
 
@@ -466,7 +467,8 @@ public class JeffAutoBasketSide extends LinearOpMode {
                 .strafeToSplineHeading(new Vector2d(-54, -45), Math.toRadians(45));
 
         TrajectoryActionBuilder trajDriveToCollectSamplePosition3 = trajDriveToHighBasket3.endTrajectory().fresh()
-                .strafeToSplineHeading(new Vector2d(-48, -25), Math.toRadians(180));
+                .strafeToSplineHeading(new Vector2d(-47, -25), Math.toRadians(180));
+        //   .strafeToSplineHeading(new Vector2d(-48, -25), Math.toRadians(180));
 //              Meet 2
 //                .strafeToSplineHeading(new Vector2d(-49, -32), Math.toRadians(160));
 
