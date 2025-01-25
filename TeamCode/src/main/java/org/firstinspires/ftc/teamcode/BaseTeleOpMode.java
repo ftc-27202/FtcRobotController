@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.configuration.annotations.DigitalIoDeviceType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -24,8 +25,9 @@ public class BaseTeleOpMode extends OpMode {
     public Servo armPivotLeft;
     public Servo armPivotRight;
     public Servo wristPivot;
-
-
+    public Servo clawPivot;
+    public double slideTiltTarget = 0;
+    public final double SLIDETILTPOWER = .4;
     public DcMotor slideMotorLeft;
     public DcMotor slideMotorRight;
 
@@ -81,7 +83,7 @@ public class BaseTeleOpMode extends OpMode {
         armPivotRight = hardwareMap.get(Servo.class, "armPivotRight");
         armPivotLeft.setDirection(Servo.Direction.REVERSE);
 
-
+        clawPivot = hardwareMap.get(Servo.class, "clawPivot");
         wristPivot = hardwareMap.get(Servo.class, "wristPivot");
     }
 
