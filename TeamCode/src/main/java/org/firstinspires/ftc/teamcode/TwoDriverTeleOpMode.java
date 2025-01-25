@@ -93,26 +93,20 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
         }
 
         if (gamepad2.a) {
-            armPivotLeft.setPosition(0);
-            armPivotRight.setPosition(0);
-
-            wristPivot.setPosition(0);
-        } else if (gamepad2.y) {
-            armPivotLeft.setPosition(0.5);
-            armPivotRight.setPosition(0.5);
-
-            wristPivot.setPosition(0);
-        } else if (gamepad2.b) {
             armPivotLeft.setPosition(1);
             armPivotRight.setPosition(1);
 
             wristPivot.setPosition(0);
-        }
+        } else if (gamepad2.y) {
+            armPivotLeft.setPosition(0);
+            armPivotRight.setPosition(0);
 
-        if (gamepad2.left_trigger > 0) {
-            wristPivot.setPosition(0.0);
-        } else if (gamepad2.right_trigger > 0) {
-            wristPivot.setPosition(1.0);
+            wristPivot.setPosition(0);
+        } else if (gamepad2.b) {
+            armPivotLeft.setPosition(-1);
+            armPivotRight.setPosition(-1);
+
+            wristPivot.setPosition(0);
         }
 
         telemetry.addData("slideMotorLeft", slideMotorLeft.getCurrentPosition());
