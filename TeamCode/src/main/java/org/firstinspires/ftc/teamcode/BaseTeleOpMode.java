@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.telephony.euicc.DownloadableSubscription;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -34,6 +36,9 @@ public class BaseTeleOpMode extends OpMode {
     final int SLIDES_UP = 3300;
     final int SLIDES_DOWN = 0;
 
+    final int SLIDE_TILT_UP = 30;
+    final int SLIDE_TILT_DOWN = 100;
+
     final double ARM_TICKS_PER_DEGREE =
             28
                 * 5800 / 312
@@ -57,15 +62,20 @@ public class BaseTeleOpMode extends OpMode {
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
-
         slideTiltLeft = hardwareMap.get(DcMotor.class, "slideTiltLeft");
         slideTiltLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slideTiltLeft.setDirection(DcMotor.Direction.FORWARD);
+        slideTiltLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         slideTiltRight = hardwareMap.get(DcMotor.class, "slideTiltRight");
         slideTiltRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slideTiltRight.setDirection(DcMotor.Direction.REVERSE);
+        slideTiltRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        slideTiltLeft.setTargetPosition(SLIDE_TILT_UP);
+        slideTiltRight.setTargetPosition(SLIDE_TILT_UP);
+        slideTiltRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideTiltLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         slideMotorLeft = hardwareMap.get(DcMotor.class, "slideMotorLeft");
         slideMotorRight = hardwareMap.get(DcMotor.class, "slideMotorRight");
@@ -75,7 +85,6 @@ public class BaseTeleOpMode extends OpMode {
 
         slideMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slideMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
 
         armPivotLeft = hardwareMap.get(Servo.class, "armPivotLeft");
         armPivotLeft.setDirection(Servo.Direction.FORWARD);

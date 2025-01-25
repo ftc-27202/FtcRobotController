@@ -47,32 +47,24 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
 
         moveBase(axial, lateral, yaw, straightSpeed, strafeSpeed, turnSpeed);
 
-        slideTiltLeft.setPower(-gamepad1.right_stick_y);
-        slideTiltRight.setPower(-gamepad1.right_stick_y);
+        //slideTiltLeft.setPower(-gamepad2.right_stick_y);
+        //slideTiltRight.setPower(-gamepad2.right_stick_y);
 
-        if (gamepad1.x) {
-            slideTiltLeft.setTargetPosition(0);
-            slideTiltLeft.setPower(0.2);
+        if (gamepad1.dpad_up) {
+            slideTiltLeft.setTargetPosition((int) (SLIDE_TILT_UP * ARM_TICKS_PER_DEGREE));
+            slideTiltLeft.setPower(1.0);
             slideTiltLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            slideTiltRight.setTargetPosition(0);
-            slideTiltRight.setPower(0.2);
+            slideTiltRight.setTargetPosition((int) (SLIDE_TILT_UP * ARM_TICKS_PER_DEGREE));
+            slideTiltRight.setPower(1.0);
             slideTiltRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        } else if (gamepad1.y) {
-            slideTiltLeft.setTargetPosition(100);
-            slideTiltLeft.setPower(0.2);
+        } else if (gamepad1.dpad_down) {
+            slideTiltLeft.setTargetPosition((int) (SLIDE_TILT_DOWN * ARM_TICKS_PER_DEGREE));
+            slideTiltLeft.setPower(1.0);
             slideTiltLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            slideTiltRight.setTargetPosition(100);
-            slideTiltRight.setPower(0.2);
-            slideTiltRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        } else if (gamepad1.b) {
-            slideTiltLeft.setTargetPosition(500);
-            slideTiltLeft.setPower(0.2);
-            slideTiltLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            slideTiltRight.setTargetPosition(500);
-            slideTiltRight.setPower(0.2);
+            slideTiltRight.setTargetPosition((int) (SLIDE_TILT_DOWN * ARM_TICKS_PER_DEGREE));
+            slideTiltRight.setPower(1.0);
             slideTiltRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
@@ -101,20 +93,26 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
         }
 
         if (gamepad2.a) {
-            armPivotLeft.setPosition(1);
-            armPivotRight.setPosition(1);
-
-            wristPivot.setPosition(0);
-        } else if (gamepad2.y) {
             armPivotLeft.setPosition(0);
             armPivotRight.setPosition(0);
 
             wristPivot.setPosition(0);
-        } else if (gamepad2.b) {
-            armPivotLeft.setPosition(-1);
-            armPivotRight.setPosition(-1);
+        } else if (gamepad2.y) {
+            armPivotLeft.setPosition(0.5);
+            armPivotRight.setPosition(0.5);
 
             wristPivot.setPosition(0);
+        } else if (gamepad2.b) {
+            armPivotLeft.setPosition(1);
+            armPivotRight.setPosition(1);
+
+            wristPivot.setPosition(0);
+        }
+
+        if (gamepad2.left_trigger > 0) {
+            wristPivot.setPosition(0.0);
+        } else if (gamepad2.right_trigger > 0) {
+            wristPivot.setPosition(1.0);
         }
 
         telemetry.addData("slideMotorLeft", slideMotorLeft.getCurrentPosition());
