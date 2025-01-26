@@ -29,6 +29,10 @@ public class JeffBaseTeleOpMode extends OpMode {
     public CRServo intake;
     public Servo wrist;
     public Servo bucket;
+    public Servo elbow;
+    public Servo gripper;
+    public Servo flag;
+    public Servo headlight;
 
     final double ARM_TICKS_PER_DEGREE =
             28 // number of encoder ticks per rotation of the bare motor
@@ -38,19 +42,20 @@ public class JeffBaseTeleOpMode extends OpMode {
 
     final double ARM_COLLAPSED_INTO_ROBOT = 0;
 //    final double ARM_COLLECT = 225 * ARM_TICKS_PER_DEGREE;
-    final double ARM_COLLECT = 224 * ARM_TICKS_PER_DEGREE;
-    final double ARM_CLEAR_BARRIER = 200 * ARM_TICKS_PER_DEGREE;
+    final double ARM_COLLECT = 190.5 * ARM_TICKS_PER_DEGREE;
+    final double ARM_CLEAR_BARRIER = 175 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SPECIMEN = 160 * ARM_TICKS_PER_DEGREE;
     final double ARM_SCORE_SAMPLE_IN_LOW = 160 * ARM_TICKS_PER_DEGREE;
 //    final double ARM_DEPOSIT = 74 * ARM_TICKS_PER_DEGREE;
     final double ARM_DEPOSIT = 78 * ARM_TICKS_PER_DEGREE;
     final double ARM_WINCH_ROBOT = 10 * ARM_TICKS_PER_DEGREE;
-    double LLSPEED = .4;
+    double LLSPEED = .2;
     final int SLIDE_GROUND = 0;
     final int SLIDE_HALF = 1350;
     final int SLIDE_HIGH = 2650;
     final double SLIDE_STALL_TIME = 2.0;
-
+    final double FLAG_IN = 1;
+    final double FLAG_SCORE = .3;
     /* Variables to store the speed the intake servo should be set at to intake, and deposit game elements. */
     final double INTAKE_COLLECT = -1.0;
     final double INTAKE_OFF = 0.0;
@@ -64,14 +69,18 @@ public class JeffBaseTeleOpMode extends OpMode {
     final double WRIST_FOLDED_OUT = 0.67;
 
     final double FUDGE_FACTOR = 15 * ARM_TICKS_PER_DEGREE;
-
+    final double GRIPPER_COLLECT= 0;
+    final double GRIPPER_HOLD = .6;
+    final double ELBOW_DEPOSIT = 0.15;
+    final double ELBOW_COLLECT = 0.85;
     final double BUCKET_CATCH = 0.5;
     final double BUCKET_DUMP = 0.10;
+    final double BUCKET_INITIAL = .5;
 
 //    final double BUCKET_CATCH = 0.80;
 //    final double BUCKET_DUMP = 0.3;
     // Target tolerance for limelight, if target is within this value from centre of LL's cam, robot will not move
-    final double LLTargetTolerance = 2;
+    final double LLTargetTolerance = 1.5;
     /* Variables that are used to set the arm to a specific position */
 
     double armPosition = (int) ARM_COLLAPSED_INTO_ROBOT;
@@ -84,6 +93,8 @@ public class JeffBaseTeleOpMode extends OpMode {
         limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
         limelight.start(); // This tells Limelight to start looking!
         limelight.pipelineSwitch(0); // Switch to pipeline number 0
+        headlight = hardwareMap.get(Servo.class, "headlight");
+        headlight.setPosition(.5);
         leftSlide = hardwareMap.get(DcMotor.class, "leftSlide");
         leftSlide.setDirection(DcMotor.Direction.FORWARD);
         leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -117,9 +128,14 @@ public class JeffBaseTeleOpMode extends OpMode {
 
         wrist = hardwareMap.get(Servo.class, "wrist");
         wrist.setPosition(WRIST_FOLDED_IN);
-
+        elbow = hardwareMap.get(Servo.class, "elbow");
+        elbow.setPosition(ELBOW_DEPOSIT);
+        flag = hardwareMap.get(Servo.class, "flag");
+        flag.setPosition(FLAG_IN);
+        gripper = hardwareMap.get(Servo.class, "gripper");
+        gripper.setPosition(GRIPPER_COLLECT);
         bucket = hardwareMap.get(Servo.class, "bucket");
-        bucket.setPosition(BUCKET_CATCH);
+
     }
 
     @Override
@@ -138,6 +154,8 @@ public class JeffBaseTeleOpMode extends OpMode {
         telemetry.addData("intake: ", intake.getPower());
         telemetry.addData("wrist: ", wrist.getPosition());
         telemetry.addData("bucket: ", bucket.getPosition());
+        telemetry.addData("elbow", elbow.getPosition());
+        telemetry.addData("gripper", gripper.getPosition());
         telemetry.addData("Run Time", getRuntime());
         telemetry.update();
     }

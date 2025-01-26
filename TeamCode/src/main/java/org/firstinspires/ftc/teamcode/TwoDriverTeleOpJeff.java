@@ -84,16 +84,20 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
 
         if (gamepad1.a) {
             intake.setPower(INTAKE_COLLECT);
+            gripper.setPosition(GRIPPER_HOLD);
         } else if (gamepad1.x) {
             intake.setPower(INTAKE_OFF);
         } else if (gamepad1.b) {
             intake.setPower(INTAKE_DEPOSIT);
+            gripper.setPosition(GRIPPER_COLLECT);
         }
 
         if (gamepad1.right_bumper) {
             armPosition = ARM_COLLECT;
             wrist.setPosition(WRIST_FOLDED_OUT);
             intake.setPower(INTAKE_COLLECT);
+            elbow.setPosition(ELBOW_COLLECT);
+
         } else if (gamepad1.left_bumper) {
             wrist.setPosition(WRIST_FOLDED_OUT);
             armPosition = ARM_CLEAR_BARRIER;
@@ -109,6 +113,7 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
         } else if (gamepad1.dpad_up) {
             armPosition = ARM_DEPOSIT;
             wrist.setPosition(WRIST_FOLDED_IN);
+            elbow.setPosition(ELBOW_DEPOSIT);
         } else if (gamepad1.dpad_down) {
             armPosition = ARM_WINCH_ROBOT;
             intake.setPower(INTAKE_OFF);
@@ -172,15 +177,19 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             telemetry.addData("Arm Current Position", armMotor.getCurrentPosition());
             armPosition -= gamepad2.left_stick_y * ARM_TICKS_PER_DEGREE * 5.0;
         }
-
+        if (gamepad2.left_bumper){
+            flag.setPosition(FLAG_IN);
+        }else if (gamepad2.right_bumper){
+            flag.setPosition(FLAG_SCORE);
+        }
         //Limelight stuff starts here
         LLResult result = limelight.getLatestResult();
-        telemetry.addData("Pipeline:", result.getPipelineIndex());
+
         //gamepad2.dpad_right will target the robot to a seen sample (rn only yellow works)
         // if gamepad2.dpad_right is pressed and target is seen, identify direction and try to move towards the target until target is within tolerance
         if (gamepad2.dpad_right && (result != null && result.isValid()) ) {
             //gets results from LL
-            double tx = result.getTx(); // How far left or right the target is (degrees)
+            double tx = result.getTx(); // How far left or right the target is using robot coords (degrees)
             double ty = result.getTy(); // How far up or down the target is (degrees)
             double ta = result.getTa(); // How big the target looks (0%-100% of the image)
 
@@ -194,18 +203,33 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
             //right is positive I think?
             if (tx >= LLTargetTolerance ){
                 telemetry.addData("Move Right", tx);
-                leftFrontDrive.setPower(LLSPEED);
-                rightFrontDrive.setPower(-LLSPEED);
-                leftBackDrive.setPower(-LLSPEED);
-                rightBackDrive.setPower(LLSPEED);
+                leftFrontDrive.setPower(LLSPEED*1.5);
+                rightFrontDrive.setPower(-LLSPEED*1.5);
+                leftBackDrive.setPower(-LLSPEED*1.5);
+                rightBackDrive.setPower(LLSPEED*1.5);
             }else if((-1*LLTargetTolerance) >= tx){
                 telemetry.addData("Move Left", tx);
                 // Fill in with code to actually strafe the robot slowly to the left
-                leftFrontDrive.setPower(-LLSPEED);
+                leftFrontDrive.setPower(-LLSPEED*1.5);
+                rightFrontDrive.setPower(LLSPEED*1.5);
+                leftBackDrive.setPower(LLSPEED*1.5);
+                rightBackDrive.setPower(-LLSPEED*1.5);
+            }else if(ty >= LLTargetTolerance){
+                telemetry.addData("Move Forward", ty);
+                leftFrontDrive.setPower(LLSPEED);
                 rightFrontDrive.setPower(LLSPEED);
                 leftBackDrive.setPower(LLSPEED);
+                rightBackDrive.setPower(LLSPEED);
+
+
+            }else if((-1*LLTargetTolerance) >= ty){
+                telemetry.addData("Move Backward", ty);
+                leftFrontDrive.setPower(-LLSPEED);
+                rightFrontDrive.setPower(-LLSPEED);
+                leftBackDrive.setPower(-LLSPEED);
                 rightBackDrive.setPower(-LLSPEED);
-            }else if((Math.abs(tx)) < LLTargetTolerance ){
+
+            }else if((Math.abs(tx)) < LLTargetTolerance && (Math.abs(ty)) < LLTargetTolerance){
                 telemetry.addData("Target within tolerance, current offset:", tx);
                 leftFrontDrive.setPower(0);
                 rightFrontDrive.setPower(0);
@@ -215,8 +239,8 @@ public class TwoDriverTeleOpJeff extends JeffBaseTeleOpMode {
 
         } else if (result != null && result.isValid()) {
             // if LL detects target but right dpad not pressed, just display target in telemetry
-            double tx = result.getTx(); // How far left or right the target is (degrees)
-            double ty = result.getTy(); // How far up or down the target is (degrees)
+            double tx = result.getTy(); // How far left or right the target is (degrees)
+            double ty = result.getTx(); // How far up or down the target is (degrees)
             double ta = result.getTa(); // How big the target looks (0%-100% of the image)
 
             telemetry.addData("Target X", tx);
