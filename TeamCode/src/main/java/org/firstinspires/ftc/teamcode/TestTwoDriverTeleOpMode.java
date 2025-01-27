@@ -53,8 +53,9 @@ public class TestTwoDriverTeleOpMode extends BaseTeleOpMode {
         slideTiltRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         moveBase(axial, lateral, yaw, straightSpeed, strafeSpeed, turnSpeed);
 
-        slideTiltLeft.setPower(-gamepad1.right_stick_y);
-        slideTiltRight.setPower(-gamepad1.right_stick_y);
+        //slideTiltLeft.setPower(-gamepad1.right_stick_y);
+        //slideTiltRight.setPower(-gamepad1.right_stick_y);
+
         if (gamepad1.dpad_up){
             slideTiltTarget = 130*ARM_TICKS_PER_DEGREE;
         } else if (gamepad1.dpad_down) {
