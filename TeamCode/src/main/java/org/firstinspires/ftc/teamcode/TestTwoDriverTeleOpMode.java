@@ -33,7 +33,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-@TeleOp(name = "Testing Two Driver TeleOp", group = "Robot")
+@TeleOp(name = "Testing12 Two Driver TeleOp", group = "Robot")
 
 public class TestTwoDriverTeleOpMode extends BaseTeleOpMode {
 
@@ -47,21 +47,21 @@ public class TestTwoDriverTeleOpMode extends BaseTeleOpMode {
         double yaw = gamepad1.right_stick_x;
         slideTiltLeft.setTargetPosition((int)slideTiltTarget);
         slideTiltRight.setTargetPosition((int)slideTiltTarget);
-        slideTiltLeft.setPower(SLIDETILTPOWER);
-        slideTiltRight.setPower(SLIDETILTPOWER);
+        ((DcMotorEx) slideTiltLeft).setVelocity(700);
         slideTiltLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ((DcMotorEx) slideTiltRight).setVelocity(700);
         slideTiltRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         moveBase(axial, lateral, yaw, straightSpeed, strafeSpeed, turnSpeed);
 
-        slideTiltLeft.setPower(-gamepad1.right_stick_y);
-        slideTiltRight.setPower(-gamepad1.right_stick_y);
+        //slideTiltLeft.setPower(-gamepad1.right_stick_y);
+        //slideTiltRight.setPower(-gamepad1.right_stick_y);
         if (gamepad1.dpad_up){
-            slideTiltTarget = 130*ARM_TICKS_PER_DEGREE;
+            slideTiltTarget = 125*ARM_TICKS_PER_DEGREE;
         } else if (gamepad1.dpad_down) {
-            slideTiltTarget = 30*ARM_TICKS_PER_DEGREE;
+            slideTiltTarget = 25*ARM_TICKS_PER_DEGREE;
 
         }
-        if (gamepad1.x) {
+        /*if (gamepad1.x) {
             slideTiltLeft.setTargetPosition(0);
             slideTiltLeft.setPower(0.2);
             slideTiltLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -86,7 +86,7 @@ public class TestTwoDriverTeleOpMode extends BaseTeleOpMode {
             slideTiltRight.setPower(0.2);
             slideTiltRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
-
+        */
         telemetry.addData("Left Trigger", gamepad1.left_trigger);
         telemetry.addData("Right Trigger", gamepad1.right_trigger);
 
@@ -124,8 +124,6 @@ public class TestTwoDriverTeleOpMode extends BaseTeleOpMode {
         } else if (gamepad2.b) {
             armPivotLeft.setPosition(.9);
             armPivotRight.setPosition(.9);
-
-
         }
         if (gamepad2.dpad_left){
             wristPivot.setPosition(0);
@@ -135,11 +133,19 @@ public class TestTwoDriverTeleOpMode extends BaseTeleOpMode {
         if (gamepad2.left_bumper){
             clawPivot.setPosition(0);
         }else if (gamepad2.right_bumper){
-            clawPivot.setPosition(.9);
+            clawPivot.setPosition(1);
         }
+
+        if (gamepad1.a){
+            claw.setPosition(0);
+        }else if (gamepad1.b){
+            claw.setPosition(0.5);
+        }
+        telemetry.addData("ClawPos",claw.getPosition());
+        telemetry.addData("ClawPivotPos", clawPivot.getPosition());
         telemetry.addData("slideMotorLeft", slideMotorLeft.getCurrentPosition());
         telemetry.addData("slideMotorRight", slideMotorRight.getCurrentPosition());
-
+        telemetry.addData("Trigger", gamepad2.left_trigger);
 
         super.loop();
     }

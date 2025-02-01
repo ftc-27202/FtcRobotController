@@ -53,27 +53,25 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
         if (gamepad1.x) {
             slideTiltLeft.setTargetPosition(0);
             slideTiltLeft.setPower(0.2);
-            slideTiltLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             slideTiltRight.setTargetPosition(0);
             slideTiltRight.setPower(0.2);
-            slideTiltRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         } else if (gamepad1.y) {
             slideTiltLeft.setTargetPosition(100);
             slideTiltLeft.setPower(0.2);
-            slideTiltLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
             slideTiltRight.setTargetPosition(100);
             slideTiltRight.setPower(0.2);
-            slideTiltRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         } else if (gamepad1.b) {
             slideTiltLeft.setTargetPosition(500);
             slideTiltLeft.setPower(0.2);
-            slideTiltLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
             slideTiltRight.setTargetPosition(500);
             slideTiltRight.setPower(0.2);
-            slideTiltRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
         telemetry.addData("Left Trigger", gamepad1.left_trigger);

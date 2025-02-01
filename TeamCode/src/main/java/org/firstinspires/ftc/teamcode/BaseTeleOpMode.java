@@ -26,8 +26,9 @@ public class BaseTeleOpMode extends OpMode {
     public Servo armPivotRight;
     public Servo wristPivot;
     public Servo clawPivot;
+    public Servo claw;
     public double slideTiltTarget = 0;
-    public final double SLIDETILTPOWER = .4;
+    public final double SLIDETILTPOWER = .5;
     public DcMotor slideMotorLeft;
     public DcMotor slideMotorRight;
 
@@ -61,10 +62,16 @@ public class BaseTeleOpMode extends OpMode {
         slideTiltLeft = hardwareMap.get(DcMotor.class, "slideTiltLeft");
         slideTiltLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slideTiltLeft.setDirection(DcMotor.Direction.FORWARD);
+        slideTiltLeft.setTargetPosition(0);
+        slideTiltLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideTiltLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         slideTiltRight = hardwareMap.get(DcMotor.class, "slideTiltRight");
         slideTiltRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slideTiltRight.setDirection(DcMotor.Direction.REVERSE);
+        slideTiltRight.setTargetPosition(0);
+        slideTiltRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideTiltRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
         slideMotorLeft = hardwareMap.get(DcMotor.class, "slideMotorLeft");
@@ -72,6 +79,15 @@ public class BaseTeleOpMode extends OpMode {
 
         slideMotorLeft.setDirection(DcMotor.Direction.REVERSE);
         slideMotorRight.setDirection(DcMotor.Direction.FORWARD);
+
+        /*slideTiltLeft.setTargetPosition(5);
+        slideTiltRight.setTargetPosition(5);
+        slideTiltLeft.setPower(SLIDETILTPOWER);
+        slideTiltRight.setPower(SLIDETILTPOWER);
+        slideTiltLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slideTiltRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slideTiltLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideTiltRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);*/
 
         slideMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slideMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -81,10 +97,11 @@ public class BaseTeleOpMode extends OpMode {
         armPivotLeft.setDirection(Servo.Direction.FORWARD);
 
         armPivotRight = hardwareMap.get(Servo.class, "armPivotRight");
-        armPivotLeft.setDirection(Servo.Direction.REVERSE);
+        armPivotRight.setDirection(Servo.Direction.REVERSE);
 
         clawPivot = hardwareMap.get(Servo.class, "clawPivot");
         wristPivot = hardwareMap.get(Servo.class, "wristPivot");
+        claw = hardwareMap.get(Servo.class, "claw");
     }
 
     public void moveBase(double axial, double lateral, double yaw, double straightSpeed, double strafeSpeed, double turnSpeed) {
