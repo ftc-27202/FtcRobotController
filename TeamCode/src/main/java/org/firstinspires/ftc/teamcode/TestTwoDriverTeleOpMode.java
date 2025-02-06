@@ -150,3 +150,11 @@ public class TestTwoDriverTeleOpMode extends BaseTeleOpMode {
         super.loop();
     }
 }
+/*
+* if (isGoingDown && slideTiltLeft.getCurrentPosition() > (100.0 * ARM_TICKS_PER_DEGREE)) {
+            slideTiltLeft.setPower(0);
+            slideTiltRight.setPower(0);
+        } else {
+            slideTiltLeft.setPower(SLIDE_TILT_POWER);
+            slideTiltRight.setPower(SLIDE_TILT_POWER);
+        }*/

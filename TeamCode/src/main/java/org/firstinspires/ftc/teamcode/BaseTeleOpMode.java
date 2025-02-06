@@ -28,18 +28,20 @@ public class BaseTeleOpMode extends OpMode {
     public Servo clawPivot;
     public Servo claw;
     public double slideTiltTarget = 0;
-    public final double SLIDETILTPOWER = .5;
+    public double armPivotTarget;
+    public final double SLIDE_TILT_POWER = 0.3;
+    public boolean slidesDown = false;
     public DcMotor slideMotorLeft;
     public DcMotor slideMotorRight;
 
-    final int SLIDES_UP = 3300;
+    final int SLIDES_UP = 2600;
     final int SLIDES_DOWN = 0;
 
     final double ARM_TICKS_PER_DEGREE =
             28
-                * 5800 / 312
-                * 100 / 30
-                * 1/360;
+                    * 5800 / 312
+                    * 100 / 30
+                    * 1/360;
 
 
     public void init() {
@@ -79,6 +81,9 @@ public class BaseTeleOpMode extends OpMode {
 
         slideMotorLeft.setDirection(DcMotor.Direction.REVERSE);
         slideMotorRight.setDirection(DcMotor.Direction.FORWARD);
+
+        slideMotorLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slideMotorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         /*slideTiltLeft.setTargetPosition(5);
         slideTiltRight.setTargetPosition(5);

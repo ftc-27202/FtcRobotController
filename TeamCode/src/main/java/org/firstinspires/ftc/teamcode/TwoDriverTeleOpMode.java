@@ -1,3 +1,4 @@
+
 /*   MIT License
  *   Copyright (c) [2024] [Base 10 Assets, LLC]
  *
@@ -47,10 +48,15 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
 
         moveBase(axial, lateral, yaw, straightSpeed, strafeSpeed, turnSpeed);
 
-        slideTiltLeft.setPower(-gamepad1.right_stick_y);
-        slideTiltRight.setPower(-gamepad1.right_stick_y);
+        //slideTiltLeft.setPower(-gamepad1.right_stick_y);
+        //slideTiltRight.setPower(-gamepad1.right_stick_y);
+        if (gamepad1.dpad_up){
+            slideTiltTarget = 125 * ARM_TICKS_PER_DEGREE;
+        } else if (gamepad1.dpad_down) {
+            slideTiltTarget = 25 * ARM_TICKS_PER_DEGREE;
 
-        if (gamepad1.x) {
+        }
+        /*if (gamepad1.x) {
             slideTiltLeft.setTargetPosition(0);
             slideTiltLeft.setPower(0.2);
 
@@ -73,51 +79,85 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
             slideTiltRight.setTargetPosition(500);
             slideTiltRight.setPower(0.2);
         }
-
+        */
         telemetry.addData("Left Trigger", gamepad1.left_trigger);
         telemetry.addData("Right Trigger", gamepad1.right_trigger);
 
-        slideMotorLeft.setPower(-gamepad2.left_stick_y);
-        slideMotorRight.setPower(-gamepad2.left_stick_y);
+        //slideMotorLeft.setPower(-gamepad2.left_stick_y);
+        //slideMotorRight.setPower(-gamepad2.left_stick_y);
 
         if (gamepad2.dpad_up) {
             slideMotorLeft.setTargetPosition(SLIDES_UP);
-            slideMotorLeft.setPower(1.0);
+            slideMotorLeft.setPower(0.5);
             slideMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             slideMotorRight.setTargetPosition(SLIDES_UP);
-            slideMotorRight.setPower(1.0);
+            slideMotorRight.setPower(0.5);
             slideMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         } else if (gamepad2.dpad_down) {
             slideMotorLeft.setTargetPosition(SLIDES_DOWN);
-            slideMotorLeft.setPower(1.0);
+            slideMotorLeft.setPower(0.5);
             slideMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             slideMotorRight.setTargetPosition(SLIDES_DOWN);
-            slideMotorRight.setPower(1.0);
+            slideMotorRight.setPower(0.5);
             slideMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
 
         if (gamepad2.a) {
-            armPivotLeft.setPosition(1);
-            armPivotRight.setPosition(1);
-
-            wristPivot.setPosition(0);
-        } else if (gamepad2.y) {
-            armPivotLeft.setPosition(0);
-            armPivotRight.setPosition(0);
-
-            wristPivot.setPosition(0);
+            armPivotLeft.setPosition(.7);
+            armPivotRight.setPosition(.7);
+        } else if (gamepad2.x) {
+            if (gamepad2.left_trigger > 0) {
+                armPivotLeft.setPosition(0.47);
+                armPivotRight.setPosition(0.47);
+            } else {
+                armPivotLeft.setPosition(0.4);
+                armPivotRight.setPosition(0.4);
+            }
         } else if (gamepad2.b) {
-            armPivotLeft.setPosition(-1);
-            armPivotRight.setPosition(-1);
-
+            armPivotLeft.setPosition(.9);
+            armPivotRight.setPosition(.9);
+        }
+        if (gamepad2.dpad_left){
             wristPivot.setPosition(0);
+        } else if (gamepad2.dpad_right){
+            wristPivot.setPosition(1);
+        }
+        if (gamepad2.left_bumper){
+            clawPivot.setPosition(0);
+        } else if (gamepad2.right_bumper){
+            clawPivot.setPosition(1);
         }
 
+        if (gamepad1.a){
+            claw.setPosition(0);
+        } else if (gamepad1.b){
+            claw.setPosition(0.5);
+        }
+        
+        telemetry.addData("ClawPos",claw.getPosition());
+        telemetry.addData("ClawPivotPos", clawPivot.getPosition());
         telemetry.addData("slideMotorLeft", slideMotorLeft.getCurrentPosition());
         telemetry.addData("slideMotorRight", slideMotorRight.getCurrentPosition());
+        telemetry.addData("Trigger", gamepad2.left_trigger);
+        telemetry.addData("SlideTiltTarget", slideTiltTarget);
 
+        slideTiltLeft.setTargetPosition((int)slideTiltTarget);
+        slideTiltRight.setTargetPosition((int)slideTiltTarget);
+
+        if (slideTiltTarget == 125 * ARM_TICKS_PER_DEGREE && slideTiltLeft.getCurrentPosition() > 120 * ARM_TICKS_PER_DEGREE) {
+            slideTiltLeft.setPower(0);
+            slideTiltRight.setPower(0);
+        } else {
+            slideTiltLeft.setPower(SLIDE_TILT_POWER);
+            slideTiltRight.setPower(SLIDE_TILT_POWER);
+            ((DcMotorEx) slideTiltLeft).setVelocity(500);
+            ((DcMotorEx) slideTiltRight).setVelocity(500);
+        }
+
+        slideTiltLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slideTiltRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         super.loop();
     }
