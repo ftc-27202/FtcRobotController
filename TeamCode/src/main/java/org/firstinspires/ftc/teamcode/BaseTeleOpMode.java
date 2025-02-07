@@ -27,14 +27,16 @@ public class BaseTeleOpMode extends OpMode {
     public Servo wristPivot;
     public Servo clawPivot;
     public Servo claw;
+    public int slideTarget = 0;
     public double slideTiltTarget = 0;
-    public double armPivotTarget;
+    public double armPivotTarget = 1.0;
     public final double SLIDE_TILT_POWER = 0.3;
-    public boolean slidesDown = false;
+    public final double CLAW_CLOSED = 0.4;
+    public final double CLAW_OPEN = 0.0;
     public DcMotor slideMotorLeft;
     public DcMotor slideMotorRight;
 
-    final int SLIDES_UP = 2600;
+    final int SLIDES_UP = 2950;
     final int SLIDES_DOWN = 0;
 
     final double ARM_TICKS_PER_DEGREE =
@@ -105,6 +107,8 @@ public class BaseTeleOpMode extends OpMode {
         armPivotRight.setDirection(Servo.Direction.REVERSE);
 
         clawPivot = hardwareMap.get(Servo.class, "clawPivot");
+        clawPivot.setPosition(0);
+
         wristPivot = hardwareMap.get(Servo.class, "wristPivot");
         claw = hardwareMap.get(Servo.class, "claw");
     }
