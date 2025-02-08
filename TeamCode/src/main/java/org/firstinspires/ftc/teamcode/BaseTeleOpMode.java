@@ -31,12 +31,12 @@ public class BaseTeleOpMode extends OpMode {
     public double slideTiltTarget = 0;
     public double armPivotTarget = 1.0;
     public final double SLIDE_TILT_POWER = 0.3;
-    public final double CLAW_CLOSED = 0.4;
-    public final double CLAW_OPEN = 0.0;
+    public final double CLAW_OPEN = 0.4;
+    public final double CLAW_CLOSED = 0.05;
     public DcMotor slideMotorLeft;
     public DcMotor slideMotorRight;
 
-    final int SLIDES_UP = 2950;
+    final int SLIDES_UP = 3000;
     final int SLIDES_DOWN = 0;
 
     final double ARM_TICKS_PER_DEGREE =

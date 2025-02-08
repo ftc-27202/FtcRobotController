@@ -216,29 +216,30 @@ public class bodhiMachineVision extends LinearOpMode {
 
         @Override
         public Mat processFrame(Mat input) {
-            //Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV, 4);
-            hsv = input;
+            Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV, 4);
             
             //red
             Core.inRange(hsv, new Scalar(160, 15, 170), new Scalar(180, 255, 255), colorR0);
-            Core.inRange(hsv, new Scalar(0, 15, 170), new Scalar(15, 255, 255), colorR1);
-
+            Core.inRange(hsv, new Scalar(0, 15, 170), new Scalar(19, 255, 255), colorR1);
             Core.add(colorR0, colorR1, colorR);
+
             //yellow
-            Core.inRange(hsv, new Scalar(20, 20, 170), new Scalar(40, 255, 255), colorG);
+            Core.inRange(hsv, new Scalar(20, 80, 170), new Scalar(40, 255, 255), colorG);
+
             //blue
-            Core.inRange(hsv, new Scalar(100, 75, 120), new Scalar(140, 255, 255), colorB);
+            Core.inRange(hsv, new Scalar(90, 25, 100), new Scalar(140, 255, 255), colorB);
 
-            result = input;
+             //result = input;
 
-            double angleR = houghPolar(colorR, new Scalar(255, 0, 0));
-            double angleG = houghPolar(colorG, new Scalar(255, 255, 0));
-            double angleB = houghPolar(colorB, new Scalar(0, 0, 255));
+            //double angleR = houghPolar(colorR, new Scalar(255, 0, 0));
+            //double angleG = houghPolar(colorG, new Scalar(255, 255, 0));
+            //double angleB = houghPolar(colorB, new Scalar(0, 0, 255));
 
-            angles = angleR;
+            //angles = angleR;
 
-            //List<Mat> listMat = Arrays.asList(colorR, colorG, colorB);
-            //Core.merge(listMat, result);
+            List<Mat> listMat = Arrays.asList(colorR, colorG, colorB);
+            Core.merge(listMat, result);
+            //result = colorR;
             return result;
         }
 

@@ -50,10 +50,10 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
 
         //slideTiltLeft.setPower(-gamepad1.right_stick_y);
         //slideTiltRight.setPower(-gamepad1.right_stick_y);
-        if (gamepad1.dpad_up){
-            slideTiltTarget = 125 * ARM_TICKS_PER_DEGREE;
-        } else if (gamepad1.dpad_down) {
-            slideTiltTarget = 25 * ARM_TICKS_PER_DEGREE;
+        if (gamepad1.dpad_down && slideMotorLeft.getCurrentPosition() < SLIDES_DOWN + 200) {
+            slideTiltTarget = 100 * ARM_TICKS_PER_DEGREE;
+        } else if (gamepad1.dpad_up && slideMotorLeft.getCurrentPosition() < SLIDES_DOWN + 200) {
+            slideTiltTarget = 1 * ARM_TICKS_PER_DEGREE;
 
         }
         /*if (gamepad1.x) {
@@ -115,9 +115,9 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
         }
 
         if (gamepad1.a){
-            claw.setPosition(CLAW_OPEN);
-        } else if (gamepad1.b){
             claw.setPosition(CLAW_CLOSED);
+        } else if (gamepad1.b){
+            claw.setPosition(CLAW_OPEN);
         }
 
         telemetry.addData("ClawPos",claw.getPosition());
@@ -130,7 +130,7 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
         slideTiltLeft.setTargetPosition((int)slideTiltTarget);
         slideTiltRight.setTargetPosition((int)slideTiltTarget);
 
-        if (slideTiltTarget == 125 * ARM_TICKS_PER_DEGREE && slideTiltLeft.getCurrentPosition() > 120 * ARM_TICKS_PER_DEGREE) {
+        if (slideTiltTarget == 100 * ARM_TICKS_PER_DEGREE && slideTiltLeft.getCurrentPosition() > 100 * ARM_TICKS_PER_DEGREE) {
             slideTiltLeft.setPower(0);
             slideTiltRight.setPower(0);
         } else {
@@ -155,8 +155,8 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
             slideMotorRight.setPower(1.0);
         }*/
 
-        if (gamepad1.left_stick_y != 0) {
-            slideTarget = Math.min(Math.max(slideTarget - (int)(gamepad1.left_stick_y * 10), SLIDES_DOWN), SLIDES_UP);
+        if (gamepad2.left_stick_y != 0) {
+            slideTarget = Math.min(Math.max(slideTarget - (int)(gamepad2.left_stick_y * 50), SLIDES_DOWN), 750);
         }
 
         slideMotorLeft.setTargetPosition(slideTarget);
@@ -168,15 +168,12 @@ public class TwoDriverTeleOpMode extends BaseTeleOpMode {
         slideMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         if (gamepad2.left_trigger > 0) {
-            armPivotLeft.setPosition(armPivotTarget + 0.07);
-            armPivotRight.setPosition(armPivotTarget + 0.07);
-            claw.setPosition(CLAW_OPEN);
+            armPivotLeft.setPosition(armPivotTarget + 0.09);
+            armPivotRight.setPosition(armPivotTarget + 0.09);
         } else {
             armPivotLeft.setPosition(armPivotTarget);
             armPivotRight.setPosition(armPivotTarget);
         }
-
-
 
         super.loop();
     }
